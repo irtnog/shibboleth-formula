@@ -1,0 +1,95 @@
+shibboleth:
+  idp:
+    hostname: login.example.com
+    entity_id: https://login.example.com/idp/shibboleth
+    scope: example.com
+    keystore_password: 'P@55w0rd!!'
+    sealer_password: 'Cis4c00kie'
+    backchannel_certificate: |
+      -----BEGIN CERTIFICATE-----
+      XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
+      aXoemLSeo682V7rmZsC3FXwxDH5H9JhP42AdaMrQLKYviSzHiyHsyiacTgxxqjc1
+      sQVQtbxq7vK5opjm66EUqqSnR4ZQOW6NG0uAonoAETaak1yM6ybF7kKvi4nIR0Xg
+      zojBbXLAoOFfo6VZluJ2fq207DIzsK6+D9HY2VKst3xJ+k04j2H0dWAVBhm9og13
+      L3vK8HRxaN+19ATrLoo1EUBEcLSOgi2O8dsaIETC+xGCbeVb2Kixd157VWodt9vR
+      KBJTigpD0fDKiK4JZ4g6m2FlQDsV70TfBbsmV9AmGkTT6D+Oz0joIOBt9gcmP0oY
+      88vCt7FBjBVnb/SfCHLV1WaWHiYyC6USXqeoOBhsMedmkexYABuotBFlQoOm/AFd
+      FhrPh6jjlW1r0jzHmvXOoQlXRAbhK58VroTxTcqgRhMohxbyAWAjRmW648RkNWC+
+      GRSS3JxgfO1QOFpp9sKApZZ0ti0fU//32dvCO1okD3rnP0qpNqgOFXCkMFzVubCv
+      CEGVAIGa/5weMMeidWFcLC0HYREm3DM62vtI7fcQQwj0iXZi7/WQyUNPG+K57yPM
+      k+VJRHuE/dxSubA7QyDFKS9udb9Qf2FK1puuqtr4QfY=
+      -----END CERTIFICATE-----
+    backchannel_key: |
+      -----BEGIN PRIVATE KEY-----
+      ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
+      7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
+      kJ03hhgdV3zJ1dhnq3p6LDiOw4HqcPkx2LzIPWKQgDGeIzzWPJnDVgD3DfcnuTVs
+      zguDOFDpFdiFytQwWWoqHmn1wbrj1p0SHZoVfnDp5HSQ6WZ7kLLTySrYJ920ku8A
+      DUlwy287Lwh/qO2hX80lXnqZYqPHXryPqxJK4PtERCCwCJdGRvrFi3CpAn99DhPz
+      d4tFBjQu19Z0/rUELPEQuCfbCtscpJZ2q/lir5xjj44yJtiky8Go73uK8E/WslEZ
+      kESPaq6LE/4MvlE5pquHkBgZA0u9VigNp+4D0RVbcWhmM5b+ZR2HRszsH+dfjA9f
+      8ums30Dxf6TGrhdQLW39Be6fIz0pisVC+hARW/6RmLvQRCmgZTkSZcjQNBICkbLe
+      v44pQ1XpbXGP8WpnGKKSyYTyXEV6GwFOzF5uWicUgpzpCJMk1RjXAyiybcg0o5fS
+      2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
+      BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
+      -----END PRIVATE KEY-----
+    encryption_certificate: |
+      -----BEGIN CERTIFICATE-----
+      XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
+      aXoemLSeo682V7rmZsC3FXwxDH5H9JhP42AdaMrQLKYviSzHiyHsyiacTgxxqjc1
+      sQVQtbxq7vK5opjm66EUqqSnR4ZQOW6NG0uAonoAETaak1yM6ybF7kKvi4nIR0Xg
+      zojBbXLAoOFfo6VZluJ2fq207DIzsK6+D9HY2VKst3xJ+k04j2H0dWAVBhm9og13
+      L3vK8HRxaN+19ATrLoo1EUBEcLSOgi2O8dsaIETC+xGCbeVb2Kixd157VWodt9vR
+      KBJTigpD0fDKiK4JZ4g6m2FlQDsV70TfBbsmV9AmGkTT6D+Oz0joIOBt9gcmP0oY
+      88vCt7FBjBVnb/SfCHLV1WaWHiYyC6USXqeoOBhsMedmkexYABuotBFlQoOm/AFd
+      FhrPh6jjlW1r0jzHmvXOoQlXRAbhK58VroTxTcqgRhMohxbyAWAjRmW648RkNWC+
+      GRSS3JxgfO1QOFpp9sKApZZ0ti0fU//32dvCO1okD3rnP0qpNqgOFXCkMFzVubCv
+      CEGVAIGa/5weMMeidWFcLC0HYREm3DM62vtI7fcQQwj0iXZi7/WQyUNPG+K57yPM
+      k+VJRHuE/dxSubA7QyDFKS9udb9Qf2FK1puuqtr4QfY=
+      -----END CERTIFICATE-----
+    encryption_key: |
+      -----BEGIN PRIVATE KEY-----
+      ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
+      7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
+      kJ03hhgdV3zJ1dhnq3p6LDiOw4HqcPkx2LzIPWKQgDGeIzzWPJnDVgD3DfcnuTVs
+      zguDOFDpFdiFytQwWWoqHmn1wbrj1p0SHZoVfnDp5HSQ6WZ7kLLTySrYJ920ku8A
+      DUlwy287Lwh/qO2hX80lXnqZYqPHXryPqxJK4PtERCCwCJdGRvrFi3CpAn99DhPz
+      d4tFBjQu19Z0/rUELPEQuCfbCtscpJZ2q/lir5xjj44yJtiky8Go73uK8E/WslEZ
+      kESPaq6LE/4MvlE5pquHkBgZA0u9VigNp+4D0RVbcWhmM5b+ZR2HRszsH+dfjA9f
+      8ums30Dxf6TGrhdQLW39Be6fIz0pisVC+hARW/6RmLvQRCmgZTkSZcjQNBICkbLe
+      v44pQ1XpbXGP8WpnGKKSyYTyXEV6GwFOzF5uWicUgpzpCJMk1RjXAyiybcg0o5fS
+      2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
+      BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
+      -----END PRIVATE KEY-----
+    signing_certificate: |
+      -----BEGIN CERTIFICATE-----
+      XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
+      aXoemLSeo682V7rmZsC3FXwxDH5H9JhP42AdaMrQLKYviSzHiyHsyiacTgxxqjc1
+      sQVQtbxq7vK5opjm66EUqqSnR4ZQOW6NG0uAonoAETaak1yM6ybF7kKvi4nIR0Xg
+      zojBbXLAoOFfo6VZluJ2fq207DIzsK6+D9HY2VKst3xJ+k04j2H0dWAVBhm9og13
+      L3vK8HRxaN+19ATrLoo1EUBEcLSOgi2O8dsaIETC+xGCbeVb2Kixd157VWodt9vR
+      KBJTigpD0fDKiK4JZ4g6m2FlQDsV70TfBbsmV9AmGkTT6D+Oz0joIOBt9gcmP0oY
+      88vCt7FBjBVnb/SfCHLV1WaWHiYyC6USXqeoOBhsMedmkexYABuotBFlQoOm/AFd
+      FhrPh6jjlW1r0jzHmvXOoQlXRAbhK58VroTxTcqgRhMohxbyAWAjRmW648RkNWC+
+      GRSS3JxgfO1QOFpp9sKApZZ0ti0fU//32dvCO1okD3rnP0qpNqgOFXCkMFzVubCv
+      CEGVAIGa/5weMMeidWFcLC0HYREm3DM62vtI7fcQQwj0iXZi7/WQyUNPG+K57yPM
+      k+VJRHuE/dxSubA7QyDFKS9udb9Qf2FK1puuqtr4QfY=
+      -----END CERTIFICATE-----
+    signing_key: |
+      -----BEGIN PRIVATE KEY-----
+      ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
+      7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
+      kJ03hhgdV3zJ1dhnq3p6LDiOw4HqcPkx2LzIPWKQgDGeIzzWPJnDVgD3DfcnuTVs
+      zguDOFDpFdiFytQwWWoqHmn1wbrj1p0SHZoVfnDp5HSQ6WZ7kLLTySrYJ920ku8A
+      DUlwy287Lwh/qO2hX80lXnqZYqPHXryPqxJK4PtERCCwCJdGRvrFi3CpAn99DhPz
+      d4tFBjQu19Z0/rUELPEQuCfbCtscpJZ2q/lir5xjj44yJtiky8Go73uK8E/WslEZ
+      kESPaq6LE/4MvlE5pquHkBgZA0u9VigNp+4D0RVbcWhmM5b+ZR2HRszsH+dfjA9f
+      8ums30Dxf6TGrhdQLW39Be6fIz0pisVC+hARW/6RmLvQRCmgZTkSZcjQNBICkbLe
+      v44pQ1XpbXGP8WpnGKKSyYTyXEV6GwFOzF5uWicUgpzpCJMk1RjXAyiybcg0o5fS
+      2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
+      BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
+      -----END PRIVATE KEY-----
+
+#### Local variables:
+#### mode: yaml
+#### End:
