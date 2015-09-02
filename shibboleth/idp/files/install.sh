@@ -6,8 +6,8 @@ JAVA_HOME=$(java -XshowSettings:java.home -version 2>&1 \
 		| awk '{print $3}')
 export JAVA_HOME
 
-{{ idp_settings.prefix }}/dist/shibboleth-identity-provider-{{ idp_settings.version }}/bin/install.sh \
-    -Didp.src.dir={{ idp_settings.prefix }}/dist/shibboleth-identity-provider-{{ idp_settings.version }} \
+{{ idp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ idp_settings.version }}/bin/install.sh \
+    -Didp.src.dir={{ idp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ idp_settings.version }} \
     -Didp.target.dir={{ idp_settings.prefix }} \
     -Didp.sealer.password={{ idp_settings.sealer_password }} \
     -Didp.host.name={{ idp_settings.hostname }} \

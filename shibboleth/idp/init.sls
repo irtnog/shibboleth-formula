@@ -26,10 +26,10 @@ shibboleth_idp_prefix:
     - user: {{ idp_settings.user }}
     - group: {{ idp_settings.group }}
 
-shibboleth_idp_dist:
+shibboleth_idp_vendor:
   archive.extracted:
-    - if_missing: {{ idp_settings.prefix }}/dist/shibboleth-identity-provider-{{ idp_settings.version }}/
-    - name: {{ idp_settings.prefix }}/dist
+    - if_missing: {{ idp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ idp_settings.version }}/
+    - name: {{ idp_settings.prefix }}/vendor
     - source: {{ idp_settings.master_site}}/{{ idp_settings.version }}/shibboleth-identity-provider-{{ idp_settings.version }}{{ idp_settings.suffix }}
     - source_hash: {{ idp_settings.source_hash[idp_settings.suffix] }}
     - archive_format: {{ "tar" if idp_settings.suffix == ".tar.gz" else "zip" }}
@@ -49,7 +49,7 @@ shibboleth_idp_install:
         - pkg: shibboleth_idp_prerequisites
     - watch:
         - file: shibboleth_idp_prefix
-        - archive: shibboleth_idp_dist
+        - archive: shibboleth_idp_vendor
 
 shibboleth_idp_update_sealer_key:
   cron.present:
