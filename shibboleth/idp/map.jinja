@@ -4,6 +4,7 @@
     'FreeBSD': {
       'packages': [
         'openjdk8',
+        'bash',
       ],
     },
   }, merge=salt['pillar.get']('shibboleth:idp:lookup')) %}

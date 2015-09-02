@@ -4,6 +4,18 @@ shibboleth_idp_prerequisites:
   pkg.installed:
     - pkgs: {{ idp_settings.packages|yaml }}
 
+{% if grains['os_family'] == 'FreeBSD' %}
+shibboleth_idp_bash_symlink:
+  file.symlink:
+    - name: /bin/bash
+    - target: /usr/local/bin/bash
+    - require:
+        - pkg: shibboleth_idp_prerequisites
+    - require_in:
+        - cmd: shibboleth_idp_install
+        - cron: shibboleth_idp_update_sealer_key
+{% endif %}
+
 shibboleth_idp_prefix:
   file.recurse:
     - name: {{ idp_settings.prefix }}
@@ -41,7 +53,7 @@ shibboleth_idp_install:
 
 shibboleth_idp_update_sealer_key:
   cron.present:
-    - name: {{ idp_settings.prefix }}/bin/update-sealer-key
+    - name: /bin/sh {{ idp_settings.prefix }}/bin/update-sealer-key.sh
     - user: {{ idp_settings.user }}
     - minute: random
     - hour: random
