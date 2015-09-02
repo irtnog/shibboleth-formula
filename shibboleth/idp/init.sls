@@ -36,7 +36,7 @@ shibboleth_idp_install:
         - pkg: shibboleth_idp_prerequisites
     - watch:
         - file: shibboleth_idp_prefix
-        - file: shibboleth_idp_dist
+        - archive: shibboleth_idp_dist
 
 shibboleth_idp_update_sealer_key:
   cron.present:
