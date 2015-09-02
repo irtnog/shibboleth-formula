@@ -22,6 +22,7 @@ shibboleth_idp_dist:
     - source_hash: {{ idp_settings.source_hash[idp_settings.suffix] }}
     - archive_format: {{ "tar" if idp_settings.suffix == ".tar.gz" else "zip" }}
     - archive_user: {{ idp_settings.user }}
+    - tar_options: v            # force use of tar(1) instead of tarfile.py
     - keep: yes
     - require:
         - file: shibboleth_idp_prefix
