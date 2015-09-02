@@ -1,0 +1,13 @@
+{% import_yaml "shibboleth/idp/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'FreeBSD': {
+      'packages': [
+        'openjdk8',
+      ],
+    },
+  }, merge=salt['pillar.get']('shibboleth:idp:lookup')) %}
+
+{% do default_settings.shibboleth.idp.update(os_family_map) %}
+
+{% set idp_settings = salt['pillar.get']('shibboleth:idp', default=default_settings.shibboleth.idp, merge=True) %}
