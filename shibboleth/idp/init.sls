@@ -17,7 +17,7 @@ shibboleth_idp_prefix:
 shibboleth_idp_dist:
   archive.extracted:
     - if_missing: {{ idp_settings.prefix }}/dist/shibboleth-identity-provider-{{ idp_settings.version }}/
-    - name: {{ idp_settings.prefix }}
+    - name: {{ idp_settings.prefix }}/dist
     - source: {{ idp_settings.master_site}}/{{ idp_settings.version }}/shibboleth-identity-provider-{{ idp_settings.version }}{{ idp_settings.suffix }}
     - source_hash: {{ idp_settings.source_hash[idp_settings.suffix] }}
     - archive_format: {{ "tar" if idp_settings.suffix == ".tar.gz" else "zip" }}
