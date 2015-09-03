@@ -25,6 +25,8 @@ shibboleth_idp_prefix:
     - exclude_pat: .gitignore
     - user: {{ idp_settings.user }}
     - group: {{ idp_settings.group }}
+    - dir_mode: 750
+    - file_mode: 640
 
 shibboleth_idp_vendor:
   archive.extracted:
