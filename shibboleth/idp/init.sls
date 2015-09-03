@@ -53,6 +53,22 @@ shibboleth_idp_install:
         - file: shibboleth_idp_prefix
         - archive: shibboleth_idp_vendor
 
+## In order to have the installation script generate any missing
+## configuration files, it is necessary to also let it generate its
+## own keying material.  This state overwrites that keying material
+## with the official key pairs stored in Pillar.
+shibboleth_idp_keymat:
+  file.recurse:
+    - name: {{ idp_settings.prefix }}
+    - source: salt://shibboleth/idp/files/keymat
+    - template: jinja
+    - include_empty: yes
+    - exclude_pat: .gitignore
+    - user: {{ idp_settings.user }}
+    - group: {{ idp_settings.group }}
+    - dir_mode: 750
+    - file_mode: 640
+
 shibboleth_idp_update_sealer_key:
   cron.present:
     - name: /bin/sh {{ idp_settings.prefix }}/bin/update-sealer-key.sh
