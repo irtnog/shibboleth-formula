@@ -1,0 +1,13 @@
+{% import_yaml "shibboleth/sp/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'FreeBSD': {
+      'packages': [
+        'shibboleth-sp',
+      ],
+    },
+  }, merge=salt['pillar.get']('shibboleth:sp:lookup')) %}
+
+{% do default_settings.shibboleth.sp.update(os_family_map) %}
+
+{% set sp_settings = salt['pillar.get']('shibboleth:sp', default=default_settings.shibboleth.sp, merge=True) %}
