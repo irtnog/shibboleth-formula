@@ -58,7 +58,7 @@ shibboleth_idp_keymat:
     - dir_mode: 750
     - file_mode: 640
     - require:
-        - cmd: shibboleth_idp_install
+        - cmd: shibboleth_idp
 
 ## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
 ## exist in that location on all operating systems.  When necessary,
