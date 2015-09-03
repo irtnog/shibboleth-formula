@@ -68,6 +68,8 @@ shibboleth_idp_keymat:
     - group: {{ idp_settings.group }}
     - dir_mode: 750
     - file_mode: 640
+    - require:
+        - cmd: shibboleth_idp_install
 
 shibboleth_idp_update_sealer_key:
   cron.present:
