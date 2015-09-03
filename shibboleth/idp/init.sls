@@ -1,22 +1,8 @@
 {% from "shibboleth/idp/map.jinja" import idp_settings with context %}
 
-shibboleth_idp_prerequisites:
+shibboleth_idp:
   pkg.installed:
     - pkgs: {{ idp_settings.packages|yaml }}
-
-{% if grains['os_family'] == 'FreeBSD' %}
-shibboleth_idp_bash_symlink:
-  file.symlink:
-    - name: /bin/bash
-    - target: /usr/local/bin/bash
-    - require:
-        - pkg: shibboleth_idp_prerequisites
-    - require_in:
-        - cmd: shibboleth_idp_install
-        - cron: shibboleth_idp_update_sealer_key
-{% endif %}
-
-shibboleth_idp_prefix:
   file.recurse:
     - name: {{ idp_settings.prefix }}
     - source: salt://shibboleth/idp/files/prefix
@@ -27,8 +13,6 @@ shibboleth_idp_prefix:
     - group: {{ idp_settings.group }}
     - dir_mode: 750
     - file_mode: 640
-
-shibboleth_idp_vendor:
   archive.extracted:
     - if_missing: {{ idp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ idp_settings.version }}/
     - name: {{ idp_settings.prefix }}/vendor
@@ -39,19 +23,24 @@ shibboleth_idp_vendor:
     - tar_options: v            # force use of tar(1) instead of tarfile.py
     - keep: yes
     - require:
-        - file: shibboleth_idp_prefix
-
-shibboleth_idp_install:
+        - file: shibboleth_idp
   cmd.wait_script:
     - source: salt://shibboleth/idp/files/install.sh
     - template: jinja
     - user: {{ idp_settings.user }}
     - group: {{ idp_settings.group }}
-    - require:
-        - pkg: shibboleth_idp_prerequisites
     - watch:
-        - file: shibboleth_idp_prefix
-        - archive: shibboleth_idp_vendor
+        - pkg: shibboleth_idp
+        - file: shibboleth_idp
+        - archive: shibboleth_idp
+  cron.present:
+    - name: /bin/sh {{ idp_settings.prefix }}/bin/update-sealer-key.sh
+    - user: {{ idp_settings.user }}
+    - minute: random
+    - hour: random
+    - comment: "Update the Shibboleth Identity Provider cookie encryption (sealer) key once per day."
+    - require:
+        - cmd: shibboleth_idp
 
 ## In order to have the installation script generate any missing
 ## configuration files, it is necessary to also let it generate its
@@ -71,12 +60,17 @@ shibboleth_idp_keymat:
     - require:
         - cmd: shibboleth_idp_install
 
-shibboleth_idp_update_sealer_key:
-  cron.present:
-    - name: /bin/sh {{ idp_settings.prefix }}/bin/update-sealer-key.sh
-    - user: {{ idp_settings.user }}
-    - minute: random
-    - hour: random
-    - comment: "Update the Shibboleth Identity Provider cookie encryption (sealer) key once per day."
+## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
+## exist in that location on all operating systems.  When necessary,
+## this symlink gets created as a workaround.
+{% if grains['os_family'] == 'FreeBSD' %}
+shibboleth_idp_bash_symlink:
+  file.symlink:
+    - name: /bin/bash
+    - target: /usr/local/bin/bash
     - require:
-        - cmd: shibboleth_idp_install
+        - pkg: shibboleth_idp
+    - require_in:
+        - cmd: shibboleth_idp
+        - cron: shibboleth_idp
+{% endif %}
