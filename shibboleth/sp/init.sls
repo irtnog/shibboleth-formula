@@ -2,4 +2,4 @@
 
 shibboleth_sp:
   pkg.installed:
-    - pkgs: {{ sp_settings.packages }}
+    - pkgs: {{ sp_settings.packages|yaml }}
