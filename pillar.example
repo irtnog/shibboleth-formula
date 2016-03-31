@@ -1,4 +1,4 @@
-shibboleth:
+shib:
   idp:
     hostname: login.example.com
     entity_id: https://login.example.com/idp/shibboleth
