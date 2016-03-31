@@ -1,0 +1,11 @@
+{% import_yaml "shib/idp/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'Debian':  { 'packages': [ 'openjdk-8-jdk', 'bash', ], },
+    'FreeBSD': { 'packages': [ 'openjdk8', 'bash', ], },
+    'RedHat':  { 'packages': [ 'java-1.8.0-openjdk', 'bash', ], },
+  }) %}
+
+{% do default_settings.shib.idp.update(os_family_map) %}
+
+{% set shibidp_settings = salt['pillar.get'](shib:idp', default=default_settings.shib.idp, merge=True) %}

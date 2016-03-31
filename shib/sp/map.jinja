@@ -1,0 +1,10 @@
+{% import_yaml "shib/sp/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'FreeBSD': { 'packages': [ 'shibboleth-sp', ],
+                 'services': [ 'shibboleth-sp', ], },
+  }) %}
+
+{% do default_settings.shib.sp.update(os_family_map) %}
+
+{% set shibsp_settings = salt['pillar.get']('shib:sp', default=default_settings.shib.sp, merge=True) %}

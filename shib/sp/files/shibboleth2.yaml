@@ -1,0 +1,116 @@
+SPConfig:
+  @xmlns:
+    $: urn:mace:shibboleth:2.0:native:sp:config
+    conf: urn:mace:shibboleth:2.0:native:sp:config
+    saml: urn:oasis:names:tc:SAML:2.0:assertion
+    samlp: urn:oasis:names:tc:SAML:2.0:protocol
+    md: urn:oasis:names:tc:SAML:2.0:metadata
+  @clockSkew: 180
+
+  ApplicationDefaults:
+    @entityID: https://sp.example.org/shibboleth
+    @REMOTE_USER: eppn persistent-id targeted-id
+
+    Sessions:
+      @lifetime: 28800
+      @timeout: 3600
+      @relayState: ss:mem
+      @checkAddress: "false"
+      @handlerSSL: "false"
+      @cookieProps: http
+
+      SSO:
+        @entityID: https://idp.example.org/idp/shibboleth
+        @discoveryProtocol: SAMLDS
+        @discoveryURL: https://ds.example.org/DS/WAYF
+        $: SAML2 SAML1
+
+      Logout:
+        $: SAML2 Local
+
+      Handler:
+        @type: MetadataGenerator
+        @location: /Metadata
+        @signing: "false"
+
+      Handler:
+        @type: Status
+        @Location: /Status
+        @acl: 127.0.0.1 ::1
+
+      Handler:
+        @type: Session
+        @Location: /Session
+        @showAttributeValues: "false"
+
+      Handler:
+        @type: DiscoveryFeed
+        @Location: /DiscoFeed
+
+    Errors:
+      @supportContact: root@localhost
+      @helpLocation: /about.html
+      @styleSheet: /shibboleth-sp/main.css
+
+    MetadataProvider:
+      @type: XML
+      @validate: "true"
+      @uri: http://federation.org/federation-metadata.xml
+      @backingFilePath: federation-metadata.xml
+      @reloadInterval: 7200
+
+      MetadataFilter:
+        @type: RequireValidUntil
+        @maxValidityInterval: 2419200
+
+      MetadataFilter:
+        @type: Signature
+        @certificate: fedsigner.pem
+
+      DiscoveryFilter:
+        @type: Blacklist
+        @matcher: EntityAttributes
+        @trimTags: "true"
+        @attributeName: http://macedir.org/entity-category
+        @attributeNameFormat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+        @attributeValue: http://refeds.org/category/hide-from-discovery
+
+    MetadataProvider:
+      @type: XML
+      @validate: "true"
+      @file: partner-metadata.xml
+
+    AttributeExtractor:
+      @type: XML
+      @validate: "true"
+      @reloadChanges: "false"
+      @path: attribute-map.xml
+
+    AttributeResolver:
+      @type: Query
+      @subjectMatch: "true"
+
+    AttributeFilter:
+      @type: XML
+      @validate: "true"
+      @path: attribute-policy.xml
+
+    CredentialResolver:
+      @type: File
+      @key: sp-key.pem
+      @certificate: sp-cert.pem
+
+    ApplicationOverride:
+      @id: admin
+      @entityID: https://admin.example.org/shibboleth
+
+  SecurityPolicyProvider:
+    @type: XML
+    @validate: "true"
+    @path: "security-policy.xml"
+
+  ProtocolProvider:
+    @type: XML
+    @validate: "true"
+    @reloadChanges: "false"
+    @path: protocols.xml
