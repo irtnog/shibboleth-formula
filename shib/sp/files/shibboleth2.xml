@@ -1,17 +1,32 @@
 {%- from "shib/sp/map.jinja" import shibsp_settings with context -%}
 {%- from "shib/lib.jinja" import xml_attribute -%}
-<SPConfig
-    xmlns="urn:mace:shibboleth:2.0:native:sp:config"
+<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
     xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"    
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-    {{ xml_attribute('logger', shibsp_settings.logger) }}
-    {{ xml_attribute('clockSkew', shibsp_settings.clock_skew) }}
-    {{ xml_attribute('unsafeChars', shibsp_settings.unsafe_chars) }}
-    {{ xml_attribute('allowedSchemes', shibsp_settings.allowed_schemes, type='list') }}
-    {{ xml_attribute('langFromClient', shibsp_settings.lang_from_client, type='boolean') }}
-    {{ xml_attribute('langPriority', shibsp_settings.lang_priority, type='list') }}>
+    {{ xml_attribute('logger', shibsp_settings.logger|default(None)) }}
+    {{ xml_attribute('clockSkew', shibsp_settings.clock_skew|default(None)) }}
+    {{ xml_attribute('unsafeChars', shibsp_settings.unsafe_chars|default(None)) }}
+    {{ xml_attribute('allowedSchemes', shibsp_settings.allowed_schemes|default(None), type='list') }}
+    {{ xml_attribute('langFromClient', shibsp_settings.lang_from_client|default(None), type='boolean') }}
+    {{ xml_attribute('langPriority', shibsp_settings.lang_priority|default(None), type='list') }}>
+{% if shibsp_settings.extension_libraries|default(None) %}
+    <Extensions>
+{%- for library in shibsp_settings.extension_libraries %}
+        <Library {{ xml_attribute('path', library.path) }} {{ xml_attribute('fatal', library.fatal|default(None)) }}
+{%- for attribute in library.attributes|default([]) %}
+            {{ attribute }}
+{%- endfor -%}>
+{%- for element in library.elements|default([]) %}
+            {{ element }}
+{%- endfor %}
+        </Library>
+{%- endfor %}
+    </Extensions>
+{%- else %}
+    <Extensions/>
+{%- endif %}
 
     <!--
     By default, in-memory StorageService, ReplayCache, ArtifactMap, and SessionCache

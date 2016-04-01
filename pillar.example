@@ -90,6 +90,38 @@ shib:
       BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
       -----END PRIVATE KEY-----
 
+  sp:
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPShibbolethXML
+    logger:
+      shibboleth/syslog.logger
+    clock_skew:
+      180
+    unsafe_chars:
+      '#%&():[]\`{}'
+    allowed_schemes:
+      - http
+      - https
+    lang_from_client:
+      True
+    lang_priority:
+      - el
+      - en
+      - de
+      - fr
+      - ja
+      - ru
+      - zh
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPLibrary
+    extension_libraries:
+      - path: /opt/example/lib/libencabulator.so
+        fatal: True
+        attributes:
+          - xmlns:encab="urn:example:encabulator"
+          - mode="Turbo"
+        elements:
+          - <encab:casing>Malleable</encab:casing>
+
 #### Local variables:
 #### mode: yaml
 #### End:
