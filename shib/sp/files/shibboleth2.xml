@@ -1,9 +1,17 @@
-<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
+{%- from "shib/sp/map.jinja" import shibsp_settings with context -%}
+{%- from "shib/lib.jinja" import xml_attribute -%}
+<SPConfig
+    xmlns="urn:mace:shibboleth:2.0:native:sp:config"
     xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"    
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-    clockSkew="180">
+    {{ xml_attribute('logger', shibsp_settings.logger) }}
+    {{ xml_attribute('clockSkew', shibsp_settings.clock_skew) }}
+    {{ xml_attribute('unsafeChars', shibsp_settings.unsafe_chars) }}
+    {{ xml_attribute('allowedSchemes', shibsp_settings.allowed_schemes, type='list') }}
+    {{ xml_attribute('langFromClient', shibsp_settings.lang_from_client, type='boolean') }}
+    {{ xml_attribute('langPriority', shibsp_settings.lang_priority, type='list') }}>
 
     <!--
     By default, in-memory StorageService, ReplayCache, ArtifactMap, and SessionCache

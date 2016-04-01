@@ -1,4 +1,27 @@
 shib:
   sp:
-    packages: []
-    services: []
+    packages:
+      - shibboleth-sp
+    group:
+      shibd
+    user:
+      shibd
+    config_directory:
+      /etc/shibboleth
+    services:
+      - shibd
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPShibbolethXML
+    logger:
+      shibboleth/syslog.logger
+    clock_skew:
+      180
+    unsafe_chars:
+      '#%&():[]\`{}'
+    allowed_schemes:
+      - http
+      - https
+    lang_from_client:
+      True
+    lang_priority:
+      ~
