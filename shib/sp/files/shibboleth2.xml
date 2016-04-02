@@ -26,6 +26,27 @@
 {%- else %}
     <Extensions/>
 {%- endif %}
+{% if shibsp_settings.outproc_extensions|default(None) %}
+    <OutOfProcess{% if 'outproc_logger' in shibsp_settings or 'outproc_catchall' in shibsp_settings or 'outproc_tranlogformat' in shibsp_settings or 'outproc_tranlogfiller' in shibsp_settings %} {% call(attribute) xml_attribute('logger', shibsp_settings.outproc_logger|default(None)) %}{% if attribute != None %}{{ attribute }}
+        {% endif %}{% endcall %}{% call(attribute) xml_attribute('catchAll', shibsp_settings.outproc_catchall|default(None), type='boolean') %}{% if attribute != None %}{{ attribute }}
+        {% endif %}{% endcall %}{% call(attribute) xml_attribute('tranLogFormat', shibsp_settings.outproc_tranlogformat|default(None)) %}{% if attribute != None %}{{ attribute }}
+        {% endif %}{% endcall %}{% call(attribute) xml_attribute('tranLogFiller', shibsp_settings.outproc_tranlogfiller|default(None)) %}{% if attribute != None %}{{ attribute }}{% endif %}{% endcall %}
+{%- endif %}>
+        <Extensions>
+{%- for library in shibsp_settings.outproc_extensions %}
+            <Library {% call(attribute) xml_attribute('path', library.path) %}{{ attribute }}{% endcall %}{% call(attribute) xml_attribute('fatal', library.fatal|default(None)) %}{% if attribute != None %}
+                {{ attribute}}{% endif %}{% endcall %}{% for attribute in library.attributes|default([]) %}
+                {{ attribute }}{% endfor %}>
+{%- for element in library.elements|default([]) %}
+                {{ element }}
+{%- endfor %}
+            </Library>
+{%- endfor %}
+        </Extensions>
+      </OutOfProcess
+{%- else %}
+    <OutOfProcess/>
+{%- endif %}
 
     <!--
     By default, in-memory StorageService, ReplayCache, ArtifactMap, and SessionCache

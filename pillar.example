@@ -123,16 +123,17 @@ shib:
           - <encab:casing>Malleable</encab:casing>
 
     ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPOutOfProcess
-    oop_extensions:
-      - path: /opt/example/lib/libfrobulator.so
-    oop_logger:
+    outproc_logger:
       shibboleth/syslog.logger
-    oop_catchall:
+    outproc_catchall:
       False
-    oop_translogformat:
+    outproc_tranlogformat:
       '%D:%E:%e:%app:%SP:%IDP:%p:%n'
-    oop_tranlogfiller:
+    outproc_tranlogfiller:
       fnord
+    outproc_extensions:
+      - path: odbc-store.so
+        fatal: True
 
 #### Local variables:
 #### mode: yaml
