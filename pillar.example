@@ -113,7 +113,7 @@ shib:
       - zh
 
     ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPLibrary
-    extension_libraries:
+    extensions:
       - path: /opt/example/lib/libencabulator.so
         fatal: True
         attributes:
@@ -121,6 +121,18 @@ shib:
           - mode="Turbo"
         elements:
           - <encab:casing>Malleable</encab:casing>
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPOutOfProcess
+    oop_extensions:
+      - path: /opt/example/lib/libfrobulator.so
+    oop_logger:
+      shibboleth/syslog.logger
+    oop_catchall:
+      False
+    oop_translogformat:
+      '%D:%E:%e:%app:%SP:%IDP:%p:%n'
+    oop_tranlogfiller:
+      fnord
 
 #### Local variables:
 #### mode: yaml

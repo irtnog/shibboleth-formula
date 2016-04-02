@@ -1,23 +1,22 @@
 {%- from "shib/sp/map.jinja" import shibsp_settings with context -%}
-{%- from "shib/lib.jinja" import xml_attribute -%}
+{%- from "shib/lib.jinja" import xml_attribute with context -%}
 <SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
     xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"    
-    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-    {{ xml_attribute('logger', shibsp_settings.logger|default(None)) }}
-    {{ xml_attribute('clockSkew', shibsp_settings.clock_skew|default(None)) }}
-    {{ xml_attribute('unsafeChars', shibsp_settings.unsafe_chars|default(None)) }}
-    {{ xml_attribute('allowedSchemes', shibsp_settings.allowed_schemes|default(None), type='list') }}
-    {{ xml_attribute('langFromClient', shibsp_settings.lang_from_client|default(None), type='boolean') }}
-    {{ xml_attribute('langPriority', shibsp_settings.lang_priority|default(None), type='list') }}>
-{% if shibsp_settings.extension_libraries|default(None) %}
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"{% call(attribute) xml_attribute('logger', shibsp_settings.logger|default(None)) %}{% if attribute != None %}
+    {{ attribute }}{% endif %}{% endcall %}{% call(attribute) xml_attribute('clockSkew', shibsp_settings.clock_skew|default(None)) %}{% if attribute != None %}
+    {{ attribute }}{% endif %}{% endcall %}{% call(attribute) xml_attribute('unsafeChars', shibsp_settings.unsafe_chars|default(None)) %}{% if attribute != None %}
+    {{ attribute }}{% endif %}{% endcall %}{% call(attribute) xml_attribute('allowedSchemes', shibsp_settings.allowed_schemes|default(None), type='list') %}{% if attribute != None %}
+    {{ attribute }}{% endif %}{% endcall %}{% call(attribute) xml_attribute('langFromClient', shibsp_settings.lang_from_client|default(None), type='boolean') %}{% if attribute != None %}
+    {{ attribute }}{% endif %}{% endcall %}{% call(attribute) xml_attribute('langPriority', shibsp_settings.lang_priority|default(None), type='list') %}{% if attribute != None %}
+    {{ attribute }}{% endif %}{% endcall %}>
+{% if shibsp_settings.extensions|default(None) %}
     <Extensions>
-{%- for library in shibsp_settings.extension_libraries %}
-        <Library {{ xml_attribute('path', library.path) }} {{ xml_attribute('fatal', library.fatal|default(None)) }}
-{%- for attribute in library.attributes|default([]) %}
-            {{ attribute }}
-{%- endfor -%}>
+{%- for library in shibsp_settings.extensions %}
+        <Library {% call(attribute) xml_attribute('path', library.path) %}{{ attribute }}{% endcall %}{% call(attribute) xml_attribute('fatal', library.fatal|default(None)) %}{% if attribute != None %}
+            {{ attribute}}{% endif %}{% endcall %}{% for attribute in library.attributes|default([]) %}
+            {{ attribute }}{% endfor %}>
 {%- for element in library.elements|default([]) %}
             {{ element }}
 {%- endfor %}

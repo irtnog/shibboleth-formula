@@ -1,11 +1,13 @@
 {%- macro xml_attribute(name, value, type='string') -%}
-{%- if value != None -%}
-{%- if type == 'boolean' -%}
-{{ '%s="%s"'|format(name, "true" if value else "false") }}
-{%- elif type == 'list' -%}
-{{ '%s="%s"'|format(name, value|join(' ')) }}
-{%- else -%}
-{{ '%s="%s"'|format(name, value) }}
-{%- endif -%}
-{%- endif -%}
+  {%- set attribute = None -%}
+  {%- if value != None -%}
+    {%- if type == 'boolean' -%}
+      {%- set attribute = '%s="%s"'|format(name, "true" if value else "false") -%}
+    {%- elif type == 'list' -%}
+      {%- set attribute = '%s="%s"'|format(name, value|join(' ')) -%}
+    {%- else -%}
+      {%- set attribute = '%s="%s"'|format(name, value) -%}
+    {%- endif -%}
+  {%- endif -%}
+  {{ caller(attribute) }}
 {%- endmacro -%}
