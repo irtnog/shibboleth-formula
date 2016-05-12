@@ -1,8 +1,13 @@
 {% import_yaml "shib/sp/defaults.yaml" as default_settings %}
 
 {% set os_family_map = salt['grains.filter_by']({
-    'FreeBSD': { 'config_directory': '/usr/local/etc/shibboleth',
-                 'services': [ 'shibboleth-sp', ], },
+    'FreeBSD': {
+      'config_directory':
+        '/usr/local/etc/shibboleth',
+      'services': [
+        'shibboleth-sp',
+      ],
+    },
   }) %}
 
 {% do default_settings.shib.sp.update(os_family_map) %}
