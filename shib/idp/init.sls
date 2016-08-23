@@ -5,7 +5,7 @@ shibidp:
     - pkgs: {{ shibidp_settings.packages|yaml }}
   file.recurse:
     - name: {{ shibidp_settings.prefix }}
-    - source: salt://shibboleth/idp/files/prefix
+    - source: salt://shib/idp/files/prefix
     - template: jinja
     - include_empty: yes
     - exclude_pat: .gitignore
@@ -25,7 +25,7 @@ shibidp:
     - require:
         - file: shibidp
   cmd.wait_script:
-    - source: salt://shibboleth/idp/files/install.sh
+    - source: salt://shib/idp/files/install.sh
     - template: jinja
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
@@ -49,7 +49,7 @@ shibidp:
 shibidp_keymat:
   file.recurse:
     - name: {{ shibidp_settings.prefix }}
-    - source: salt://shibboleth/idp/files/keymat
+    - source: salt://shib/idp/files/keymat
     - template: jinja
     - include_empty: yes
     - exclude_pat: .gitignore
