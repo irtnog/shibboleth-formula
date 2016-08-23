@@ -17,7 +17,7 @@ shibidp:
     - if_missing: {{ shibidp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ shibidp_settings.version }}/
     - name: {{ shibidp_settings.prefix }}/vendor
     - source: {{ shibidp_settings.master_site}}/{{ shibidp_settings.version }}/shibboleth-identity-provider-{{ shibidp_settings.version }}{{ shibidp_settings.suffix }}
-    - source_hash: {{ shibidp_settings.source_hash[idp_settings.suffix] }}
+    - source_hash: {{ shibidp_settings.source_hash[shibidp_settings.suffix] }}
     - archive_format: {{ "tar" if shibidp_settings.suffix == ".tar.gz" else "zip" }}
     - archive_user: {{ shibidp_settings.user }}
     - tar_options: v            # force use of tar(1) instead of tarfile.py
