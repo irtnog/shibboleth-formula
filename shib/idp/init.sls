@@ -59,6 +59,17 @@ shibidp_keymat:
     - file_mode: 640
     - require:
         - cmd: shibidp
+  cmd.wait:
+    - name:
+        openssl pkcs12 -export -password env:SHIBIDP_KEYSTORE_PASSWORD
+          -out   {{ shibidp_settings.prefix }}/credentials/idp-backchannel.p12
+          -in    {{ shibidp_settings.prefix }}/credentials/idp-backchannel.crt
+          -inkey {{ shibidp_settings.prefix }}/credentials/idp-backchannel.key
+    - env:
+        - SHIBIDP_KEYSTORE_PASSWORD:
+            {{ shibidp_settings.keystore_password|yaml_encode }}
+    - watch:
+        - file: shibidp_keymat
 
 ## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
 ## exist in that location on all operating systems.  When necessary,
