@@ -8,6 +8,6 @@ export JAVA_HOME
 
 {{ shibidp_settings.prefix }}/bin/seckeygen.sh \
     --storefile {{ shibidp_settings.prefix }}/credentials/sealer.jks \
-    --storepass {{ shibidp_settings.sealer_password }} \
+    --storepass {{ shibidp_settings.sealer_password|yaml_squote }} \
     --versionfile {{ shibidp_settings.prefix }}/credentials/sealer.kver \
     --alias secret
