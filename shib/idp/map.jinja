@@ -3,7 +3,7 @@
 {% set os_family_map = salt['grains.filter_by']({
     'Debian':  { 'packages': [ 'openjdk-8-jdk', 'bash', ], },
     'FreeBSD': { 'packages': [ 'openjdk8', 'bash', ], },
-    'RedHat':  { 'packages': [ 'java-1.8.0-openjdk', 'bash', ], },
+    'RedHat':  { 'packages': [ 'java-1.8.0-openjdk-devel', 'bash', ], },
   }) %}
 
 {% do default_settings.shib.idp.update(os_family_map) %}
