@@ -34,6 +34,7 @@ shibidp:
         - file: shibidp
         - archive: shibidp
   cron.present:
+    - identifier: shibidp_update_sealer_key
     - name: /bin/sh {{ shibidp_settings.prefix }}/bin/update-sealer-key.sh
     - user: {{ shibidp_settings.user }}
     - minute: random
@@ -68,6 +69,7 @@ shibidp_keymat:
     - env:
         - SHIBIDP_KEYSTORE_PASSWORD:
             {{ shibidp_settings.keystore_password|yaml_encode }}
+    - runas: {{ shibidp_settings.user }}
     - watch:
         - file: shibidp_keymat
 
