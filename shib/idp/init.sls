@@ -73,6 +73,28 @@ shibidp_keymat:
     - watch:
         - file: shibidp_keymat
 
+## Tomcat does not provide the Java Server Tag Library, which is
+## required to use JSP pages as Spring views.  The IdP status page at
+## /idp/status is built with JSP and will not work without this
+## library.
+shibidp_tomcat_jstl:
+  file.managed:
+    - name: {{ shibidp_settings.prefix }}/edit-webapp/WEB-INF/lib/jstl-{{ shibidp_settings.jstl_version }}.jar
+    - source: {{ shibidp_settings.jstl_source_template|format(shibidp_settings.jstl_version, shibidp_settings.jstl_version) }}
+    - source_hash: {{ shibidp_settings.jstl_source_hash }}
+    - user: {{ shibidp_settings.user }}
+    - group: {{ shibidp_settings.group }}
+    - mode: 644
+    - require:
+        - cmd: shibidp
+  cmd.wait_script:
+    - source: salt://shib/idp/files/build.sh
+    - template: jinja
+    - user: {{ shibidp_settings.user }}
+    - group: {{ shibidp_settings.group }}
+    - watch:
+        - file: shibidp_tomcat_jstl
+
 ## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
 ## exist in that location on all operating systems.  When necessary,
 ## this symlink gets created as a workaround.

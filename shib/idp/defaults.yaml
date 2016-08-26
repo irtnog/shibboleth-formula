@@ -6,6 +6,11 @@ shib:
     source_hash:
       .tar.gz: sha256=231d100c81f3039f08782cc46067718b2fedf2d988fccc543250fb1813a2bc20
       .zip: sha256=9d509e4c54cba5de8b63fba9a59c90138f289f8126ab7849f8a42392432a1317
+    jstl_version: 1.2
+    jstl_source_template:
+      https://build.shibboleth.net/nexus/service/local/repositories/thirdparty/content/javax/servlet/jstl/%s/jstl-%s.jar
+    jstl_source_hash:
+      sha256=c6273119354a41522877e663582041012b22f8204fe72bba337ed84c7e649b0a
     packages: []
     prefix: /opt/shibboleth-idp
     user: root                  # assumed to already exist; use
