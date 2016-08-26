@@ -116,24 +116,223 @@ shib:
     extensions:
       - path: /opt/example/lib/libencabulator.so
         fatal: True
+        nsmap:
+          encab: "urn:example:encabulator"
         attributes:
-          - xmlns:encab="urn:example:encabulator"
-          - mode="Turbo"
-        elements:
-          - <encab:casing>Malleable</encab:casing>
+          encab:mode: "Turbo"
+          encab:prefabulatedAmulite: True
+          encab:gears:
+            - Reverse
+            - Park
+            - Neutral
+            - Drive
+            - Third
+            - Second
+            - First
+        elements:               # list of XML literals (mind the escapes!)
+          - <encab:casing encab:scale=\"logrithmic\" encab:type=\"Malleable\"/>
+          - <encab:stator>
+              <encab:slots>Panendermic Semi-boloid</encab:slots>
+            </encab:stator>
 
     ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPOutOfProcess
-    outproc_logger:
+    outofprocess_logger:
       shibboleth/syslog.logger
-    outproc_catchall:
+    outofprocess_catchall:
       False
-    outproc_tranlogformat:
+    outofprocess_tranlog_format:
       '%D:%E:%e:%app:%SP:%IDP:%p:%n'
-    outproc_tranlogfiller:
+    outofprocess_tranlog_filler:
       fnord
-    outproc_extensions:
+    outofprocess_extensions:
+      - path: adfs.so           # entries follow the same layout as
+        fatal: True             # the extensions list shown above
       - path: odbc-store.so
         fatal: True
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPInProcess
+    inprocess_logger:
+      native.logger
+    inprocess_catchall:
+      False
+    inprocess_unset_header_value:
+      'UNKNOWN'
+    inprocess_check_spoofing:
+      True
+    inprocess_spoofkey:
+      secret
+    inprocess_extensions:
+      - path: adfs-lite.so
+        fatal: True
+    inprocess_isapi_normalize_request:
+      True
+    inprocess_isapi_safe_header_names:
+      False
+    inprocess_isapi_sites:
+      - id: 1
+        name: www.example.org
+        aliases:
+          - web.example.org
+      - id: 1534573457
+        name: virtual.example.org
+        scheme: https
+        port: 443
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPUnixListener
+    unixlistener_address:
+      shibd.sock
+    unixlistener_stacksize:
+      1024
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPTCPListener
+    tcplistener_address:
+      192.0.2.100
+    tcplistener_port:
+      1600
+    tcplistener_acl:
+      - 127.0.0.1/32
+      - ::1/128
+    tcplistener_stacksize:
+      1024
+
+    ## TODO: https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPListener
+    # listener_type:
+    #   Plugh
+    # listner_configuration:
+    #   Xyzzy
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPStorageService
+    storage_services:
+      - type: Memory
+        id: mem
+        cleanup_interval: 900
+      - type: ODBC
+        id: db
+        cleanup_interval: 900
+        isolation_level:
+          SERIALIZABLE
+        connection_string:
+          DRIVER=drivername;SERVER=dbserver;UID=shibboleth;PWD=password;DATABASE=shibboleth;APP=Shibboleth
+        retry_on_error: 3
+      - type: MEMCACHE
+        id: mc
+        prefix:
+          'SERVICE_PREFIX:'
+        hosts:
+          - 192.0.2.101:11211
+          - 192.0.2.102:11211
+      - type: MEMCACHE
+        id: mc-ctx
+        prefix:
+          'SERVICE_PREFIX:'
+        build_map: False
+        send_timeout: 999999
+        recv_timeout: 999999
+        poll_timeout: 1000
+        fail_limit: 5
+        retry_timeout: 30
+        nonblocking: True
+        hosts:
+          - 192.0.2.101:11211
+          - 192.0.2.102:11211
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSessionCache
+    session_cache_type:
+      StorageService
+    session_cache_allowance:
+      0
+    session_cache_timeout:
+      28000
+    session_cache_maintain_reverse_index:
+      True
+    session_cache_exclude_reverse_index:
+      - givenName
+      - surname
+    session_cache_storage_service:
+      mc-ctx
+    session_cache_storage_service_lite:
+      mc
+    session_cache_cleanup_interval:
+      900
+    session_cache_inprocess_timeout:
+      900
+    session_cache_cache_assertions:
+      True
+    session_cache_inbound_header:
+      X-Apache-Session
+    session_cache_outbound_header:
+      X-Shibboleth-Session
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPReplayCache
+    replay_cache_storage_service:
+      mc
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPArtifactMap
+    artifact_map_ttl:
+      180
+    artifact_map_storage_service:
+      mc
+    artifact_map_context:
+      foo
+
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPRequestMapper
+    request_mapper_type:
+      Native
+    request_mapper_auth_type:
+      shibboleth
+    request_mapper_app_id:
+      someApplicationID
+    request_mapper_require_session:
+      False
+    request_mapper_session_with:
+      someSessionInitiatorID
+    request_mapper_export_assertion:
+      False
+    request_mapper_redirect_to_ssl:
+      443
+    request_mapper_entity_id:
+      urn:mace:example:example.com
+    request_mapper_is_passive:
+      False
+    request_mapper_force_authn:
+      False
+    request_mapper_authn_context_class_ref:
+      - urn:oasis:names:tc:SAML:2.0:ac:classes:password # username and password
+      - urn:oasis:names:tc:SAML:2.0:ac:classes:x509     # X.509 certificate
+    request_mapper_authn_context_comparison:
+      exact
+    request_mapper_redirect_errors:
+      https://www.example.com/redirect_error.html
+    request_mapper_session_error:
+      /opt/shibboleth-sp/templates/session_error.vm
+    request_mapper_metadata_error:
+      /opt/shibboleth-sp/templates/metadata_error.vm
+    request_mapper_access_error:
+      /opt/shibboleth-sp/templates/access_error.vm
+    request_mapper_ssl_error:
+      /opt/shibboleth-sp/templates/ssl_error.vm
+    request_mapper_remote_addr:
+      X-Forwarded-For
+    request_mapper_target:
+      https://www.example.com/
+    request_mapper_encoding:
+      UTF8                      # or 'URL'
+    request_mapper_nameid_format:
+      urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+    request_mapper_spname_qualifier:
+      http://sso.example.com/adfs/services/trust
+    request_mapper_export_stdvars:
+      True
+    request_mapper_export_cookie:
+      False
+    request_mapper_discovery_url:
+      https://ds.example.com/wayf
+    request_mapper_discovery_policy:
+      FIXME
+    request_mapper_require_logout_with:
+      https://www.example.com/goodbye.html
+    exportDuplicateValues:
+      True
 
 #### Local variables:
 #### mode: yaml
