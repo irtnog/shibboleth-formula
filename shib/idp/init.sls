@@ -31,7 +31,6 @@ shibidp:
     - group: {{ shibidp_settings.group }}
     - watch:
         - pkg: shibidp
-        - file: shibidp
         - archive: shibidp
   cron.present:
     - identifier: shibidp_update_sealer_key
