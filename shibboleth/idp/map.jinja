@@ -1,4 +1,4 @@
-{% import_yaml "shib/idp/defaults.yaml" as default_settings %}
+{% import_yaml "shibboleth/idp/defaults.yaml" as default_settings %}
 
 {% set os_family_map = salt['grains.filter_by']({
     'Debian':  { 'packages': [ 'openjdk-8-jdk', 'bash', ], },

@@ -1,4 +1,4 @@
-{% from "shib/sp/map.jinja" import shibsp_settings with context %}
+{% from "shibboleth/sp/map.jinja" import shibsp_settings with context %}
 
 shibsp:
   pkg.installed:
@@ -23,7 +23,7 @@ shibsp:
 
   file.recurse:
     - name: {{ shibsp_settings.config_directory }}
-    - source: salt://shib/sp/files/
+    - source: salt://shibboleth/sp/files/
     - template: jinja
     - user: root
     - group: {{ shibsp_settings.group }}

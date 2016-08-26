@@ -1,11 +1,11 @@
-{% from "shib/idp/map.jinja" import shibidp_settings with context %}
+{% from "shibboleth/idp/map.jinja" import shibidp_settings with context %}
 
 shibidp:
   pkg.installed:
     - pkgs: {{ shibidp_settings.packages|yaml }}
   file.recurse:
     - name: {{ shibidp_settings.prefix }}
-    - source: salt://shib/idp/files/prefix
+    - source: salt://shibboleth/idp/files/prefix
     - template: jinja
     - include_empty: yes
     - exclude_pat: .gitignore
@@ -25,7 +25,7 @@ shibidp:
     - require:
         - file: shibidp
   cmd.wait_script:
-    - source: salt://shib/idp/files/install.sh
+    - source: salt://shibboleth/idp/files/install.sh
     - template: jinja
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
@@ -49,7 +49,7 @@ shibidp:
 shibidp_keymat:
   file.recurse:
     - name: {{ shibidp_settings.prefix }}
-    - source: salt://shib/idp/files/keymat
+    - source: salt://shibboleth/idp/files/keymat
     - template: jinja
     - include_empty: yes
     - exclude_pat: .gitignore
@@ -87,7 +87,7 @@ shibidp_tomcat_jstl:
     - require:
         - cmd: shibidp
   cmd.wait_script:
-    - source: salt://shib/idp/files/build.sh
+    - source: salt://shibboleth/idp/files/build.sh
     - template: jinja
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}

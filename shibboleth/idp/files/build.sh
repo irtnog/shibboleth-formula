@@ -1,4 +1,4 @@
-{%- from "shib/idp/map.jinja" import shibidp_settings with context -%}
+{%- from "shibboleth/idp/map.jinja" import shibidp_settings with context -%}
 #!/bin/sh
 
 JAVA_HOME=$(java -XshowSettings:java.home -version 2>&1 \

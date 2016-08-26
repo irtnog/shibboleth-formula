@@ -1,3 +1,3 @@
 {#- -*- mode: jinja2 -*- -#}
-{%- from "shib/sp/map.jinja" import shibsp_settings with context -%}
+{%- from "shibboleth/sp/map.jinja" import shibsp_settings with context -%}
 {{ salt['shibboleth.generate_spconfig'](shibsp_settings) }}
