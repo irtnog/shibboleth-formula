@@ -34,7 +34,7 @@ shib:
 
     ## The remaining customizations are optional.
     cookie_secure: ~
-    cooky_http_only: ~
+    cookie_http_only: ~
     cookie_domain: ~
     cookie_path: ~
     cookie_max_age: ~
