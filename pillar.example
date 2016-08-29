@@ -47,8 +47,9 @@ shib:
 
     ## Include the Tomcat package when installing Shibboleth IdP, as
     ## this creates the above service account/group; otherwise, the
-    ## shib.idp and tomcat states can't be applied idempotently
-    ## (again, as above, Apache Tomcat on CentOS 7).
+    ## shibboleth.idp (from this formula) and tomcat (from
+    ## tomcat-formula) states can't be applied idempotently (again, as
+    ## above, Apache Tomcat on CentOS 7).
     packages:
       - java-1.8.0-openjdk-devel
       - bash
