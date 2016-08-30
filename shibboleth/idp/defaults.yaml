@@ -19,7 +19,7 @@ shibboleth:
     group: 0                    # 'root' (SVR4) or 'wheel' (BSD) is
                                 # unportable
 
-    ## The following must be customized by the system operator.
+    ## The following must be set by the system operator.
     hostname: ''
     entity_id: ''
     scope: ''
@@ -32,7 +32,7 @@ shibboleth:
     signing_certificate: ''
     signing_key: ''
 
-    ## The remaining customizations are optional.
+    ## idp.properties
     cookie_secure: ~
     cookie_http_only: ~
     cookie_domain: ~
@@ -96,6 +96,8 @@ shibboleth:
     fticks_federation: ~
     fticks_algorithm: ~
     fticks_salt: ~
+
+    ## ldap.properties
     ldap_authenticator: ~
     ldap_url: ~
     ldap_use_starttls: ~
