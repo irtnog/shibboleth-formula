@@ -109,6 +109,8 @@ shibboleth:
     ldap_bind_dn: ~
     ldap_bind_credential: ~
     ldap_dn_format: ~
+    attribute_resolver_ldap_search_filter: ~
+    attribute_resolver_ldap_return_attributes: ~
     ldap_pool_size_minimum: ~
     ldap_pool_size_maximum: ~
     ldap_pool_validate_on_checkout: ~
