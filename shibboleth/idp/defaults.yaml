@@ -96,3 +96,25 @@ shibboleth:
     fticks_federation: ~
     fticks_algorithm: ~
     fticks_salt: ~
+    ldap_authenticator: ~
+    ldap_url: ~
+    ldap_use_starttls: ~
+    ldap_use_ssl: ~
+    ldap_connect_timeout: ~
+    ldap_ssl_config: ~
+    ldap_return_attributes: ~
+    ldap_base_dn: ~
+    ldap_subtree_search: ~
+    ldap_user_filter: ~
+    ldap_bind_dn: ~
+    ldap_bind_credential: ~
+    ldap_dn_format: ~
+    ldap_pool_size_minimum: ~
+    ldap_pool_size_maximum: ~
+    ldap_pool_validate_on_checkout: ~
+    ldap_pool_validate_periodically: ~
+    ldap_pool_validate_period: ~
+    ldap_pool_prune_period: ~
+    ldap_pool_idle_time: ~
+    ldap_pool_block_wait_time: ~
+    ldap_pool_fail_fast_initialize: ~
