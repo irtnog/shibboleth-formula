@@ -10,6 +10,6 @@
     },
   }) %}
 
-{% do default_settings.shib.sp.update(os_family_map) %}
+{% do default_settings.shibboleth.sp.update(os_family_map) %}
 
-{% set shibsp_settings = salt['pillar.get']('shib:sp', default=default_settings.shib.sp, merge=True) %}
+{% set shibsp_settings = salt['pillar.get']('shibboleth:sp', default=default_settings.shibboleth.sp, merge=True) %}

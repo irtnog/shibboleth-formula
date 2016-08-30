@@ -30,7 +30,7 @@
 ### described in OSHA 1910.145,
 ### https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_table=standards&p_id=9794.
 
-shib:
+shibboleth:
   idp:
     hostname: login.example.com
     entity_id: https://login.example.com/idp/shibboleth

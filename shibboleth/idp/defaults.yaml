@@ -1,4 +1,4 @@
-shib:
+shibboleth:
   idp:
     version: 3.2.1
     master_site: http://shibboleth.net/downloads/identity-provider

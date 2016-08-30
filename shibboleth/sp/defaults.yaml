@@ -1,4 +1,4 @@
-shib:
+shibboleth:
   sp:
     packages:
       - shibboleth-sp
