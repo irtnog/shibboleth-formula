@@ -72,7 +72,7 @@
 {% for metadata_provider in shibidp_settings.metadata_providers %}
  {%- if metadata_provider is mapping and 'url' in metadata_provider %}
   {%- set metadata_provider_id = salt['hashutil.digest'](metadata_provider['url']) %}
-    <MetadataProvider id="{{ metadata_provider_id }}"
+    <MetadataProvider id="_{{ metadata_provider_id }}"
                       xsi:type="FileBackedHTTPMetadataProvider"
                       backingFile="%{idp.home}/metadata/{{ metadata_provider_id }}.xml"
                       metadataURL="{{ metadata_provider['url'] }}">
@@ -102,7 +102,7 @@
     </MetadataProvider>
  {%- else %}
   {%- set metadata_provider_id = salt['hashutil.digest'](metadata_provider) %}
-    <MetadataProvider id="{{ metadata_provider_id }}"
+    <MetadataProvider id="_{{ metadata_provider_id }}"
                       xsi:type="FileBackedHTTPMetadataProvider"
                       backingFile="%{idp.home}/metadata/{{ metadata_provider_id }}.xml"
                       metadataURL="{{ metadata_provider }}" />
