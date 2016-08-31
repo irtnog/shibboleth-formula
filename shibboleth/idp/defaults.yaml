@@ -122,3 +122,6 @@ shibboleth:
     ldap_pool_idle_time: ~
     ldap_pool_block_wait_time: ~
     ldap_pool_fail_fast_initialize: ~
+
+    ## metadata-providers.xml
+    metadata_providers: []
