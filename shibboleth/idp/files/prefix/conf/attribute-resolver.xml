@@ -137,7 +137,7 @@
     -->
 {% for dataconn in shibidp_settings.resolver_data_connectors %}
     <resolver:DataConnector id="{{ dataconn['id'] }}"
-                            type="{{ dataconn['type'] }}">
+                            xsi:type="{{ dataconn['type'] }}">
         {%- for attrib in dataconn['attributes']|default([]) %}
         <dc:Attribute id="{{ attrib['id'] }}">
             <dc:Value>{{ attrib['value'] }}</dc:Value>
