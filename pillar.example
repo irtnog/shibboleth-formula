@@ -57,34 +57,34 @@ shibboleth:
 
     ## Trust the following sources of federation metadata.
     metadata_providers:
+      ## TestShib
       - http://www.testshib.org/metadata/testshib-providers.xml
+      ## Amazon Web Services
       - https://signin.aws.amazon.com/static/saml-metadata.xml
+      - https://signin.amazonaws-us-gov.com/static/saml-metadata.xml
+      ## InCommon Federation
+      ## https://spaces.internet2.edu/display/InCFederation/Metadata+Aggregates
       - url: http://md.incommon.org/InCommon/InCommon-metadata.xml
         filters:
           - type: SignatureValidation
             require_signed_root: True
+            ## https://spaces.internet2.edu/display/InCFederation/Metadata+Signing+Certificate
+            ##
+            ## WARNING: THIS IS THE PUBLIC KEY OF THAT CERTIFICATE,
+            ## NOT THE CERTIFICATE ITSELF!  Export the public key
+            ## using something like the following command:
+            ##
+            ## curl --silent https://ds.incommon.org/certs/inc-md-cert.pem | openssl x509 -pubkey -noout
             public_key: |
-              -----BEGIN CERTIFICATE-----
-              MIIDgTCCAmmgAwIBAgIJAJRJzvdpkmNaMA0GCSqGSIb3DQEBCwUAMFcxCzAJBgNV
-              BAYTAlVTMRUwEwYDVQQKDAxJbkNvbW1vbiBMTEMxMTAvBgNVBAMMKEluQ29tbW9u
-              IEZlZGVyYXRpb24gTWV0YWRhdGEgU2lnbmluZyBLZXkwHhcNMTMxMjE2MTkzNDU1
-              WhcNMzcxMjE4MTkzNDU1WjBXMQswCQYDVQQGEwJVUzEVMBMGA1UECgwMSW5Db21t
-              b24gTExDMTEwLwYDVQQDDChJbkNvbW1vbiBGZWRlcmF0aW9uIE1ldGFkYXRhIFNp
-              Z25pbmcgS2V5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Chdkrn+
-              dG5Zj5L3UIw+xeWgNzm8ajw7/FyqRQ1SjD4Lfg2WCdlfjOrYGNnVZMCTfItoXTSp
-              g4rXxHQsykeNiYRu2+02uMS+1pnBqWjzdPJE0od+q8EbdvE6ShimjyNn0yQfGyQK
-              CNdYuc+75MIHsaIOAEtDZUST9Sd4oeU1zRjV2sGvUd+JFHveUAhRc0b+JEZfIEuq
-              /LIU9qxm/+gFaawlmojZPyOWZ1JlswbrrJYYyn10qgnJvjh9gZWXKjmPxqvHKJcA
-              TPhAh2gWGabWTXBJCckMe1hrHCl/vbDLCmz0/oYuoaSDzP6zE9YSA/xCplaHA0mo
-              C1Vs2H5MOQGlewIDAQABo1AwTjAdBgNVHQ4EFgQU5ij9YLU5zQ6K75kPgVpyQ2N/
-              lPswHwYDVR0jBBgwFoAU5ij9YLU5zQ6K75kPgVpyQ2N/lPswDAYDVR0TBAUwAwEB
-              /zANBgkqhkiG9w0BAQsFAAOCAQEAaQkEx9xvaLUt0PNLvHMtxXQPedCPw5xQBd2V
-              WOsWPYspRAOSNbU1VloY+xUkUKorYTogKUY1q+uh2gDIEazW0uZZaQvWPp8xdxWq
-              Dh96n5US06lszEc+Lj3dqdxWkXRRqEbjhBFh/utXaeyeSOtaX65GwD5svDHnJBcl
-              AGkzeRIXqxmYG+I2zMm/JYGzEnbwToyC7yF6Q8cQxOr37hEpqz+WN/x3qM2qyBLE
-              CQFjmlJrvRLkSL15PCZiu+xFNFd/zx6btDun5DBlfDS9DG+SHCNH6Nq+NfP+ZQ8C
-              GzP/3TaZPzMlKPDCjp0XOQfyQqFIXdwjPFTWjEusDBlm4qJAlQ==
-              -----END CERTIFICATE-----
+              -----BEGIN PUBLIC KEY-----
+              MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Chdkrn+dG5Zj5L3UIw+
+              xeWgNzm8ajw7/FyqRQ1SjD4Lfg2WCdlfjOrYGNnVZMCTfItoXTSpg4rXxHQsykeN
+              iYRu2+02uMS+1pnBqWjzdPJE0od+q8EbdvE6ShimjyNn0yQfGyQKCNdYuc+75MIH
+              saIOAEtDZUST9Sd4oeU1zRjV2sGvUd+JFHveUAhRc0b+JEZfIEuq/LIU9qxm/+gF
+              aawlmojZPyOWZ1JlswbrrJYYyn10qgnJvjh9gZWXKjmPxqvHKJcATPhAh2gWGabW
+              TXBJCckMe1hrHCl/vbDLCmz0/oYuoaSDzP6zE9YSA/xCplaHA0moC1Vs2H5MOQGl
+              ewIDAQAB
+              -----END PUBLIC KEY-----
           - type: RequiredValidUntil
             max_validity_period: P30D
           - type: EntityRoleWhiteList
