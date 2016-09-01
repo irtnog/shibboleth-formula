@@ -179,7 +179,7 @@ shibboleth:
             friendly_name: eduPersonScopedAffiliation
             encode_type: False
     resolver_data_connectors:
-      - id: StaticAttributes
+      - id: staticAttributes
         type: dc:Static
         attributes:
           - id: affiliation
