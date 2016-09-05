@@ -30,6 +30,10 @@
 ### described in OSHA 1910.145,
 ### https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_table=standards&p_id=9794.
 
+####
+#### SHIBBOLETH IDENTITY PROVIDER CONFIGURATION EXAMPLE
+####
+
 shibboleth:
   idp:
     hostname: login.example.com
@@ -63,8 +67,12 @@ shibboleth:
       - https://signin.aws.amazon.com/static/saml-metadata.xml
       - https://signin.amazonaws-us-gov.com/static/saml-metadata.xml
       ## InCommon Federation
+      ## https://spaces.internet2.edu/display/InCFederation/Shibboleth+Metadata+Config
       ## https://spaces.internet2.edu/display/InCFederation/Metadata+Aggregates
       - url: http://md.incommon.org/InCommon/InCommon-metadata.xml
+        min_refresh_delay: PT5M    # TODO
+        max_refresh_delay: PT1H    # TODO
+        refresh_delay_factor: 0.75 # TODO
         filters:
           - type: SignatureValidation
             require_signed_root: True
@@ -86,7 +94,7 @@ shibboleth:
               ewIDAQAB
               -----END PUBLIC KEY-----
           - type: RequiredValidUntil
-            max_validity_period: P30D
+            max_validity_period: P14D
           - type: EntityRoleWhiteList
             retained_roles:
               - md:SPSSODescriptor
@@ -164,6 +172,7 @@ shibboleth:
             permit_value: ANY
 
     ## IdP keying material
+    ## TODO: handle IdP keymat rollover
     backchannel_certificate: |
       -----BEGIN CERTIFICATE-----
       XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
@@ -192,7 +201,7 @@ shibboleth:
       2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
       BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
       -----END PRIVATE KEY-----
-    encryption_certificate: |
+    encryption_certificate: &idpcert |
       -----BEGIN CERTIFICATE-----
       XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
       aXoemLSeo682V7rmZsC3FXwxDH5H9JhP42AdaMrQLKYviSzHiyHsyiacTgxxqjc1
@@ -206,7 +215,7 @@ shibboleth:
       CEGVAIGa/5weMMeidWFcLC0HYREm3DM62vtI7fcQQwj0iXZi7/WQyUNPG+K57yPM
       k+VJRHuE/dxSubA7QyDFKS9udb9Qf2FK1puuqtr4QfY=
       -----END CERTIFICATE-----
-    encryption_key: |
+    encryption_key: &idpkey |
       -----BEGIN PRIVATE KEY-----
       ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
       7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
@@ -220,278 +229,167 @@ shibboleth:
       2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
       BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
       -----END PRIVATE KEY-----
-    signing_certificate: |
-      -----BEGIN CERTIFICATE-----
-      XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
-      aXoemLSeo682V7rmZsC3FXwxDH5H9JhP42AdaMrQLKYviSzHiyHsyiacTgxxqjc1
-      sQVQtbxq7vK5opjm66EUqqSnR4ZQOW6NG0uAonoAETaak1yM6ybF7kKvi4nIR0Xg
-      zojBbXLAoOFfo6VZluJ2fq207DIzsK6+D9HY2VKst3xJ+k04j2H0dWAVBhm9og13
-      L3vK8HRxaN+19ATrLoo1EUBEcLSOgi2O8dsaIETC+xGCbeVb2Kixd157VWodt9vR
-      KBJTigpD0fDKiK4JZ4g6m2FlQDsV70TfBbsmV9AmGkTT6D+Oz0joIOBt9gcmP0oY
-      88vCt7FBjBVnb/SfCHLV1WaWHiYyC6USXqeoOBhsMedmkexYABuotBFlQoOm/AFd
-      FhrPh6jjlW1r0jzHmvXOoQlXRAbhK58VroTxTcqgRhMohxbyAWAjRmW648RkNWC+
-      GRSS3JxgfO1QOFpp9sKApZZ0ti0fU//32dvCO1okD3rnP0qpNqgOFXCkMFzVubCv
-      CEGVAIGa/5weMMeidWFcLC0HYREm3DM62vtI7fcQQwj0iXZi7/WQyUNPG+K57yPM
-      k+VJRHuE/dxSubA7QyDFKS9udb9Qf2FK1puuqtr4QfY=
-      -----END CERTIFICATE-----
-    signing_key: |
-      -----BEGIN PRIVATE KEY-----
-      ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
-      7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
-      kJ03hhgdV3zJ1dhnq3p6LDiOw4HqcPkx2LzIPWKQgDGeIzzWPJnDVgD3DfcnuTVs
-      zguDOFDpFdiFytQwWWoqHmn1wbrj1p0SHZoVfnDp5HSQ6WZ7kLLTySrYJ920ku8A
-      DUlwy287Lwh/qO2hX80lXnqZYqPHXryPqxJK4PtERCCwCJdGRvrFi3CpAn99DhPz
-      d4tFBjQu19Z0/rUELPEQuCfbCtscpJZ2q/lir5xjj44yJtiky8Go73uK8E/WslEZ
-      kESPaq6LE/4MvlE5pquHkBgZA0u9VigNp+4D0RVbcWhmM5b+ZR2HRszsH+dfjA9f
-      8ums30Dxf6TGrhdQLW39Be6fIz0pisVC+hARW/6RmLvQRCmgZTkSZcjQNBICkbLe
-      v44pQ1XpbXGP8WpnGKKSyYTyXEV6GwFOzF5uWicUgpzpCJMk1RjXAyiybcg0o5fS
-      2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
-      BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
-      -----END PRIVATE KEY-----
+    signing_certificate: *idpcert
+    signing_key: *idpkey
 
+####
+#### SHIBBOLETH SERVICE PROVIDER CONFIGURATION EXAMPLE
+####
+
+shibboleth:
   sp:
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPShibbolethXML
-    logger:
-      shibboleth/syslog.logger
-    clock_skew:
-      180
-    unsafe_chars:
-      '#%&():[]\`{}'
-    allowed_schemes:
-      - http
-      - https
-    lang_from_client:
-      True
-    lang_priority:
-      - el
-      - en
-      - de
-      - fr
-      - ja
-      - ru
-      - zh
+    entity_id: https://www.example.com/shibboleth
+    support_contact: 'webmaster@example.com'
+    remote_user:
+      - eppn
+      - upn
+      - persistent-id
+      - targeted-id
+    session_check_address: True
+    session_handler_ssl: True
+    session_cookie_properties: https
+    session_idp_history: True
+    session_sso:
+      - SAML2
+    sso_default_idp: https://login.example.com/idp/shibboleth
+    # sso_discovery_protocol: SAMLDS
+    # sso_discovery_url: https://www.example.com/shibboleth-eds/
+    async_logout: False         # workaround for AD FS
+    session_handlers:
+      - type: MetadataGenerator
+        location: /Metadata.xml # need file type for AD FS interop
+        signing: False          # TODO: configure signing
+      - type: Status
+        location: /Status
+        acl:
+          - 192.0.2.0/24        # example management network
+          - 127.0.0.1           # IPv4 loopback (default)
+          - ::1                 # IPv6 loopback (default)
+      - type: Session
+        location: /Session
+        show_attribute_values: True
+      - type: DiscoveryFeed
+        location: /DiscoFeed
 
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPLibrary
-    extensions:
-      - path: /opt/example/lib/libencabulator.so
-        fatal: True
-        nsmap:
-          encab: "urn:example:encabulator"
-        attributes:
-          encab:mode: "Turbo"
-          encab:prefabulatedAmulite: True
-          encab:gears:
-            - Reverse
-            - Park
-            - Neutral
-            - Drive
-            - Third
-            - Second
-            - First
-        elements:               # list of XML literals (mind the escapes!)
-          - <encab:casing encab:scale=\"logrithmic\" encab:type=\"Malleable\"/>
-          - <encab:stator>
-              <encab:slots>Panendermic Semi-boloid</encab:slots>
-            </encab:stator>
+    metadata_providers:
+      ## TestShib
+      - http://www.testshib.org/metadata/testshib-providers.xml
+      ## InCommon Federation
+      ## https://spaces.internet2.edu/display/InCFederation/Shibboleth+Metadata+Config
+      ## https://spaces.internet2.edu/display/InCFederation/Metadata+Aggregates
+      - type: XML
+        url: http://md.incommon.org/InCommon/InCommon-metadata.xml
+        max_refresh_delay: 3600
+        legacy_org_names: True
+        metadata_filters:
+          ## To bootstrap the trust fabric of the federation, each
+          ## relying party obtains and configures an authentic copy of
+          ## the federation operator’s Metadata Signing Certificate
+          ## (https://spaces.internet2.edu/x/moHFAg).
+          ##
+          ## Fetch the InCommon Metadata Signing Certificate and check
+          ## its integrity:
+          ##
+          ## $ /usr/bin/curl -s https://ds.incommon.org/certs/inc-md-cert.pem \
+          ##   | /usr/bin/tee inc-md-cert.pem \
+          ##   | /usr/bin/openssl x509 -sha1 -fingerprint -noout
+          ## SHA1 Fingerprint=7D:B4:BB:28:D3:D5:C8:52:E0:80:B3:62:43:2A:AF:34:B2:A6:0E:DD
+          ##
+          ## Verify the signature on the root element of the metadata
+          ## aggregate (i.e., the EntitiesDescriptor element) using
+          ## the trusted Metadata Signing Certificate.
+          - type: Signature
+            ## A large metadata file can cause a significant increase
+            ## in startup time at the SP.  This is due to the time it
+            ## takes to verify the signature on the metadata, which is
+            ## known to increase exponentially as the size of the
+            ## metadata file increases.  To disable signature
+            ## verification at startup time only, set verify_backup to
+            ## False.
+            # verify_backup: False
+            certificate: |
+              -----BEGIN CERTIFICATE-----
+              MIIDgTCCAmmgAwIBAgIJAJRJzvdpkmNaMA0GCSqGSIb3DQEBCwUAMFcxCzAJBgNV
+              BAYTAlVTMRUwEwYDVQQKDAxJbkNvbW1vbiBMTEMxMTAvBgNVBAMMKEluQ29tbW9u
+              IEZlZGVyYXRpb24gTWV0YWRhdGEgU2lnbmluZyBLZXkwHhcNMTMxMjE2MTkzNDU1
+              WhcNMzcxMjE4MTkzNDU1WjBXMQswCQYDVQQGEwJVUzEVMBMGA1UECgwMSW5Db21t
+              b24gTExDMTEwLwYDVQQDDChJbkNvbW1vbiBGZWRlcmF0aW9uIE1ldGFkYXRhIFNp
+              Z25pbmcgS2V5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Chdkrn+
+              dG5Zj5L3UIw+xeWgNzm8ajw7/FyqRQ1SjD4Lfg2WCdlfjOrYGNnVZMCTfItoXTSp
+              g4rXxHQsykeNiYRu2+02uMS+1pnBqWjzdPJE0od+q8EbdvE6ShimjyNn0yQfGyQK
+              CNdYuc+75MIHsaIOAEtDZUST9Sd4oeU1zRjV2sGvUd+JFHveUAhRc0b+JEZfIEuq
+              /LIU9qxm/+gFaawlmojZPyOWZ1JlswbrrJYYyn10qgnJvjh9gZWXKjmPxqvHKJcA
+              TPhAh2gWGabWTXBJCckMe1hrHCl/vbDLCmz0/oYuoaSDzP6zE9YSA/xCplaHA0mo
+              C1Vs2H5MOQGlewIDAQABo1AwTjAdBgNVHQ4EFgQU5ij9YLU5zQ6K75kPgVpyQ2N/
+              lPswHwYDVR0jBBgwFoAU5ij9YLU5zQ6K75kPgVpyQ2N/lPswDAYDVR0TBAUwAwEB
+              /zANBgkqhkiG9w0BAQsFAAOCAQEAaQkEx9xvaLUt0PNLvHMtxXQPedCPw5xQBd2V
+              WOsWPYspRAOSNbU1VloY+xUkUKorYTogKUY1q+uh2gDIEazW0uZZaQvWPp8xdxWq
+              Dh96n5US06lszEc+Lj3dqdxWkXRRqEbjhBFh/utXaeyeSOtaX65GwD5svDHnJBcl
+              AGkzeRIXqxmYG+I2zMm/JYGzEnbwToyC7yF6Q8cQxOr37hEpqz+WN/x3qM2qyBLE
+              CQFjmlJrvRLkSL15PCZiu+xFNFd/zx6btDun5DBlfDS9DG+SHCNH6Nq+NfP+ZQ8C
+              GzP/3TaZPzMlKPDCjp0XOQfyQqFIXdwjPFTWjEusDBlm4qJAlQ==
+              -----END CERTIFICATE-----
+          ## Require a validUntil XML attribute on the
+          ## EntitiesDescriptor element and make sure its value is no
+          ## more than 14 days into the future.
+          - type: RequireValidUntil
+            max_validity_interval: 1209600
+          ## Consume all IdP metadata in the aggregate.
+          - type: EntityRoleWhiteList
+            entries:
+              - md:IDPSSODescriptor
+              - md:AttributeAuthorityDescriptor
+          ## Only trust IdPs tagged as supporting REFEDS R&S attribute
+          ## release.
+          - type: EntityRoleWhiteList
+            matcher: EntityAttributes
+            entries:            # FIXME: switch to a list of mappings
+              - http://macedir.org/entity-category-support:                # attribute
+                  http://id.incommon.org/category/research-and-scholarship # value
+              - http://macedir.org/entity-category-support:                # attribute
+                  urn:oasis:names:tc:SAML:2.0:attrname-format:uri:         # format (default shown here)
+                    http://refeds.org/category/research-and-scholarship    # value
+        ## Hiding an IdP from the discovery interface does NOT prevent
+        ## the SP from accepting an assertion from the IdP.
+        discovery_filters:      # TODO
+          - type: EntityRoleWhiteList
+            matcher: EntityAttributes
+            entries:
+              - http://macedir.org/entity-category:
+                  http://refeds.org/category/hide-from-discovery
 
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPOutOfProcess
-    outofprocess_logger:
-      shibboleth/syslog.logger
-    outofprocess_catchall:
-      False
-    outofprocess_tranlog_format:
-      '%D:%E:%e:%app:%SP:%IDP:%p:%n'
-    outofprocess_tranlog_filler:
-      fnord
-    outofprocess_extensions:
-      - path: adfs.so           # entries follow the same layout as
-        fatal: True             # the extensions list shown above
-      - path: odbc-store.so
-        fatal: True
+    ## TODO: manage SP keymat
+    encryption_certificate: &spcert |
+      -----BEGIN CERTIFICATE-----
+      XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l
+      aXoemLSeo682V7rmZsC3FXwxDH5H9JhP42AdaMrQLKYviSzHiyHsyiacTgxxqjc1
+      sQVQtbxq7vK5opjm66EUqqSnR4ZQOW6NG0uAonoAETaak1yM6ybF7kKvi4nIR0Xg
+      zojBbXLAoOFfo6VZluJ2fq207DIzsK6+D9HY2VKst3xJ+k04j2H0dWAVBhm9og13
+      L3vK8HRxaN+19ATrLoo1EUBEcLSOgi2O8dsaIETC+xGCbeVb2Kixd157VWodt9vR
+      KBJTigpD0fDKiK4JZ4g6m2FlQDsV70TfBbsmV9AmGkTT6D+Oz0joIOBt9gcmP0oY
+      88vCt7FBjBVnb/SfCHLV1WaWHiYyC6USXqeoOBhsMedmkexYABuotBFlQoOm/AFd
+      FhrPh6jjlW1r0jzHmvXOoQlXRAbhK58VroTxTcqgRhMohxbyAWAjRmW648RkNWC+
+      GRSS3JxgfO1QOFpp9sKApZZ0ti0fU//32dvCO1okD3rnP0qpNqgOFXCkMFzVubCv
+      CEGVAIGa/5weMMeidWFcLC0HYREm3DM62vtI7fcQQwj0iXZi7/WQyUNPG+K57yPM
+      k+VJRHuE/dxSubA7QyDFKS9udb9Qf2FK1puuqtr4QfY=
+      -----END CERTIFICATE-----
+    encryption_key: &spkey |
+      -----BEGIN PRIVATE KEY-----
+      ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
+      7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
+      kJ03hhgdV3zJ1dhnq3p6LDiOw4HqcPkx2LzIPWKQgDGeIzzWPJnDVgD3DfcnuTVs
+      zguDOFDpFdiFytQwWWoqHmn1wbrj1p0SHZoVfnDp5HSQ6WZ7kLLTySrYJ920ku8A
+      DUlwy287Lwh/qO2hX80lXnqZYqPHXryPqxJK4PtERCCwCJdGRvrFi3CpAn99DhPz
+      d4tFBjQu19Z0/rUELPEQuCfbCtscpJZ2q/lir5xjj44yJtiky8Go73uK8E/WslEZ
+      kESPaq6LE/4MvlE5pquHkBgZA0u9VigNp+4D0RVbcWhmM5b+ZR2HRszsH+dfjA9f
+      8ums30Dxf6TGrhdQLW39Be6fIz0pisVC+hARW/6RmLvQRCmgZTkSZcjQNBICkbLe
+      v44pQ1XpbXGP8WpnGKKSyYTyXEV6GwFOzF5uWicUgpzpCJMk1RjXAyiybcg0o5fS
+      2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
+      BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
+      -----END PRIVATE KEY-----
+    signing_certificate: *spcert
+    signing_key: *spkey
 
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPInProcess
-    inprocess_logger:
-      native.logger
-    inprocess_catchall:
-      False
-    inprocess_unset_header_value:
-      'UNKNOWN'
-    inprocess_check_spoofing:
-      True
-    inprocess_spoofkey:
-      secret
-    inprocess_extensions:
-      - path: adfs-lite.so
-        fatal: True
-    inprocess_isapi_normalize_request:
-      True
-    inprocess_isapi_safe_header_names:
-      False
-    inprocess_isapi_sites:
-      - id: 1
-        name: www.example.org
-        aliases:
-          - web.example.org
-      - id: 1534573457
-        name: virtual.example.org
-        scheme: https
-        port: 443
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPUnixListener
-    unixlistener_address:
-      shibd.sock
-    unixlistener_stacksize:
-      1024
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPTCPListener
-    tcplistener_address:
-      192.0.2.100
-    tcplistener_port:
-      1600
-    tcplistener_acl:
-      - 127.0.0.1/32
-      - ::1/128
-    tcplistener_stacksize:
-      1024
-
-    ## TODO: https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPListener
-    # listener_type:
-    #   Plugh
-    # listner_configuration:
-    #   Xyzzy
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPStorageService
-    storage_services:
-      - type: Memory
-        id: mem
-        cleanup_interval: 900
-      - type: ODBC
-        id: db
-        cleanup_interval: 900
-        isolation_level:
-          SERIALIZABLE
-        connection_string:
-          DRIVER=drivername;SERVER=dbserver;UID=shibboleth;PWD=password;DATABASE=shibboleth;APP=Shibboleth
-        retry_on_error: 3
-      - type: MEMCACHE
-        id: mc
-        prefix:
-          'SERVICE_PREFIX:'
-        hosts:
-          - 192.0.2.101:11211
-          - 192.0.2.102:11211
-      - type: MEMCACHE
-        id: mc-ctx
-        prefix:
-          'SERVICE_PREFIX:'
-        build_map: False
-        send_timeout: 999999
-        recv_timeout: 999999
-        poll_timeout: 1000
-        fail_limit: 5
-        retry_timeout: 30
-        nonblocking: True
-        hosts:
-          - 192.0.2.101:11211
-          - 192.0.2.102:11211
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSessionCache
-    session_cache_type:
-      StorageService
-    session_cache_allowance:
-      0
-    session_cache_timeout:
-      28000
-    session_cache_maintain_reverse_index:
-      True
-    session_cache_exclude_reverse_index:
-      - givenName
-      - surname
-    session_cache_storage_service:
-      mc-ctx
-    session_cache_storage_service_lite:
-      mc
-    session_cache_cleanup_interval:
-      900
-    session_cache_inprocess_timeout:
-      900
-    session_cache_cache_assertions:
-      True
-    session_cache_inbound_header:
-      X-Apache-Session
-    session_cache_outbound_header:
-      X-Shibboleth-Session
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPReplayCache
-    replay_cache_storage_service:
-      mc
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPArtifactMap
-    artifact_map_ttl:
-      180
-    artifact_map_storage_service:
-      mc
-    artifact_map_context:
-      foo
-
-    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPRequestMapper
-    request_mapper_type:
-      Native
-    request_mapper_auth_type:
-      shibboleth
-    request_mapper_app_id:
-      someApplicationID
-    request_mapper_require_session:
-      False
-    request_mapper_session_with:
-      someSessionInitiatorID
-    request_mapper_export_assertion:
-      False
-    request_mapper_redirect_to_ssl:
-      443
-    request_mapper_entity_id:
-      urn:mace:example:example.com
-    request_mapper_is_passive:
-      False
-    request_mapper_force_authn:
-      False
-    request_mapper_authn_context_class_ref:
-      - urn:oasis:names:tc:SAML:2.0:ac:classes:password # username and password
-      - urn:oasis:names:tc:SAML:2.0:ac:classes:x509     # X.509 certificate
-    request_mapper_authn_context_comparison:
-      exact
-    request_mapper_redirect_errors:
-      https://www.example.com/redirect_error.html
-    request_mapper_session_error:
-      /opt/shibboleth-sp/templates/session_error.vm
-    request_mapper_metadata_error:
-      /opt/shibboleth-sp/templates/metadata_error.vm
-    request_mapper_access_error:
-      /opt/shibboleth-sp/templates/access_error.vm
-    request_mapper_ssl_error:
-      /opt/shibboleth-sp/templates/ssl_error.vm
-    request_mapper_remote_addr:
-      X-Forwarded-For
-    request_mapper_target:
-      https://www.example.com/
-    request_mapper_encoding:
-      UTF8                      # or 'URL'
-    request_mapper_nameid_format:
-      urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
-    request_mapper_spname_qualifier:
-      http://sso.example.com/adfs/services/trust
-    request_mapper_export_stdvars:
-      True
-    request_mapper_export_cookie:
-      False
-    request_mapper_discovery_url:
-      https://ds.example.com/wayf
-    request_mapper_discovery_policy:
-      FIXME
-    request_mapper_require_logout_with:
-      https://www.example.com/goodbye.html
-    exportDuplicateValues:
-      True
 
 #### Local variables:
 #### mode: yaml

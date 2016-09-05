@@ -10,5 +10,59 @@ shibboleth:
       /etc/shibboleth
     services:
       - shibd
-    clock_skew:
-      180
+
+    ## The following must be set by the system operator.
+    entity_id: ''
+    support_contact: 'root@localhost'
+    encryption_certificate: ''
+    encryption_key: ''
+    signing_certificate: ''
+    signing_key: ''
+    sso_default_idp: ~             # Either set a default IdP, or
+    sso_discovery_protocol: SAMLDS # configure a discovery service
+    sso_discovery_url: ~           # (requires additional software).
+    metadata_providers: []
+
+    ## shibboleth2.xml
+    logger: ~
+    clock_skew: 180
+    unsafe_chars: ~
+    allowed_schemes: ~
+    lang_from_client: ~
+    lang_priority: ~
+
+    remote_user:
+      - eppn
+      - persistent-id
+      - targeted-id
+
+    session_lifetime: 28800
+    session_timeout: 3600
+    session_relay_state: ss:mem
+    session_check_address: False
+    session_handler_ssl: False
+    session_cookie_properties: http
+    session_idp_history: ~
+    session_sso:
+      - SAML2
+      - SAML1
+    session_logout:
+      - SAML2
+      - Local
+    session_handlers:
+      - type: MetadataGenerator # approx. metadata based on SP config
+        location: /Metadata
+        signing: False
+      - type: Status            # status reporting service
+        location: /Status
+        acl:
+          - 127.0.0.1
+          - ::1
+      - type: Session           # session diagnostic service
+        location: /Session
+        show_attribute_values: False
+      - type: DiscoveryFeed     # JSON feed of discovery info
+        location: /DiscoFeed
+
+    help_location: /about.html
+    style_sheet: /shibboleth-sp/main.css
