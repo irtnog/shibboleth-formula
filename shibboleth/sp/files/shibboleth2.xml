@@ -158,6 +158,7 @@
                                 'matcher': filter.matcher|default(None),
                                 'trimTags': None if filter.trim_tags|default(None) == None else
                                             'true' if filter.trim_tags else 'false',
+                                'maxValidityInterval': filter.max_validity_interval|default(None),
                               }|xmlattr }}
               {%- if filter.type in ['Whitelist', 'Blacklist', 'EntityRoleWhiteList'] %}>
                 {%- for item in filter.entries %}
