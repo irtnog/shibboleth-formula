@@ -124,3 +124,28 @@ successfully deploy the identity provider:
 
   At a minimum this is a list of URLs, from which the SP can download
   the XML metadata of trusted identity providers.
+
+## Deployment
+
+The IdP must be hosted by a suitable Java servlet container, such as
+Tomcat's Catalina or Jetty.  For an example Tomcat configuration,
+please refer to
+[pillar.example from tomcat-formula](/irtnog/tomcat-formula/blob/master/pillar.example)
+
+Likewise, the SP interfaces with the web server.  For example, the
+following configures Apache httpd 2.4 to authenticate users using
+Shibboleth:
+
+```
+LoadModule mod_shib /usr/local/lib/shibboleth/mod_shib_24.so
+
+<Location /Shibboleth.sso>
+  SetHandler shib
+</Location>
+
+<LocationMatch "^/login">
+  AuthType shibboleth
+  ShibRequestSetting requireSession 1
+  Require valid-user
+</LocationMatch>
+```
