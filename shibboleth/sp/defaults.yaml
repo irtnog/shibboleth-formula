@@ -13,14 +13,12 @@ shibboleth:
 
     ## The following must be set by the system operator.
     entity_id: ''
-    support_contact: 'root@localhost'
     encryption_certificate: ''
     encryption_key: ''
     signing_certificate: ''
     signing_key: ''
     sso_default_idp: ~             # Either set a default IdP, or
-    sso_discovery_protocol: SAMLDS # configure a discovery service
-    sso_discovery_url: ~           # (requires additional software).
+    sso_discovery_url: ~           # configure a discovery service.
     metadata_providers: []
 
     ## shibboleth2.xml
@@ -46,6 +44,7 @@ shibboleth:
     session_sso:
       - SAML2
       - SAML1
+    sso_discovery_protocol: SAMLDS
     session_logout:
       - SAML2
       - Local
@@ -64,5 +63,6 @@ shibboleth:
       - type: DiscoveryFeed     # JSON feed of discovery info
         location: /DiscoFeed
 
+    support_contact: 'root@localhost'
     help_location: /about.html
     style_sheet: /shibboleth-sp/main.css

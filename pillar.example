@@ -252,7 +252,6 @@ shibboleth:
     session_sso:
       - SAML2
     sso_default_idp: https://login.example.com/idp/shibboleth
-    # sso_discovery_protocol: SAMLDS
     # sso_discovery_url: https://www.example.com/shibboleth-eds/
     async_logout: False         # workaround for AD FS
     session_handlers:
