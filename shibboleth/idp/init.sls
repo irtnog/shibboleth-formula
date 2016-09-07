@@ -3,9 +3,10 @@
 shibidp:
   pkg.installed:
     - pkgs: {{ shibidp_settings.packages|yaml }}
+
   file.recurse:
     - name: {{ shibidp_settings.prefix }}
-    - source: salt://shibboleth/idp/files/prefix
+    - source: salt://shibboleth/idp/files
     - template: jinja
     - include_empty: yes
     - exclude_pat: .gitignore
@@ -13,6 +14,7 @@ shibidp:
     - group: {{ shibidp_settings.group }}
     - dir_mode: 750
     - file_mode: 640
+
   archive.extracted:
     - if_missing: {{ shibidp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ shibidp_settings.version }}/
     - name: {{ shibidp_settings.prefix }}/vendor
@@ -24,32 +26,34 @@ shibidp:
     - keep: yes
     - require:
         - file: shibidp
+
   cmd.wait_script:
-    - source: salt://shibboleth/idp/files/install.sh
+    - source: salt://shibboleth/idp/scripts/install.sh
     - template: jinja
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
     - watch:
         - pkg: shibidp
         - archive: shibidp
+
   cron.present:
     - identifier: shibidp_update_sealer_key
     - name: /bin/sh {{ shibidp_settings.prefix }}/bin/update-sealer-key.sh
     - user: {{ shibidp_settings.user }}
     - minute: random
     - hour: random
-    - comment: "Update the Shibboleth Identity Provider cookie encryption (sealer) key once per day."
+    - comment: "Update the Shibboleth Identity Provider data sealer key once per day."
     - require:
         - cmd: shibidp
 
 ## In order to have the installation script generate any missing
 ## configuration files, it is necessary to also let it generate its
-## own keying material.  This state overwrites that keying material
-## with the official key pairs stored in Pillar.
+## own keying material.  These states overwrites the
+## installer-generated keymat with the real keymat stored in Pillar.
 shibidp_keymat:
   file.recurse:
-    - name: {{ shibidp_settings.prefix }}
-    - source: salt://shibboleth/idp/files/keymat
+    - name: {{ shibidp_settings.prefix }}/credentials
+    - source: salt://shibboleth/idp/keymat
     - template: jinja
     - include_empty: yes
     - exclude_pat: .gitignore
@@ -59,6 +63,11 @@ shibidp_keymat:
     - file_mode: 640
     - require:
         - cmd: shibidp
+
+  ## Re-generate the PKCS#12 container that holds the back channel key
+  ## pair.  Note that the password used to encrypt the container gets
+  ## passed via an environment variable in order to prevent it leaking
+  ## via the process list.
   cmd.wait:
     - name:
         openssl pkcs12 -export -password env:SHIBIDP_KEYSTORE_PASSWORD
@@ -71,28 +80,6 @@ shibidp_keymat:
     - runas: {{ shibidp_settings.user }}
     - watch:
         - file: shibidp_keymat
-
-## Tomcat does not provide the Java Server Tag Library, which is
-## required to use JSP pages as Spring views.  The IdP status page at
-## /idp/status is built with JSP and will not work without this
-## library.
-shibidp_tomcat_jstl:
-  file.managed:
-    - name: {{ shibidp_settings.prefix }}/edit-webapp/WEB-INF/lib/jstl-{{ shibidp_settings.jstl_version }}.jar
-    - source: {{ shibidp_settings.jstl_source_template|format(shibidp_settings.jstl_version, shibidp_settings.jstl_version) }}
-    - source_hash: {{ shibidp_settings.jstl_source_hash }}
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
-    - mode: 644
-    - require:
-        - cmd: shibidp
-  cmd.wait_script:
-    - source: salt://shibboleth/idp/files/build.sh
-    - template: jinja
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
-    - watch:
-        - file: shibidp_tomcat_jstl
 
 ## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
 ## exist in that location on all operating systems.  When necessary,

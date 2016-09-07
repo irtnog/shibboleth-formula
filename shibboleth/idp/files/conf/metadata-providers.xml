@@ -84,8 +84,7 @@
     {%- endif %}>
     {%- if 'public_key' in filter %}
             <PublicKey>
-{{ filter['public_key'] }}
-            </PublicKey>
+{{ filter['public_key'] }}            </PublicKey>
     {%- endif %}
         </MetadataFilter>
    {%- elif filter['type'] == 'RequiredValidUntil' %}
