@@ -130,10 +130,12 @@ successfully deploy the identity provider:
 The IdP must be hosted by a suitable Java servlet container, such as
 Tomcat's Catalina or Jetty.  For an example Tomcat configuration,
 please refer to
-[pillar.example from tomcat-formula](https://github.com/irtnog/tomcat-formula/blob/master/pillar.example).
+[pillar.example from tomcat-formula](https://github.com/irtnog/tomcat-formula/blob/master/pillar.example)
+as well as the "glue" state
+[tomcat.shibboleth-idp](https://github.com/irtnog/tomcat-formula/blob/master/tomcat/shibboleth-idp.sls).
 
 Likewise, the SP interfaces with the web server.  For example, the
-following configures Apache httpd 2.4 to authenticate users using
+following configures Apache httpd 2.4 to authenticate users via
 Shibboleth:
 
 ```
