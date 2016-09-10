@@ -1,7 +1,7 @@
 shibboleth:
   sp:
     packages:
-      - shibboleth-sp
+      - shibboleth
     group:
       shibd
     user:

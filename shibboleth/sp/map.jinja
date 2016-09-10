@@ -2,6 +2,9 @@
 
 {% set os_family_map = salt['grains.filter_by']({
     'FreeBSD': {
+      'packages': [
+        'shibboleth-sp',
+      ],
       'config_directory':
         '/usr/local/etc/shibboleth',
       'services': [
