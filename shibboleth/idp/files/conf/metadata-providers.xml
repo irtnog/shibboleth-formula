@@ -69,44 +69,75 @@
     <MetadataProvider id="LocalMetadata"  xsi:type="FilesystemMetadataProvider" metadataFile="PATH_TO_YOUR_METADATA"/>
     -->
 
-{% for metadata_provider in shibidp_settings.metadata_providers %}
- {%- if metadata_provider is mapping and 'url' in metadata_provider %}
-  {%- set metadata_provider_id = salt['hashutil.digest'](metadata_provider['url']) %}
-    <MetadataProvider id="_{{ metadata_provider_id }}"
-                      xsi:type="FileBackedHTTPMetadataProvider"
-                      backingFile="%{idp.home}/metadata/{{ metadata_provider_id }}.xml"
-                      metadataURL="{{ metadata_provider['url'] }}">
-  {%- for filter in metadata_provider['filters']|default([]) %}
-        <MetadataFilter xsi:type="{{ filter['type'] }}"
-   {%- if filter['type'] == 'SignatureValidation' %}
-    {%- if 'require_signed_root' in filter %}
-                        requireSignedRoot="{{ 'true' if filter['require_signed_root'] else 'false' }}"
-    {%- endif %}>
-    {%- if 'public_key' in filter %}
-            <PublicKey>
-{{ filter['public_key'] }}            </PublicKey>
+{% for mp in shibidp_settings.metadata_providers %}
+  {%- if mp is string %}
+    {%- set mp_id = salt['hashutil.digest'](mp) %}
+    {%- if mp.startswith('http') %}
+      {#- just a URL, OK for testing, use HTTPS if possible #}
+    {{ '<MetadataProvider%s />'|format(
+         { 'id': '_%s'|format(mp_id),
+           'xsi:type': 'FileBackedHTTPMetadataProvider',
+           'xmlns': 'urn:mace:shibboleth:2.0:metadata',
+           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+           'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
+           'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
+           'metadataURL': mp,
+         }|xmlattr
+       )|indent(4) }}
+    {%- else %}
+      {#- assume inline metadata #}
+    {{ '<MetadataProvider%s />'|format(
+         { 'id': '_%s'|format(mp_id),
+           'xsi:type': 'FilesystemMetadataProvider',
+           'xmlns': 'urn:mace:shibboleth:2.0:metadata',
+           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+           'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
+           'failFastInitialization': 'true',
+           'metadataFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp),
+         }|xmlattr
+       )|indent(4) }}
     {%- endif %}
-        </MetadataFilter>
-   {%- elif filter['type'] == 'RequiredValidUntil' %}
-    {%- if 'max_validity_period' in filter %}
-                        maxValidityInterval="{{ filter['max_validity_period'] }}"
-    {%- endif %} />
-   {%- elif filter['type'] == 'EntityRoleWhiteList' %}>
-    {%- for retained_role in filter['retained_roles'] %}
-            <RetainedRole>{{ retained_role }}</RetainedRole>
+  {%- elif mp is mapping %}
+    {#- TODO: support other metadata provider types #}
+    {%- set mp_id = salt['hashutil.digest'](mp.url) %}
+    {{ '<MetadataProvider %s>'|format(
+         { 'id': '_%s'|format(mp_id),
+           'xsi:type': 'FileBackedHTTPMetadataProvider',
+           'xmlns': 'urn:mace:shibboleth:2.0:metadata',
+           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+           'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
+           'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
+           'metadataURL': mp.url,
+         }|xmlattr
+       )|indent(4) }}
+    {#- TODO: support for additional metadata filters #}
+    {%- for filter in mp.filters|default([]) %}
+      {%- set mf_needs_end_tag = True if 'public_key' in filter or
+                                         'retained_role' in filter
+                                      else False %}
+      {{ '<MetadataFilter%s%s>'|format(
+           { 'id': filter.type,
+             'requireSignedRoot': None if 'require_signed_root' not in filter else
+                                  'true' if filter.require_signed_root else 'false',
+             'maxValidityInterval': filter.max_validity_period|default(None),
+           }|xmlattr,
+           '' if mf_needs_end_tag else ' /'
+         )|indent(6) }}
+      {%- if 'public_key' in filter %}
+        <PublicKey>
+          {{ filter.public_key|indent(10) }}
+        </PublicKey>
+      {%- endif %}
+      {%- for rr in filter.retained_roles|default([]) %}
+        <RetainedRole>{{ rr }}</RetainedRole>
+      {%- endfor %}
+      {%- if mf_needs_end_tag %}
+      </MetadataFilter>
+      {%- endif %}
     {%- endfor %}
-        </MetadataFilter>
-   {%- endif %}
-  {%- endfor %}
     </MetadataProvider>
- {%- else %}
-  {%- set metadata_provider_id = salt['hashutil.digest'](metadata_provider) %}
-    <MetadataProvider id="_{{ metadata_provider_id }}"
-                      xsi:type="FileBackedHTTPMetadataProvider"
-                      backingFile="%{idp.home}/metadata/{{ metadata_provider_id }}.xml"
-                      metadataURL="{{ metadata_provider }}" />
- {%- endif %}
-{%- endfor %}
+  {%- endif %}
+{%- endfor %}    
           
     
 </MetadataProvider>

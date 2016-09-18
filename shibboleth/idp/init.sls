@@ -95,3 +95,18 @@ shibidp_bash_symlink:
         - cmd: shibidp
         - cron: shibidp
 {% endif %}
+
+## Handle inline metadata.
+{% for mp in shibidp_settings.metadata_providers
+   if mp is string and not mp.startswith('http') %}
+{% set mp_id = salt['hashutil.digest'](mp) %}
+shibidp_inline_metadata_{{ loop.index0 }}:
+  file.managed:
+    - name: {{ shibidp_settings.prefix }}/metadata/{{ mp_id }}.xml
+    - contents: {{ mp|yaml_encode }}
+    - user: {{ shibidp_settings.user }}
+    - group: {{ shibidp_settings.group }}
+    - file_mode: 640            # FIXME: too strict?
+    - require:
+        - file: shibidp
+{% endfor %}
