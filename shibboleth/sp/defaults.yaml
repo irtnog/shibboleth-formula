@@ -18,7 +18,8 @@ shibboleth:
     signing_certificate: ''
     signing_key: ''
     sso_default_idp: ~             # Either set a default IdP, or
-    sso_discovery_url: ~           # configure a discovery service.
+    sso_discovery_protocol: ~      # configure a discovery service.
+    sso_discovery_url: ~
     metadata_providers: []
 
     ## shibboleth2.xml
@@ -44,7 +45,6 @@ shibboleth:
     session_sso:
       - SAML2
       - SAML1
-    sso_discovery_protocol: SAMLDS
     session_logout:
       - SAML2
       - Local
