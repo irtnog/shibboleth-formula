@@ -162,14 +162,30 @@ shibboleth:
     ## providers.
     attribute_filter_policies:
       ## Release eppn, epsa, and mail to all SPs.
-      - policy_requirement: ANY
-        attribute_rules:
-          - attribute_id: eduPersonPrincipalName
-            permit_value: ANY
-          - attribute_id: eduPersonScopedAffiliation
-            permit_value: ANY
-          - attribute_id: mail
-            permit_value: ANY
+      - if:
+          ANY
+        then:
+          - release:
+              eduPersonPrincipalName
+            permit:
+              ANY
+          - release:
+              eduPersonScopedAffiliation
+            permit:
+              ANY
+          - release:
+              mail
+            permit:
+              ANY
+      - if:
+          OR:
+            - Requester: https://sp.example.org
+            - Requester: https://another.example.org/shibboleth
+        then:
+          - release:
+              uid
+            permit:
+              ANY
 
     ## IdP keying material
     ## TODO: handle IdP keymat rollover

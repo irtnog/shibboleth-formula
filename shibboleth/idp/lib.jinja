@@ -1,0 +1,11 @@
+{%- macro generate_policy(mode, policy, indent=8, step=4) %}
+{{ '<%s%s%s>'|format(
+    mode,
+    { 'xsi:type': 'ANY' if policy == 'ANY' else
+                  (policy|dictsort)[0][0],
+      'value':    None if policy == 'ANY' or (policy|dictsort)[0][1] is mapping else
+                  (policy|dictsort)[0][1],
+    }|xmlattr,
+    ' /' if policy == 'ANY' or 'Requester' in policy else ''
+  )|indent(indent, True) }}
+{%- endmacro %}
