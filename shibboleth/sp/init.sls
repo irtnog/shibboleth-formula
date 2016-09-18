@@ -77,3 +77,17 @@ shibsp_{{ hash }}_signing_certificate:
         - service: shibsp
 {% endfor %}
 {% endfor %}
+
+
+{% if grains['osfamily'] in ['RedHat'] %}
+## Work around bug in the Shibboleth SELinux policy module that
+## prevents httpd/mod_shib from communicating with shibd.
+shibsp_selinux_socket:
+  cmd.wait:
+    - name:
+        semanage fcontext -a -t httpd_sys_rw_content_t /var/run/shibboleth
+    - watch:
+        - pkg: shibsp
+    - require_in:
+        - service: shibsp
+{% endif %}
