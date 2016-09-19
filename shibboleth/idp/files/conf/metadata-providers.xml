@@ -68,7 +68,6 @@
     <!--
     <MetadataProvider id="LocalMetadata"  xsi:type="FilesystemMetadataProvider" metadataFile="PATH_TO_YOUR_METADATA"/>
     -->
-
 {% for mp in shibidp_settings.metadata_providers %}
   {%- if mp is string %}
     {%- set mp_id = salt['hashutil.digest'](mp) %}
@@ -93,14 +92,14 @@
            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
            'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
            'failFastInitialization': 'true',
-           'metadataFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp),
+           'metadataFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
          }|xmlattr
        )|indent(4) }}
     {%- endif %}
   {%- elif mp is mapping %}
     {#- TODO: support other metadata provider types #}
     {%- set mp_id = salt['hashutil.digest'](mp.url) %}
-    {{ '<MetadataProvider %s>'|format(
+    {{ '<MetadataProvider%s>'|format(
          { 'id': '_%s'|format(mp_id),
            'xsi:type': 'FileBackedHTTPMetadataProvider',
            'xmlns': 'urn:mace:shibboleth:2.0:metadata',
@@ -113,10 +112,10 @@
     {#- TODO: support for additional metadata filters #}
     {%- for filter in mp.filters|default([]) %}
       {%- set mf_needs_end_tag = True if 'public_key' in filter or
-                                         'retained_role' in filter
+                                         'retained_roles' in filter
                                       else False %}
       {{ '<MetadataFilter%s%s>'|format(
-           { 'id': filter.type,
+           { 'xsi:type': filter.type,
              'requireSignedRoot': None if 'require_signed_root' not in filter else
                                   'true' if filter.require_signed_root else 'false',
              'maxValidityInterval': filter.max_validity_period|default(None),
@@ -125,7 +124,7 @@
          )|indent(6) }}
       {%- if 'public_key' in filter %}
         <PublicKey>
-          {{ filter.public_key|indent(10) }}
+{{ filter.public_key|indent(0) }}
         </PublicKey>
       {%- endif %}
       {%- for rr in filter.retained_roles|default([]) %}
@@ -137,7 +136,5 @@
     {%- endfor %}
     </MetadataProvider>
   {%- endif %}
-{%- endfor %}    
-          
-    
+{% endfor %}
 </MetadataProvider>
