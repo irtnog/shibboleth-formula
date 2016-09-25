@@ -265,8 +265,6 @@ shibboleth:
     session_handler_ssl: True
     session_cookie_properties: https
     session_idp_history: True
-    session_sso:
-      - SAML2
     sso_default_idp: https://login.example.com/idp/shibboleth
     # sso_discovery_url: https://www.example.com/shibboleth-eds/
     async_logout: False         # workaround for AD FS
