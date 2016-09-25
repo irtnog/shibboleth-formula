@@ -1,11 +1,36 @@
 {%- macro generate_policy(mode, policy, indent=8, step=4) %}
+  {%- set needs_end_tag =
+  'AND' in policy or
+  'OR' in policy or
+  'NOT' in policy %}
 {{ '<%s%s%s>'|format(
     mode,
-    { 'xsi:type': 'ANY' if policy == 'ANY' else
-                  (policy|dictsort)[0][0],
-      'value':    None if policy == 'ANY' or (policy|dictsort)[0][1] is mapping else
-                  (policy|dictsort)[0][1],
+    { 'xsi:type':
+        (policy|dictsort)[0][0] if policy is mapping
+        else policy,
+      'value':
+        (policy|dictsort)[0][1]
+        if policy is mapping and (policy|dictsort)[0][1] is string else
+        (policy|dictsort)[0][1].value
+        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+        None,
+      'ignoreCase':
+        (policy|dictsort)[0][1].ignore_case|default(None)
+        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+        None,
+      'attributeName':
+        (policy|dictsort)[0][1].attribute_name|default(None)
+        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+        None,
+      'attributeValue':
+        (policy|dictsort)[0][1].attribute_value|default(None)
+        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+        None,
     }|xmlattr,
-    ' /' if policy == 'ANY' or 'Requester' in policy else ''
+    '' if needs_end_tag else ' /'
   )|indent(indent, True) }}
+  {#- TODO recursive call(s) to generate_policy() happen here #}
+  {%- if needs_end_tag %}
+{{ '</%s>'|format(mode)|indent(indent, True) }}
+  {%- endif %}
 {%- endmacro %}
