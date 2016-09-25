@@ -66,6 +66,8 @@
                      'entityID': shibsp_settings.sso_default_idp,
                      'discoveryProtocol': shibsp_settings.sso_discovery_protocol,
                      'discoveryURL': shibsp_settings.sso_discovery_url,
+                     'ECP': None if shibsp_settings.ecp_enabled == None else
+                     'true' if shibsp_settings.ecp_enabled else 'false',
                    }|xmlattr }}>
               {{ shibsp_settings.session_sso|join(' ') }}
             </SSO>

@@ -44,6 +44,7 @@ shibboleth:
     session_idp_history: ~
     session_sso:
       - SAML2
+    ecp_enabled: ~
     session_logout:
       - SAML2
       - Local
