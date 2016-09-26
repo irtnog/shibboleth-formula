@@ -41,7 +41,7 @@ shibsp:
         - group: shibsp
 
   file.recurse:
-    - name: {{ shibsp_settings.config_directory|yaml_encode }}
+    - name: {{ shibsp_settings.confdir|yaml_encode }}
     - source: salt://shibboleth/sp/files/
     - template: jinja
     - user: root
@@ -63,7 +63,7 @@ shibsp:
 
 shibsp_keymat:
   file.recurse:
-    - name: {{ shibsp_settings.config_directory|yaml_encode }}
+    - name: {{ shibsp_settings.confdir|yaml_encode }}
     - source: salt://shibboleth/sp/keymat
     - template: jinja
     - include_empty: yes
@@ -80,7 +80,7 @@ shibsp_keymat:
 {% set hash = salt['hashutil.digest'](mp.url) %}
 shibsp_{{ hash }}_signing_certificate:
   file.managed:
-    - name: {{ '%s%s_%s.pem'|format(shibsp_settings.config_directory, dirsep, hash)|yaml_encode }}
+    - name: {{ '%s%s_%s.pem'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
     - contents: {{ filter.certificate|yaml_encode }}
     - user: root
     - group: {{ shibsp_settings.group }}

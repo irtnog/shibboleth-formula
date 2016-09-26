@@ -6,7 +6,7 @@ shibboleth:
       shibd
     user:
       shibd
-    config_directory:
+    confdir:
       /etc/shibboleth
     services:
       - shibd
