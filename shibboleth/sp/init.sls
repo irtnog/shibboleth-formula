@@ -59,6 +59,21 @@ shibsp:
     - watch:
         - pkg: shibsp
         - file: shibsp
+        - file: shibsp_keymat
+
+shibsp_keymat:
+  file.recurse:
+    - name: {{ shibsp_settings.config_directory|yaml_encode }}
+    - source: salt://shibboleth/sp/keymat
+    - template: jinja
+    - include_empty: yes
+    - exclude_pat: .gitignore
+    - user: {{ shibsp_settings.user }}
+    - group: {{ shibsp_settings.group }}
+    - dir_mode: 750
+    - file_mode: 600
+    - require:
+        - file: shibsp
 
 {% for mp in shibsp_settings.metadata_providers if mp is mapping %}
 {% for filter in mp.metadata_filters|default([]) if filter.type == 'Signature' %}
@@ -79,7 +94,7 @@ shibsp_{{ hash }}_signing_certificate:
 {% endfor %}
 
 
-{% if grains['osfamily'] in ['RedHat'] %}
+{% if grains['os_family'] in ['RedHat'] %}
 ## Work around bug in the Shibboleth SELinux policy module that
 ## prevents httpd/mod_shib from communicating with shibd.
 shibsp_selinux_socket:
