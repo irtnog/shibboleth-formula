@@ -119,7 +119,8 @@ successfully deploy the service provider:
   The SP uses this key-pair (a DER-encoded X.509 certificate and
   private key in base64 format) to sign SAML messages.
 
-* **shibboleth:sp:sso_default_idp** or
+* **shibboleth:sp:sso_default_idp**, or
+  **shibboleth:sp:sso_discovery_protocol** and
   **shibboleth:sp:sso_discovery_url**
 
   Either unconditionally redirect users to a single identity provider,
