@@ -18,6 +18,11 @@ of protected online resources in a privacy-preserving manner.
 
   Installs and configures the Shibboleth Service Provider (SP).
 
+* **shibboleth.ds**
+
+  Installs and configures the Shibboleth Embedded Discovery Service
+  (EDS).
+
 ## Configuration
 
 Additional settings and more complicated configurations are possible;
@@ -95,6 +100,9 @@ successfully deploy the identity provider:
 
 ### Shibboleth SP
 
+At a minimum one must set the following Pillar keys in order to
+successfully deploy the service provider:
+
 * **shibboleth:sp:entity_id**
 
   The SP's SAML entity ID, e.g., `https://www.example.com/shibboleth`.
@@ -125,6 +133,10 @@ successfully deploy the identity provider:
   At a minimum this is a list of URLs, from which the SP can download
   the XML metadata of trusted identity providers.
 
+### Shibboleth EDS
+
+Configuration of the embedded discovery service is optional.
+
 ## Deployment
 
 The IdP must be hosted by a suitable Java servlet container, such as
@@ -136,13 +148,20 @@ as well as the "glue" state
 
 Likewise, the SP interfaces with the web server.  For example, the
 following configures Apache httpd 2.4 to authenticate users via
-Shibboleth:
+Shibboleth, using the discovery service to choose their IdP:
 
 ```
 LoadModule mod_shib /usr/local/lib/shibboleth/mod_shib_24.so
 
 <Location /Shibboleth.sso>
   SetHandler shib
+</Location>
+
+Alias /shibboleth-ds /etc/shibboleth-ds
+<Location /shibboleth-ds>
+  AuthType shibboleth
+  ShibRequestSetting requireSession false
+  Require shibboleth
 </Location>
 
 <LocationMatch "^/login">

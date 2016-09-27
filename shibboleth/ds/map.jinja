@@ -1,0 +1,13 @@
+{% import_yaml "shibboleth/ds/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'FreeBSD': { 'packages': [],
+                 'prefix':   '/usr/local/www',
+                 'conffile': '/usr/local/www/shibboleth-embedded-ds-1.1.0/idpselect_config.js', },
+    'default': {},
+  }) %}
+
+{% do default_settings.shibboleth.ds.update(os_family_map) %}
+
+{% set shibds_settings = salt['pillar.get']('shibboleth:ds',
+  default=default_settings.shibboleth.ds, merge=True) %}

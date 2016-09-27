@@ -403,6 +403,39 @@ shibboleth:
     signing_certificate: *spcert
     signing_key: *spkey
 
+####
+#### SHIBBOLETH EMBEDDED DISCOVERY SERVICE CONFIGURATION EXAMPLE
+####
+
+shibboleth:
+  ds:
+    preferred_idps:
+      - https://login.example.org/shibboleth/idp
+      - https://login.example.com/adfs/services/trust
+    hidden_idps:
+      - https://login.example.net/
+    language_bundles:
+      en-pt:                    # Pirate English
+        fatal_div_missing: YAR! Yon DIV be missin\'!
+        fatal_no_xmlhttprequest: Yon browser be lackin\' th\' XMLHttpRequest function!
+        fatal_wrong_protocol: I cannae understan\' ye!
+        fatal_wrong_entityid: I cannae understan\' ye!
+        fatal_no_data: Where be th\' treasure?!
+        fatal_load_failed: "We didna fin' th' booty aboar' th' good ship "
+        fatal_no_parameters: Ye cannae change th\' laws o\' physics!
+        fatal_no_return_url: Ye cannae change th\' laws o\' physics!
+        fatal_bad_protocol: Ye cannae change th\' laws o\' physics!
+        idp_preferred_label: Make yer choice!
+        idp_entry_label: Gimme yer crew\'s name
+        idp_entry_nopreferred_label: Gimme yer crew\'s name
+        idp_list_label: Choose yer crew from th\' roster below
+        idp_list_nopreferred_label: Choose yer crew from th\' roster below
+        idp_list_default_option_label: Choose yer crew from th\' roster, ye scurvy dog!
+        idp_list_show_list: Th\' roster or yer LIFE!
+        idp_list_show_search: What be yer orders, Cap\'n?
+        submit_button_label: Walk th\' plank!
+        help_text: Parley!
+        default_logo_alt: Th\' BLACK FLAG!
 
 #### Local variables:
 #### mode: yaml

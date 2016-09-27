@@ -1,0 +1,86 @@
+shibboleth:
+  ds:
+    packages:
+      - shibboleth-embedded-ds
+    dist_version:               # don't forget to update map.jinja
+      1.1.0                     # when updating the version number
+    user:
+      root
+    group:
+      0
+    prefix:
+      ~
+    conffile:
+      /etc/shibboleth-ds/idpselect_config.js
+
+    ## Adjust the following to fit into your local configuration.
+    always_show:                # If true, this will show results as
+      True                      # soon as you start typing.
+    data_source:                # Where to get the data from.
+      /Shibboleth.sso/DiscoFeed
+    default_language:           # Language to use if the browser local
+      en                        # doesn't have a bundle.
+    default_logo:               # Replace with your own logo.
+      blank.gif
+    default_logo_width:
+      1
+    default_logo_height:
+      1
+    default_return:             # If non null, then the default place
+      ~                         # to send users who are not...
+    default_return_id_param:
+      ~
+    help_url:
+      https://wiki.shibboleth.net/confluence/display/SHIB2/DSRoadmap
+    ie6_hack:                   # An array of structures to disable
+      []                        # when drawing the pull down (needed
+                                # to handle the ie6 z axis problem. 
+    insert_at_div:              # The div where we will insert the
+      idpSelect                 # data.
+    max_results:                # How many results to show at once or
+      10                        # the number at which to start showing
+                                # if always_show is False.
+    my_entity_id:               # If non null then this string must
+      ~                         # match the string provided in the DS
+                                # parms.
+    preferred_idps:             # Array of entityIds to always show.
+      []
+    hidden_idps:                # Array of entityIds to delete.
+      []
+    ignore_keywords:            # Do we ignore the <mdui:Keywords/>
+      False                     # when looking for candidates?
+    show_list_first:            # Do we start with a list of IdPs or
+      False                     # just the dropdown?
+    saml_idp_cookie_ttl:        # in days
+      730
+    set_focus_text_box:         # Set to false to suppress focus.
+      True
+    test_gui:
+      False
+
+    ## Language support: The minified source provides "en", "de",
+    ## "pt-br" and "jp".  Override any of these below, or provide your
+    ## own language.
+    language_bundles:
+      {}
+
+    ## The following should not be changed without changes to the css.
+    ## Consider them as mandatory defaults.
+    max_preferred_idps:
+      3
+    max_idp_chars_button:
+      33
+    max_idp_chars_dropdown:
+      58
+    max_idp_chars_alt_text:
+      60
+    min_width:
+      20
+    min_height:
+      20
+    max_width:
+      115
+    max_height:
+      69
+    best_ratio:
+      'Math.log(80 / 60)'
