@@ -8,6 +8,11 @@ of protected online resources in a privacy-preserving manner.
 
 ## Available States
 
+* **shibboleth.repo**
+
+  Enables either the OpenSUSE Build Service (on RHEL/SUSE) or the
+  SWITCH AAI (on Debian/Ubuntu) binary package repositories.
+
 * **shibboleth.idp**
 
   Installs and configures the Shibboleth Identity Provider (IdP).
