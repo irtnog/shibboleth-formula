@@ -76,9 +76,6 @@
     {{ '<MetadataProvider%s />'|format(
          { 'id': '_%s'|format(mp_id),
            'xsi:type': 'FileBackedHTTPMetadataProvider',
-           'xmlns': 'urn:mace:shibboleth:2.0:metadata',
-           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-           'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
            'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
            'metadataURL': mp,
          }|xmlattr
@@ -88,9 +85,6 @@
     {{ '<MetadataProvider%s />'|format(
          { 'id': '_%s'|format(mp_id),
            'xsi:type': 'FilesystemMetadataProvider',
-           'xmlns': 'urn:mace:shibboleth:2.0:metadata',
-           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-           'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
            'failFastInitialization': 'true',
            'metadataFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
          }|xmlattr
@@ -102,9 +96,6 @@
     {{ '<MetadataProvider%s>'|format(
          { 'id': '_%s'|format(mp_id),
            'xsi:type': 'FileBackedHTTPMetadataProvider',
-           'xmlns': 'urn:mace:shibboleth:2.0:metadata',
-           'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-           'xsi:schemaLocation': 'urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd',
            'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
            'metadataURL': mp.url,
          }|xmlattr
