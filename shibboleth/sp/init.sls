@@ -57,8 +57,11 @@ shibsp_keymat:
     - require:
         - file: shibsp
 
-{% for mp in shibsp_settings.metadata_providers if mp is mapping %}
-{% for filter in mp.metadata_filters|default([]) if filter.type == 'Signature' %}
+## Handle inline signing certificates.
+{% for mp in shibsp_settings.metadata_providers
+   if mp is mapping %}
+{% for filter in mp.metadata_filters|default([])
+   if filter.type == 'Signature' %}
 {% set hash = salt['hashutil.digest'](mp.url) %}
 shibsp_{{ hash }}_signing_certificate:
   file.managed:
@@ -75,6 +78,22 @@ shibsp_{{ hash }}_signing_certificate:
 {% endfor %}
 {% endfor %}
 
+## Handle inline metadata.
+{% for mp in shibsp_settings.metadata_providers
+   if mp is string and not mp.startswith('http') %}
+{% set hash = salt['hashutil.digest'](mp) %}
+shibsp_inline_metadata_{{ loop.index0 }}:
+  file.managed:
+    - name: {{ '%s%s_%s.xml'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
+    - contents: {{ mp|yaml_encode }}
+    - user: {{ shibsp_settings.user }}
+    - group: {{ shibsp_settings.group }}
+    - file_mode: 640            # FIXME: too strict?
+    - require:
+        - file: shibsp
+    - watch_in:
+        - service: shibsp
+{% endfor %}
 
 {% if grains['os_family'] in ['RedHat'] %}
 ## Work around bug in the Shibboleth SELinux policy module that

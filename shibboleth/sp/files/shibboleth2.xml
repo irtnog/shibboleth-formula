@@ -131,16 +131,33 @@
         <!--
         <MetadataProvider type="XML" validate="true" file="partner-metadata.xml"/>
         -->
-{% for metadata_provider in shibsp_settings.metadata_providers %}
-        {%- if metadata_provider is mapping %}
-          {%- set mp = metadata_provider %}
-        {%- else %}
-          {%- set mp = { 'type': 'XML', 'url': metadata_provider } %}
-        {%- endif %}
+{% for mp in shibsp_settings.metadata_providers %}
+  {%- if mp is string %}
+    {%- set mp_id = salt['hashutil.digest'](mp) %}
+    {%- if mp.startswith('http') %}
+      {#- just a URL, OK for testing, use HTTPS if possible #}
+        {{ '<MetadataProvider%s />'|format(
+             { 'type': 'XML',
+               'validate': 'true',
+               'uri': mp,
+               'backingFilePath': '_%s.xml'|format(mp_id),
+               'reloadInterval': 86400,
+             }|xmlattr) }}
+    {%- else %}
+      {#- assume inline metadata #}
+        {{ '<MetadataProvider%s />'|format(
+             { 'type': 'XML',
+               'validate': 'true',
+               'file': '_%s.xml'|format(mp_id),
+             }|xmlattr) }}
+    {%- endif %}
+  {%- elif mp is mapping %}
+    {#- TODO: support other metadata provider types #}
+    {%- set mp_id = salt['hashutil.digest'](mp.url) %}
         <MetadataProvider{{ {
                               'type': mp.type,
                               'url': mp.url|default(None),
-                              'backingFilePath': '_%s.xml'|format(salt['hashutil.digest'](mp.url)),
+                              'backingFilePath': '_%s.xml'|format(mp_id),
                               'maxRefreshDelay': mp.max_refresh_delay|default(None),
                               'legacyOrgNames': None if mp.legacy_org_names|default(None) == None else
                                                 'true' if mp.legacy_org_names else 'false',
@@ -149,7 +166,7 @@
             {%- for filter in mp.metadata_filters|default([]) %}
             <MetadataFilter{{ {
                                 'type': filter.type,
-                                'certificate': '_%s.pem'|format(salt['hashutil.digest'](mp.url))
+                                'certificate': '_%s.pem'|format(mp_id)
                                                if 'certificate' in filter else None,
                                 'verifyRoles': None if filter.verify_roles|default(None) == None else
                                                'true' if filter.verify_roles else 'false',
@@ -196,6 +213,7 @@
             {%- endfor %}
         </MetadataProvider>
         {%- endif %}
+  {%- endif %}
 {% endfor %}
         <!-- Map to extract attributes from SAML assertions. -->
         <AttributeExtractor type="XML" validate="true" reloadChanges="false" path="attribute-map.xml"/>
