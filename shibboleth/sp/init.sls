@@ -16,6 +16,7 @@ shibsp:
     - system: True
     - gid: {{ shibsp_settings.group }}
     - home: /nonexistent
+    - createhome: False
     - password: '*'
     - shell: /usr/sbin/nologin
     - require:
