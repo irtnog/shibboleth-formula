@@ -1,0 +1,12 @@
+shibboleth:
+  mda:
+    packages:
+      []
+    dist_version:
+      0.9.2
+    prefix:
+      /opt
+    master_site:
+      http://shibboleth.net/downloads/metadata-aggregator/latest/
+    source_hash:
+      sha256=8051c3ed43b0a4dc6b44ad346f495fbb1c1722d6d2ff7994fe0b08b5e514b6a4

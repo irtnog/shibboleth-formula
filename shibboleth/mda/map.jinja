@@ -1,0 +1,12 @@
+{% import_yaml "shibboleth/mda/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'Debian':  { 'packages': [ 'openjdk-8-jdk', 'bash', ], },
+    'FreeBSD': { 'packages': [ 'openjdk8', 'bash', ], },
+    'RedHat':  { 'packages': [ 'java-1.8.0-openjdk-devel', 'bash', ], },
+  }) %}
+
+{% do default_settings.shibboleth.mda.update(os_family_map) %}
+
+{% set shibmda_settings = salt['pillar.get']('shibboleth:mda',
+  default=default_settings.shibboleth.mda, merge=True) %}
