@@ -1,0 +1,19 @@
+xmlsectool:
+  packages:
+    []
+  dist_version:
+    2.0.0
+  prefix:
+    /opt
+  master_site:
+    http://shibboleth.net/downloads/tools/xmlsectool/latest
+  source_hash:
+    sha1=0a624e270f1dfdd913034dfe65a1ec92e8cd8833
+
+  ## The following must be set by the system operator.
+  signing_certificate:
+    ''
+  signing_key:
+    ''
+  entities:
+    []
