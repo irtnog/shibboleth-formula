@@ -50,7 +50,7 @@ shibsp_keymat:
     - source: salt://shibboleth/sp/keymat
     - template: jinja
     - include_empty: yes
-    - exclude_pat: .gitignore
+    - exclude_pat: E@\.gitignore
     - user: {{ shibsp_settings.user }}
     - group: {{ shibsp_settings.group }}
     - dir_mode: 750

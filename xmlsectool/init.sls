@@ -18,7 +18,7 @@ xmlsectool:
     - source: salt://xmlsectool/files
     - template: jinja
     - include_empty: yes
-    - exclude_pat: .gitignore
+    - exclude_pat: E@\.gitignore
     - user: root
     - group: 0
     - dir_mode: 755

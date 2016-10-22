@@ -9,7 +9,7 @@ shibidp:
     - source: salt://shibboleth/idp/files
     - template: jinja
     - include_empty: yes
-    - exclude_pat: .gitignore
+    - exclude_pat: E@\.gitignore
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
     - dir_mode: 750
@@ -56,7 +56,7 @@ shibidp_keymat:
     - source: salt://shibboleth/idp/keymat
     - template: jinja
     - include_empty: yes
-    - exclude_pat: .gitignore
+    - exclude_pat: E@\.gitignore
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
     - dir_mode: 750
