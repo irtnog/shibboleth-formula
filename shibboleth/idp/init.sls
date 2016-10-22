@@ -67,8 +67,10 @@ shibidp_keymat:
   ## Re-generate the PKCS#12 container that holds the back channel key
   ## pair.  Note that the password used to encrypt the container gets
   ## passed via an environment variable in order to prevent it leaking
-  ## via the process list.
-  cmd.wait:
+  ## via the process list.  (This runs every time---as opposed to only
+  ## when a requisite signals a change---because there's no way to
+  ## detect keystore password changes.)
+  cmd.run:
     - name:
         openssl pkcs12 -export -password env:SHIBIDP_KEYSTORE_PASSWORD
           -out   {{ shibidp_settings.prefix }}/credentials/idp-backchannel.p12
@@ -78,7 +80,7 @@ shibidp_keymat:
         - SHIBIDP_KEYSTORE_PASSWORD:
             {{ shibidp_settings.keystore_password|yaml_encode }}
     - runas: {{ shibidp_settings.user }}
-    - watch:
+    - require:
         - file: shibidp_keymat
 
 ## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
