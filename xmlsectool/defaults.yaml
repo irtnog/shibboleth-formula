@@ -16,4 +16,4 @@ xmlsectool:
   signing_key:
     ''
   entities:
-    []
+    {}
