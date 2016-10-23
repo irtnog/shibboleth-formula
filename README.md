@@ -28,6 +28,11 @@ of protected online resources in a privacy-preserving manner.
   Installs and configures the Shibboleth Embedded Discovery Service
   (EDS).
 
+* **xmlsectool**
+
+  Installs and configures xmlsectool, and signs SAML metadata
+  specified in Pillar data.
+
 ## Configuration
 
 Additional settings and more complicated configurations are possible;
@@ -142,6 +147,22 @@ successfully deploy the service provider:
 ### Shibboleth EDS
 
 Configuration of the embedded discovery service is optional.
+
+### xmlsectool
+
+One must set the following Pillar keys in order to use this state:
+
+* **xmlsectool:signing_certificate** and
+  **xmlsectool:signing_key**
+
+  This key-pair (a DER-encoded X.509 certificate and private key in
+  base64 format) is required for XML document signing.
+
+* **xmlsectool:entities**
+
+  A dictionary containing XML metadata, keyed using identifiers
+  following the same format
+  as [XML identifiers](http://www.datypic.com/sc/xsd/t-xsd_ID.html).
 
 ## Deployment
 
