@@ -10,3 +10,19 @@ shibboleth:
       http://shibboleth.net/downloads/metadata-aggregator/latest/
     source_hash:
       sha256=8051c3ed43b0a4dc6b44ad346f495fbb1c1722d6d2ff7994fe0b08b5e514b6a4
+    jvmopts:
+      -Xmx256m
+    validity_period:
+      1000L * 60 * 60 * 24 * 28
+    schemas:
+      []
+
+    ## The following must be set by the system operator.
+    signing_key:
+      ~
+    all_entities_aggregate:
+      ~
+    idp_entities_aggregate:
+      ~
+    sp_entities_aggregate:
+      ~

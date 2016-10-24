@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-init-method="initialize" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+{%- for schema in schemas %}
+{%- if loop.first %}
+  <!-- Define the pathnames of the XML schema files to be used during
+       the validation stage. -->
+{%- endif %}
+  <bean id="schema{{ loop.index0 }}" class="java.lang.String">
+    <constructor-arg value="{{ [destdir, 'schema', '%s.xsd'|format(loop.index0)]|join(dirsep) }}"/>
+  </bean>
+{%- else %}
+  <!-- NOTE: No schemas were specified, so schema validation is
+       disabled. -->
+{%- endfor %}
+
+  <!-- Define the pathname of the directory containing XML metadata
+       files to be loaded, validated, and signed. -->
+  <bean id="localMetadataDirectory" class="java.io.File">
+    <constructor-arg value="{{ [destdir, 'src']|join(dirsep) }}"/>
+  </bean>
+
+  <!-- Define the pathname of the signing key. -->
+  <bean id="signingKeyFile" class="java.io.File">
+    <constructor-arg value="{{ [destdir, 'etc', 'pki', 'signing-key.pem']|join(dirsep) }}"/>
+  </bean>
+
+  <!-- Define the pathnames of the output files. -->
+  <bean id="allEntitiesOutputFile" class="java.io.File">
+    <constructor-arg value="{{ all_entities_aggregate }}"/>
+  </bean>
+  <bean id="idpEntitiesOutputFile" class="java.io.File">
+    <constructor-arg value="{{ idp_entities_aggregate }}"/>
+  </bean>
+  <bean id="spEntitiesOutputFile" class="java.io.File">
+    <constructor-arg value="{{ sp_entities_aggregate }}"/>
+  </bean>
+
+  <!-- Load source metadata. -->
+  <bean id="parserPool" class="net.shibboleth.utilities.java.support.xml.BasicParserPool"/>
+  <bean id="readLocalMetadata" class="net.shibboleth.metadata.dom.DOMFilesystemSourceStage" p:id="readLocalMetadata" p:parserPool-ref="parserPool" p:source-ref="localMetadataDirectory"/>
+
+  <!-- Configure error handling. -->
+  <util:list id="errorStatusClass">
+    <value>#{T(net.shibboleth.metadata.ErrorStatus)}</value>
+  </util:list>
+  <bean id="logItemErrors" class="net.shibboleth.metadata.pipeline.StatusMetadataLoggingStage" p:id="logItemErrors" p:selectionRequirements-ref="errorStatusClass"/>
+  <bean id="removeErrorItems" class="net.shibboleth.metadata.pipeline.ItemMetadataFilterStage" p:id="removeErrorItems" p:selectionRequirements-ref="errorStatusClass"/>
+
+{% if schemas != [] -%}
+  <!-- Configure schema validation. -->
+  <bean id="validateSchema" class="net.shibboleth.metadata.dom.XMLSchemaValidationStage" p:id="validateSchema">
+    <property name="schemaResources">
+      <util:list>
+{%- for schema in schemas %}
+        <bean class="org.springframework.core.io.FileSystemResource">
+          <constructor-arg>
+            <bean class="java.io.File">
+              <constructor-arg ref="schema{{ loop.index0 }}"/>
+            </bean>
+          </constructor-arg>
+        </bean>
+{%- endfor %}
+      </util:list>
+    </property>
+  </bean>
+
+{% endif %}  <!-- Generate an EntitiesDescriptor from the list of entities in the
+       pipeline, add validity period, sign it, and write it out to a
+       file. -->
+  <bean id="buildEntitiesDescriptor" class="net.shibboleth.metadata.dom.saml.EntitiesDescriptorAssemblerStage" p:id="buildEntitiesDescriptor"/>
+  <bean id="addValidUntil" class="net.shibboleth.metadata.dom.saml.SetValidUntilStage" p:id="addValidUntil" p:validityDuration="#{ {{ validity_period }} }"/>
+  <bean id="generateContentReferenceId" class="net.shibboleth.metadata.dom.saml.GenerateIdStage">
+    <property name="id" value="generateContentReferenceId"/>
+  </bean>
+  <bean id="signEntitiesDescriptor" class="net.shibboleth.metadata.dom.XMLSignatureSigningStage" p:id="signEntitiesDescriptor">
+    <property name="privateKey">
+      <bean class="net.shibboleth.ext.spring.factory.PrivateKeyFactoryBean">
+        <property name="resource">
+          <bean class="org.springframework.core.io.FileSystemResource">
+            <constructor-arg ref="signingKeyFile"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+  <bean id="domSerializer" class="net.shibboleth.metadata.dom.DOMElementSerializer"/>
+
+  <!-- Generate the all-entities metadata aggregate. -->
+  <bean id="serializeAll" class="net.shibboleth.metadata.pipeline.SerializationStage" p:id="serializeAll" p:outputFile-ref="allEntitiesOutputFile" p:serializer-ref="domSerializer"/>
+  <bean id="outputAll" class="net.shibboleth.metadata.pipeline.SimplePipeline" p:id="outputAll" >
+    <property name="stages">
+      <util:list>
+        <ref bean="buildEntitiesDescriptor"/>
+        <ref bean="addValidUntil"/>
+        <ref bean="generateContentReferenceId"/>
+        <ref bean="signEntitiesDescriptor"/>
+        <ref bean="serializeAll"/>
+      </util:list>
+    </property>
+  </bean>
+
+  <!-- Generate the only-IdP-entities metadata aggregate. -->
+  <bean id="retainIdPs" class="net.shibboleth.metadata.dom.saml.EntityRoleFilterStage" p:id="retainIdPs" p:whitelistingRoles="true">
+    <property name="designatedRoles">
+      <util:list>
+        <bean class="javax.xml.namespace.QName">
+          <constructor-arg value="urn:oasis:names:tc:SAML:2.0:metadata"/>
+          <constructor-arg value="IDPSSODescriptor"/>
+        </bean>
+        <bean class="javax.xml.namespace.QName">
+          <constructor-arg value="urn:oasis:names:tc:SAML:2.0:metadata"/>
+          <constructor-arg value="AttributeAuthorityDescriptor"/>
+        </bean>
+      </util:list>
+    </property>
+  </bean>
+  <bean id="serializeIdPs" class="net.shibboleth.metadata.pipeline.SerializationStage" p:id="serializeIdPs" p:outputFile-ref="idpEntitiesOutputFile" p:serializer-ref="domSerializer"/>
+  <bean id="outputIdPs" class="net.shibboleth.metadata.pipeline.SimplePipeline" p:id="outputIdPs">
+    <property name="stages">
+      <util:list>
+        <ref bean="retainIdPs"/>
+        <ref bean="buildEntitiesDescriptor"/>
+        <ref bean="addValidUntil"/>
+        <ref bean="generateContentReferenceId"/>
+        <ref bean="signEntitiesDescriptor"/>
+        <ref bean="serializeIdPs"/>
+      </util:list>
+    </property>
+  </bean>
+
+  <!-- Generate the only-SP-entities metadata aggregate. -->
+  <bean id="retainSPs" class="net.shibboleth.metadata.dom.saml.EntityRoleFilterStage" p:id="retainSPs" p:whitelistingRoles="true">
+    <property name="designatedRoles">
+      <util:list>
+        <bean class="javax.xml.namespace.QName">
+          <constructor-arg value="urn:oasis:names:tc:SAML:2.0:metadata"/>
+          <constructor-arg value="SPSSODescriptor"/>
+        </bean>
+      </util:list>
+    </property>
+  </bean>
+  <bean id="serializeSPs" class="net.shibboleth.metadata.pipeline.SerializationStage" p:id="serializeSPs" p:outputFile-ref="spEntitiesOutputFile" p:serializer-ref="domSerializer"/>
+  <bean id="outputSPs" class="net.shibboleth.metadata.pipeline.SimplePipeline" p:id="outputSPs">
+    <property name="stages">
+      <util:list>
+        <ref bean="retainSPs"/>
+        <ref bean="buildEntitiesDescriptor"/>
+        <ref bean="addValidUntil"/>
+        <ref bean="generateContentReferenceId"/>
+        <ref bean="signEntitiesDescriptor"/>
+        <ref bean="serializeSPs"/>
+      </util:list>
+    </property>
+  </bean>
+
+  <!-- Output the three metadata aggregates. -->
+  <bean id="matchEverything" class="com.google.common.base.Predicates" factory-method="alwaysTrue"/>
+  <bean id="generateOutputs" class="net.shibboleth.metadata.pipeline.PipelineDemultiplexerStage" p:id="generateOutputs" p:waitingForPipelines ="true">
+    <property name="pipelineAndSelectionStrategies">
+      <util:list>
+        <bean class="net.shibboleth.utilities.java.support.collection.Pair">
+          <constructor-arg ref="outputAll"/>
+          <constructor-arg ref="matchEverything"/>
+        </bean>
+        <bean class="net.shibboleth.utilities.java.support.collection.Pair">
+          <constructor-arg ref="outputIdPs"/>
+          <constructor-arg ref="matchEverything"/>
+        </bean>
+        <bean class="net.shibboleth.utilities.java.support.collection.Pair">
+          <constructor-arg ref="outputSPs"/>
+          <constructor-arg ref="matchEverything"/>
+        </bean>
+      </util:list>
+    </property>
+  </bean>
+
+  <!-- This controls the whole process. -->
+  <bean id="main" class="net.shibboleth.metadata.pipeline.SimplePipeline" p:id="main">
+    <property name="stages">
+      <util:list>
+        <ref bean="readLocalMetadata"/>
+        <ref bean="logItemErrors"/>
+{%- if schemas != [] %}
+        <ref bean="validateSchema"/>
+{%- endif %}
+        <ref bean="removeErrorItems"/>
+        <ref bean="generateOutputs"/>
+      </util:list>
+    </property>
+  </bean>
+</beans>
