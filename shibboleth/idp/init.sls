@@ -12,7 +12,7 @@ shibidp:
     - exclude_pat: E@\.gitignore
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
-    - dir_mode: 750
+    - dir_mode: 751
     - file_mode: 640
 
   archive.extracted:
@@ -59,7 +59,7 @@ shibidp_keymat:
     - exclude_pat: E@\.gitignore
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
-    - dir_mode: 750
+    - dir_mode: 751
     - file_mode: 640
     - require:
         - cmd: shibidp
