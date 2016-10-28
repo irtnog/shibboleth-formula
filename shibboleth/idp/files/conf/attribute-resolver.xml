@@ -98,9 +98,9 @@
                                   {%- if 'source_attribute_id' in attrdef %}
                                   sourceAttributeID="{{ attrdef['source_attribute_id'] }}"
                                   {%- endif %}>
-        {%- if 'dependency' in attrdef %}
-        <resolver:Dependency ref="{{ attrdef['dependency'] }}" />
-        {%- endif %}
+        {%- for dependency in attrdef['dependencies']|default([]) %}
+        <resolver:Dependency{{ { 'ref': dependency }|xmlattr }}/>
+        {%- endfor %}
         {%- for attrenc in attrdef['attribute_encoders']|default([]) %}
         <resolver:AttributeEncoder xsi:type="{{ attrenc['type'] }}"
                                    name="{{ attrenc['name'] }}"
@@ -118,9 +118,9 @@
           ]]>
         </ad:Template>
         {%- endif %}
-        {%- if 'source_attribute' in attrdef %}
-        <ad:SourceAttribute>{{ attrdef['source_attribute'] }}</ad:SourceAttribute>
-        {%- endif %}
+        {%- for source_attribute in attrdef['source_attributes']|default([]) %}
+        <ad:SourceAttribute>{{ source_attribute }}</ad:SourceAttribute>
+        {%- endfor %}
     </resolver:AttributeDefinition>
 {% endfor %}
     <!-- ========================================== -->

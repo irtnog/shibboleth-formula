@@ -30,11 +30,13 @@
 ### described in OSHA 1910.145,
 ### https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_table=standards&p_id=9794.
 
+## all Pillar keys rooted here
+shibboleth:
+
 ####
 #### SHIBBOLETH IDENTITY PROVIDER CONFIGURATION EXAMPLE
 ####
 
-shibboleth:
   idp:
     hostname: login.example.com
     entity_id: https://login.example.com/idp/shibboleth
@@ -105,7 +107,8 @@ shibboleth:
         type: ad:Scoped
         scope: '%{idp.scope}'
         source_attribute_id: uid
-        dependency: uid
+        dependencies:
+          - uid
         attribute_encoders:
           - type: enc:SAML1ScopedString
             name: urn:mace:dir:attribute-def:eduPersonPrincipalName
@@ -126,7 +129,8 @@ shibboleth:
             encode_type: False
       - id: mail
         type: ad:Template
-        dependency: uid
+        dependencies:
+          - uid
         attribute_encoders:
           - type: enc:SAML1String
             name: urn:mace:dir:attribute-def:mail
@@ -137,12 +141,14 @@ shibboleth:
             encode_type: False
         template:
           ${uid}@example.org
-        source_attribute: uid   # NB: different than source_attribute_id!
+        source_attributes:      # NB: different than source_attribute_id!
+          - uid
       - id: eduPersonScopedAffiliation
         type: ad:Scoped
         scope: '%{idp.scope}'
         source_attribute_id: affiliation
-        dependency: staticAttributes # NB: data connector reference
+        dependencies:           # NB: data connector reference
+          - staticAttributes
         attribute_encoders:
           - type: enc:SAML1ScopedString
             name: urn:mace:dir:attribute-def:eduPersonScopedAffiliation
@@ -151,6 +157,7 @@ shibboleth:
             name: urn:oid:1.3.6.1.4.1.5923.1.1.1.9
             friendly_name: eduPersonScopedAffiliation
             encode_type: False
+
     resolver_data_connectors:
       - id: staticAttributes
         type: dc:Static
@@ -252,7 +259,6 @@ shibboleth:
 #### SHIBBOLETH SERVICE PROVIDER CONFIGURATION EXAMPLE
 ####
 
-shibboleth:
   sp:
     entity_id: https://www.example.com/shibboleth
     support_contact: 'webmaster@example.com'
@@ -407,7 +413,6 @@ shibboleth:
 #### SHIBBOLETH EMBEDDED DISCOVERY SERVICE CONFIGURATION EXAMPLE
 ####
 
-shibboleth:
   ds:
     preferred_idps:
       - https://login.example.org/shibboleth/idp
