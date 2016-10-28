@@ -1,5 +1,5 @@
 {%- macro generate_policy(mode, policy, indent=8, step=4) %}
-  {%- set needs_end_tag =
+{%- set needs_end_tag =
   'AND' in policy or
   'OR' in policy or
   'NOT' in policy %}
