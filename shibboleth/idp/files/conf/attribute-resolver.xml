@@ -107,6 +107,9 @@
                                    {%- if 'friendly_name' in attrenc %}
                                    friendlyName="{{ attrenc['friendly_name'] }}"
                                    {%- endif %}
+                                   {%- if 'format' in attrenc %}
+                                   nameFormat="{{ attrenc['format'] }}"
+                                   {%- endif %}
                                    {%- if 'encode_type' in attrenc %}
                                    encodeType="{{ 'true' if attrenc['encode_type'] else 'false' }}"
                                    {%- endif %} />
