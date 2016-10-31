@@ -19,6 +19,13 @@ of protected online resources in a privacy-preserving manner.
   Currently, only very simple attribute generation and attribute
   release rules are supported.
 
+* **shibboleth.mda**
+
+  Installs, configures, and runs the CLI version of the Shibboleth
+  Metadata Aggregator (MA a/k/a MDA).  On supported versions of
+  Unix/Linux, this also creates a cron(8) job to refresh the generated
+  metadata aggregates on an hourly basis.
+
 * **shibboleth.sp**
 
   Installs and configures the Shibboleth Service Provider (SP).
@@ -105,7 +112,7 @@ successfully deploy the identity provider:
 
 * **shibboleth.idp:metadata_providers**
 
-  At a minimum this is a list of URLs, from which the IdP can download
+  At a minimum this is a list of URLs from which the IdP can download
   the XML metadata of trusted service providers.
 
 ### Shibboleth SP
@@ -147,6 +154,23 @@ successfully deploy the service provider:
 ### Shibboleth EDS
 
 Configuration of the embedded discovery service is optional.
+
+### Shibboleth MDA
+
+At a minimum one must set the following Pillar keys in order to
+successfully deploy the CLI version of the metadata aggregator:
+
+* **shibboleth:mda:signing_key*
+
+  This key (a DER-encoded X.509 private key in base64 format) is
+  required for XML document signing.
+
+* **shibboleth:mda:all_entities_aggregate**,
+  **shibboleth:mda:idp_entities_aggregate**, and
+  **shibboleth:mda:sp_entities_aggregate**
+
+  These are pathnames denoting the location of the respective
+  aggregates on the minion's file system.
 
 ### xmlsectool
 

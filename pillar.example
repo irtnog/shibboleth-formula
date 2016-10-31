@@ -194,6 +194,41 @@ shibboleth:
             permit:
               ANY
 
+    unverified_rp_profiles:     # run an open IdP
+      - parent: SAML2.SSO
+        encrypt_assertions: false
+
+    rp_profile_overrides:
+      - parent:                 # optional; this is the default
+          RelyingPartyByName
+        relying_parties:
+          - https://sp.example.org
+        profiles:               # disable encrypted assertions
+          - parent: SAML2.SSO
+            encrypt_assertions: False
+      - relying_parties:
+          - https://sp2.example.org
+          - https://sp3.example.org
+        profiles:               # force a specific Name ID format
+          - parent: SAML2.SSO
+            name_id_format_precedence:
+              urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+      - parent:
+          RelyingPartyByGroup
+        relying_parties:        # FIXME: more than one allowed?
+          - urn:mace:incommon
+        profiles:               # FIXME: does this disable consent?
+          - parent: SAML2.SSO
+            post_authentication_flows: []
+      - parent:
+          RelyingPartyByTag
+        tag_candidates:         # FIXME: more than one allowed? ordered list?
+          - http://macedir.org/entity-category:
+              http://refeds.org/category/research-and-scholarship
+        profiles:
+          - parent: SAML2.SSO
+            post_authentication_flows: []
+
     ## IdP keying material
     ## TODO: handle IdP keymat rollover
     backchannel_certificate: |
@@ -441,6 +476,32 @@ shibboleth:
         submit_button_label: Walk th\' plank!
         help_text: Parley!
         default_logo_alt: Th\' BLACK FLAG!
+
+####
+#### SHIBBOLETH METADATA AGGREGATOR (CLI) CONFIGURATION EXAMPLE
+####
+
+  mda:
+    signing_key: |
+      -----BEGIN PRIVATE KEY-----
+      ZNF17QTx4kfPEfRqI7AA4y3jJ7zXOzT1WBh7XJ8o5Tm/W+zVR5ngC7h5hLZaL4gl
+      7nmtDqKWXvY695BByTaW9QB2gM+9y8z5tFNowPkQYsSRpWctjLyOiq6IeuBblJo9
+      kJ03hhgdV3zJ1dhnq3p6LDiOw4HqcPkx2LzIPWKQgDGeIzzWPJnDVgD3DfcnuTVs
+      zguDOFDpFdiFytQwWWoqHmn1wbrj1p0SHZoVfnDp5HSQ6WZ7kLLTySrYJ920ku8A
+      DUlwy287Lwh/qO2hX80lXnqZYqPHXryPqxJK4PtERCCwCJdGRvrFi3CpAn99DhPz
+      d4tFBjQu19Z0/rUELPEQuCfbCtscpJZ2q/lir5xjj44yJtiky8Go73uK8E/WslEZ
+      kESPaq6LE/4MvlE5pquHkBgZA0u9VigNp+4D0RVbcWhmM5b+ZR2HRszsH+dfjA9f
+      8ums30Dxf6TGrhdQLW39Be6fIz0pisVC+hARW/6RmLvQRCmgZTkSZcjQNBICkbLe
+      v44pQ1XpbXGP8WpnGKKSyYTyXEV6GwFOzF5uWicUgpzpCJMk1RjXAyiybcg0o5fS
+      2xsofsGmuWHyhKEarwEheFEyz1RtQ2h0uWEG3+l1Hi+rQAO1uxnEv1H3cfEu2bc6
+      BkvGmo8EcpTkRvBU1aRVHhzGXp3kzR+SPV261qYYDBI=
+      -----END PRIVATE KEY-----
+    all_entities_aggregate:
+      /var/www/html/metadata.xml
+    idp_entities_aggregate:
+      /var/www/html/metadata-idp-only.xml
+    sp_entities_aggregate:
+      /var/www/html/metadata-sp-only.xml
 
 #### Local variables:
 #### mode: yaml
