@@ -144,3 +144,23 @@ shibboleth:
         attribute_rules:
           - attribute_id: uid
             permit_value: ANY
+
+    ## relying-party.xml
+    unverified_rp_profiles:     # how to handle SPs with no metadata;
+      []                        # run a closed IdP by default
+    default_rp_profiles:        # default profiles for all SPs
+      - parent: Shibboleth.SSO
+        post_authentication_flows:
+          - attribute-release   # here's the consent flow
+      - SAML1.AttributeQuery
+      - SAML1.ArtifactResolution
+      - parent: SAML2.SSO
+        post_authentication_flows:
+          - attribute-release
+      - SAML2.ECP
+      - SAML2.Logout
+      - SAML2.AttributeQuery
+      - SAML2.ArtifactResolution
+      - Liberty.SSOS
+    rp_profile_overrides:       # per-SP overrides for the above
+      []                        # defaults

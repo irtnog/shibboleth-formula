@@ -1,11 +1,12 @@
 {%- macro generate_policy(mode, policy, indent=8, step=4) %}
-{%- set needs_end_tag =
-  'AND' in policy or
-  'OR' in policy or
-  'NOT' in policy %}
+  {%- set needs_end_tag =
+    'AND' in policy or
+    'OR' in policy or
+    'NOT' in policy %}
 {{ '<%s%s%s>'|format(
     mode,
-    { 'xsi:type':
+    {
+      'xsi:type':
         (policy|dictsort)[0][0] if policy is mapping
         else policy,
       'value':
@@ -33,4 +34,28 @@
   {%- if needs_end_tag %}
 {{ '</%s>'|format(mode)|indent(indent, True) }}
   {%- endif %}
+{%- endmacro %}
+
+{%- macro generate_rp_profile(profile, indent=20) %}
+{%- if profile is string %}
+{{ '<ref bean="%s"/>'|format(profile)|indent(indent, True) }}
+{%- elif profile is mapping %}
+{{ '<bean%s/>'|format(
+    {
+      'parent':
+        profile.parent,
+      'p:postAuthenticationFlows':
+        profile.post_authentication_flows|join(' ')
+        if 'post_authentication_flows' in profile else
+        None,
+      'p:encryptAssertions':
+        None if 'encrypt_assertions' not in profile else
+        'true' if profile.encrypt_assertions else 'false',
+      'p:nameIDFormatPrecedence':
+        profile.name_id_format_precedence
+        if 'name_id_format_precedence' in profile else
+        None,
+    }|xmlattr
+  )|indent(indent, True) }}
+{%- endif %}
 {%- endmacro %}
