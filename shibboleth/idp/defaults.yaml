@@ -164,3 +164,31 @@ shibboleth:
       - Liberty.SSOS
     rp_profile_overrides:       # per-SP overrides for the above
       []                        # defaults
+
+    ## saml-nameid.properties
+    nameid_saml2_legacy_generator:
+      ~
+    nameid_saml1_legacy_generator:
+      ~
+    nameid_saml2_default:
+      ~
+    nameid_saml1_default:
+      ~
+    transient_id_generator:
+      ~
+    persistent_id_source_attribute:
+      ~
+    persistent_id_use_unfiltered_attributes:
+      ~
+    persistent_id_algorithm:
+      ~
+    persistent_id_salt:
+      ~
+    persistent_id_generator:
+      ~
+    persistent_id_data_source:
+      ~
+    persistent_id_store:
+      ~
+    persistent_id_computed:
+      ~

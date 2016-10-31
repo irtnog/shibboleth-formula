@@ -229,6 +229,11 @@ shibboleth:
           - parent: SAML2.SSO
             post_authentication_flows: []
 
+    persistent_id_source_attribute:
+      uid
+    persistent_id_salt:
+      12345
+
     ## IdP keying material
     ## TODO: handle IdP keymat rollover
     backchannel_certificate: |
