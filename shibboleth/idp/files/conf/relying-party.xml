@@ -58,8 +58,8 @@
             </property>
         </bean>
         -->
+{#- This manually generates XML attributes because SpEL isn't markup-safe. #}
 {%- for rp in shibidp_settings.rp_profile_overrides %}
-{#- Manually generate XML attributes because SpEL isn't markup-safe. #}
 {%- set parent = rp.parent if 'parent' in rp and rp.parent is string else 'RelyingPartyByName' %}
 {%- if parent == 'RelyingPartyByName' %}
 {%- set rp_ids = rp.relying_parties
@@ -84,18 +84,12 @@
                 <list>
 {%- for tag_candidate in rp.tag_candidates %}
 {%- for tag_name, tag_values in tag_candidate %}
-                    <bean{{ {
-                              'parent':
-                                'TagCandidate',
-                              'c:name':
-                                tag_name,
-                              'p:values':
-                                tag_values
-                                if tag_values is string else
-                                '#{{\'%s\'}}'|format(tag_values|join('\', \''))
-                                if tag_values is sequence else
-                                None,
-                            }|xmlattr }}/>
+{%- set values = tag_values
+                 if tag_values is string else
+                 tag_values[0]
+                 if tag_values is sequence and tag_values|length == 1 else
+                 '#{{\'%s\'}}'|format(tag_values|join('\', \'')) %}
+                    <bean parent="TagCandidate" c:name="{{ tag_name }}" p:values="{{ values }}"/>
 {%- endfor %}
 {%- endfor %}
                 </list>

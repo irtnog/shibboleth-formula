@@ -90,29 +90,26 @@
     </resolver:AttributeDefinition>
     -->
 {% for attrdef in shibidp_settings.resolver_attribute_definitions %}
-    <resolver:AttributeDefinition id="{{ attrdef['id'] }}"
-                                  xsi:type="{{ attrdef['type'] }}"
-                                  {%- if 'scope' in attrdef %}
-                                  scope="{{ attrdef['scope'] }}"
-                                  {%- endif %}
-                                  {%- if 'source_attribute_id' in attrdef %}
-                                  sourceAttributeID="{{ attrdef['source_attribute_id'] }}"
-                                  {%- endif %}>
+    <resolver:AttributeDefinition{{ {
+        'id': attrdef['id'],
+        'xsi:type': attrdef['type'],
+        'scope': attrdef['scope']|default(None),
+        'sourceAttributeID': attrdef['source_attribute_id']|default(None),
+      }|xmlattr }}>
         {%- for dependency in attrdef['dependencies']|default([]) %}
         <resolver:Dependency{{ { 'ref': dependency }|xmlattr }}/>
         {%- endfor %}
         {%- for attrenc in attrdef['attribute_encoders']|default([]) %}
-        <resolver:AttributeEncoder xsi:type="{{ attrenc['type'] }}"
-                                   name="{{ attrenc['name'] }}"
-                                   {%- if 'friendly_name' in attrenc %}
-                                   friendlyName="{{ attrenc['friendly_name'] }}"
-                                   {%- endif %}
-                                   {%- if 'format' in attrenc %}
-                                   nameFormat="{{ attrenc['format'] }}"
-                                   {%- endif %}
-                                   {%- if 'encode_type' in attrenc %}
-                                   encodeType="{{ 'true' if attrenc['encode_type'] else 'false' }}"
-                                   {%- endif %} />
+        <resolver:AttributeEncoder{{ {
+            'xsi:type': attrenc['type'],
+            'name': attrenc['name'],
+            'friendlyName': attrenc['friendly_name']|default(None),
+            'nameFormat': attrenc['format']|default(None),
+            'encodeType': None
+                          if 'encode_type' not in attrenc else
+                          'true' if attrenc['encode_type'] else
+                          'false',
+          }|xmlattr }} />
         {%- endfor %}
         {%- if 'template' in attrdef %}
         <ad:Template>
@@ -138,10 +135,14 @@
     </resolver:DataConnector>
     -->
 {% for dataconn in shibidp_settings.resolver_data_connectors %}
-    <resolver:DataConnector id="{{ dataconn['id'] }}"
-                            xsi:type="{{ dataconn['type'] }}">
+    <resolver:DataConnector{{ {
+        'id': dataconn['id'],
+        'xsi:type': dataconn['type'],
+      }|xmlattr }}>
         {%- for attrib in dataconn['attributes']|default([]) %}
-        <dc:Attribute id="{{ attrib['id'] }}">
+        <dc:Attribute{{ {
+            'id': attrib['id'],
+          }|xmlattr }}>
             <dc:Value>{{ attrib['value'] }}</dc:Value>
         </dc:Attribute>
         {%- endfor %}

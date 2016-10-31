@@ -73,46 +73,44 @@
     {%- set mp_id = salt['hashutil.digest'](mp) %}
     {%- if mp.startswith('http') %}
       {#- just a URL, OK for testing, use HTTPS if possible #}
-    {{ '<MetadataProvider%s />'|format(
-         { 'id': '_%s'|format(mp_id),
-           'xsi:type': 'FileBackedHTTPMetadataProvider',
-           'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
-           'metadataURL': mp,
-         }|xmlattr
-       )|indent(4) }}
+    <MetadataProvider{{ {
+        'id': '_%s'|format(mp_id),
+        'xsi:type': 'FileBackedHTTPMetadataProvider',
+        'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
+        'metadataURL': mp,
+      }|xmlattr }}/>
     {%- else %}
       {#- assume inline metadata #}
-    {{ '<MetadataProvider%s />'|format(
-         { 'id': '_%s'|format(mp_id),
-           'xsi:type': 'FilesystemMetadataProvider',
-           'failFastInitialization': 'true',
-           'metadataFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
-         }|xmlattr
-       )|indent(4) }}
+    <MetadataProvider{{ {
+        'id': '_%s'|format(mp_id),
+        'xsi:type': 'FilesystemMetadataProvider',
+        'failFastInitialization': 'true',
+        'metadataFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
+      }|xmlattr }}/>
     {%- endif %}
   {%- elif mp is mapping %}
     {#- TODO: support other metadata provider types #}
     {%- set mp_id = salt['hashutil.digest'](mp.url) %}
-    {{ '<MetadataProvider%s>'|format(
-         { 'id': '_%s'|format(mp_id),
-           'xsi:type': 'FileBackedHTTPMetadataProvider',
-           'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
-           'metadataURL': mp.url,
-         }|xmlattr
-       )|indent(4) }}
+    <MetadataProvider{{ {
+        'id': '_%s'|format(mp_id),
+        'xsi:type': 'FileBackedHTTPMetadataProvider',
+        'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
+        'metadataURL': mp.url,
+      }|xmlattr }}>
     {#- TODO: support for additional metadata filters #}
     {%- for filter in mp.filters|default([]) %}
-      {%- set mf_needs_end_tag = True if 'public_key' in filter or
-                                         'retained_roles' in filter
-                                      else False %}
-      {{ '<MetadataFilter%s%s>'|format(
-           { 'xsi:type': filter.type,
-             'requireSignedRoot': None if 'require_signed_root' not in filter else
-                                  'true' if filter.require_signed_root else 'false',
-             'maxValidityInterval': filter.max_validity_period|default(None),
-           }|xmlattr,
-           '' if mf_needs_end_tag else ' /'
-         )|indent(6) }}
+      {%- set mf_needs_end_tag = True
+                                 if 'public_key' in filter or 'retained_roles' in filter else
+                                 False %}
+      <MetadataFilter{{ {
+          'xsi:type': filter.type,
+          'requireSignedRoot': None
+                               if 'require_signed_root' not in filter else
+                               'true'
+                               if filter.require_signed_root else
+                               'false',
+          'maxValidityInterval': filter['max_validity_period']|default(None),
+        }|xmlattr }}{{ '' if mf_needs_end_tag else ' /' }}>
       {%- if 'public_key' in filter %}
         <PublicKey>
 {{ filter.public_key|indent(0) }}

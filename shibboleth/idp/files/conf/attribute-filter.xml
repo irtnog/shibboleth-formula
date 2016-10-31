@@ -48,9 +48,13 @@
     </AttributeFilterPolicy>
     -->
     {% for afp in shibidp_settings.attribute_filter_policies %}
-    <AttributeFilterPolicy id="_{{ loop.index }}">{{ generate_policy('PolicyRequirementRule', afp.if) }}
+    <AttributeFilterPolicy{{ {
+        'id': '_%s'|format(loop.index),
+      }|xmlattr }}>{{ generate_policy('PolicyRequirementRule', afp.if) }}
         {%- for ar in afp.then %}
-        <AttributeRule attributeID="{{ ar.release }}">
+        <AttributeRule{{ {
+            'attributeID': ar.release,
+          }|xmlattr }}>
           {%- if 'permit' in ar %}{{ generate_policy('PermitValueRule', ar.permit, indent=12) }}
           {%- elif 'deny' in ar %}{{ generate_policy('DenyValueRule', ar.deny, indent=12) }}
           {%- endif %}
