@@ -160,7 +160,7 @@ Configuration of the embedded discovery service is optional.
 At a minimum one must set the following Pillar keys in order to
 successfully deploy the CLI version of the metadata aggregator:
 
-* **shibboleth:mda:signing_key*
+* **shibboleth:mda:signing_key**
 
   This key (a DER-encoded X.509 private key in base64 format) is
   required for XML document signing.
