@@ -138,14 +138,132 @@
     <resolver:DataConnector{{ {
         'id': dataconn['id'],
         'xsi:type': dataconn['type'],
+        'activationConditionRef': dataconn['activation_condition']|default(None),
+        'springResources':
+          None if 'spring_resources' not in dataconn else
+          dataconn['spring_resources'] if dataconn['spring_resources'] is string else
+          dataconn['spring_resources']|join(';'),
+        'springResourcesRef': dataconn['spring_resources_reference']|default(None),
+        'factoryPostProcessorsRef': dataconn['factory_post_processors']|default(None),
+        'postProcessorsRef': dataconn['post_processors']|default(None),
+        'profileContextStrategyRef': dataconn['profile_context_strategy']|default(None),
+        'noRetryDelay': dataconn['no_retry_delay']|default(None),
+        'ldapURL': dataconn['ldap_url']|default(None),
+        'baseDN': dataconn['base_dn']|default(None),
+        'principal': dataconn['principal']|default(None),
+        'principalCredential': dataconn['principal_credential']|default(None),
+        'lowercaseAttributeNames':
+          None if 'lowercase_attribute_names' not in dataconn else
+          'true' if dataconn['lowercase_attribute_names'] else
+          'false',
+        'trustFile': dataconn['trust_file']|default(None),
+        'connectionStrategy': dataconn['connection_strategy']|default(None),
+        'authenticationType': dataconn['auth_type']|default(None),
+        'searchScope': dataconn['search_scope']|default(None),
+        'useStartTLS':
+          None if 'use_starttls' not in dataconn else
+          dataconn['use_starttls'] if dataconn['use_starttls'] is string else
+          'true' if dataconn['use_starttls'] else
+          'false',
+        'searchTimeLimit': dataconn['search_time_limit']|default(None),
+        'maxResultSize': dataconn['max_result_size']|default(None),
+        'noResultIsError':
+          None if 'no_result_is_error' not in dataconn else
+          dataconn['no_result_is_error'] if dataconn['no_result_is_error'] is string else
+          'true' if dataconn['no_result_is_error'] else
+          'false',
+        'multipleResultsIsError':
+          None if 'multiple_results_is_error' not in dataconn else
+          dataconn['multiple_results_is_error'] if dataconn['multiple_results_is_error'] is string else
+          'true' if dataconn['multiple_results_is_error'] else
+          'false',
+        'templateEngine': dataconn['template_engine']|default(None),
+        'mappingStrategyRef': dataconn['mapping_strategy']|default(None),
+        'validatorRef': dataconn['validator']|default(None)
       }|xmlattr }}>
+        {%- for dependency in dataconn['dependencies']|default([]) %}
+        <resolver:Dependency ref="{{ dependency }}"/> #}
+        {%- endfor %}
+        {%- for fdc in dataconn['failover_data_connectors']|default([]) %}
+        <resolver:FailoverDataConnector ref="{{ fdc }}"/> #}
+        {%- endfor %}
         {%- for attrib in dataconn['attributes']|default([]) %}
         <dc:Attribute{{ {
             'id': attrib['id'],
           }|xmlattr }}>
+            {%- if attrib['value'] is string %}
             <dc:Value>{{ attrib['value'] }}</dc:Value>
+            {%- else %}
+            {%- for value in attrib['value'] %}
+            <dc:Value>{{ value }}</dc:Value>
+            {%- endfor %}
+            {%- endif %}
         </dc:Attribute>
         {%- endfor %}
+        {%- if 'filter_template' in dataconn %}
+        <dc:FilterTemplate>
+          <![CDATA[
+                   {{ dataconn['filter_template'] }}
+          ]]>
+        </dc:FilterTemplate>
+        {%- endif %}
+        {%- if 'return_attributes' in dataconn %}
+        <dc:ReturnAttributes>{{
+          dataconn['return_attributes'] if dataconn['return_attributes'] is string else
+          dataconn['return_attributes']|join(' ')
+        }}</dc:ReturnAttributes>
+        {%- endif %}
+        {%- if 'ldap_properties' in dataconn %}
+        {%- for property, value in dataconn['ldap_properties'] %}
+        <dc:LDAPProperty{{ {
+            'name': property,
+            'value': value,
+          }|xmlattr }}/>
+        {%- endfor %}
+        {%- endif %}
+        {#- TODO: write a generic renderer for security credentials #}
+        {#- <dc:StartTLSTrustCredential>...</dc:StartTLSTrustCredential> #}
+        {#- <dc:StartTLSAuthenticationCredential>...</dc:StartTLSAuthenticationCredential> #}
+        {%- set conn_pool_properties = {
+            'minPoolSize': dataconn['min_pool_size']|default(None),
+            'maxPoolSize': dataconn['max_pool_size']|default(None),
+            'blockWhenEmpty':
+              None if 'block_when_empty' not in dataconn else
+              'true' if dataconn['block_when_empty'] else
+              'false',
+            'blockWaitTime': dataconn['block_wait_time']|default(None),
+            'validatePeriodically':
+              None if 'validate_periodically' not in dataconn else
+              'true' if dataconn['validate_periodically'] else
+              'false',
+            'validateTimerPeriod': dataconn['validate_timer_period']|default(None),
+            'validateDN': dataconn['validate_dn']|default(None),
+            'validateFilter': dataconn['validate_filter']|default(None),
+            'expirationTime': dataconn['expiration_time']|default(None),
+            'failFastInitialize':
+              None if 'fail_fast_init' not in dataconn else
+              'true' if dataconn['fail_fast_init'] else
+              'false',
+          }|xmlattr(False) %}
+        {%- if conn_pool_properties != '' %}
+        <dc:ConnectionPool {{ conn_pool_properties }}/>
+        {%- endif %}
+        {%- for column_name, attribute_id in dataconn['column_attribute_map']|default({}) %}
+        <dc:Column{{ {
+            'columnName': column_name,
+            'attributeID': attribute_id,
+          }|xmlattr }}/>
+        {%- endfor %}
+        {%- set result_cache_properties = {
+            'maximumCachedElements': dataconn['max_cached_elements']|default(None),
+            'elementTimeToLive': dataconn['cached_element_ttl']|default(None),
+          }|xmlattr(False) %}
+        {%- if result_cache_properties != '' %}
+        <dc:ResultCache {{ result_cache_properties }}/>
+        {%- endif %}
+        {%- if 'result_cache' in dataconn %}
+        <dc:ResultCacheBean>{{ dataconn['result_cache'] }}</dc:ResultCacheBean>
+        {%- endif %}
     </resolver:DataConnector>
 {% endfor %}
 </resolver:AttributeResolver>
