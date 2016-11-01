@@ -27,13 +27,14 @@ shibidp:
     - require:
         - file: shibidp
 
-  cmd.wait_script:
+  cmd.script:
     - source: salt://shibboleth/idp/scripts/install.sh
     - template: jinja
     - user: {{ shibidp_settings.user }}
     - group: {{ shibidp_settings.group }}
-    - watch:
+    - require:
         - pkg: shibidp
+    - onchanges:
         - archive: shibidp
 
   cron.present:
@@ -64,12 +65,15 @@ shibidp_keymat:
     - require:
         - cmd: shibidp
 
-  ## Re-generate the PKCS#12 container that holds the back channel key
-  ## pair.  Note that the password used to encrypt the container gets
-  ## passed via an environment variable in order to prevent it leaking
-  ## via the process list.  (This runs every time---as opposed to only
-  ## when a requisite signals a change---because there's no way to
-  ## detect keystore password changes.)
+  ## Generate the PKCS#12 container, used in Jetty deployments, that
+  ## holds the back channel key pair.  Note that the password used to
+  ## encrypt the container gets passed via an environment variable in
+  ## order to prevent it leaking via the process list.  This formula
+  ## cannot detect keystore password changes as a result.  To cause it
+  ## to regenerate the PKCS#12 container, add an `onchanges_in`
+  ## requisite referencing `cmd: shibidp_keymat` to whatever state
+  ## manages the Jetty configuration file containing the keystore
+  ## password.
   cmd.run:
     - name:
         openssl pkcs12 -export -password env:SHIBIDP_KEYSTORE_PASSWORD
@@ -80,7 +84,7 @@ shibidp_keymat:
         - SHIBIDP_KEYSTORE_PASSWORD:
             {{ shibidp_settings.keystore_password|yaml_encode }}
     - runas: {{ shibidp_settings.user }}
-    - require:
+    - onchanges:
         - file: shibidp_keymat
 
 ## The vendor hardcodes shell scripts to use /bin/bash, which doesn't
