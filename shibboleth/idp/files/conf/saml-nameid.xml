@@ -35,10 +35,10 @@
         <ref bean="shibboleth.SAML2TransientGenerator" />
         
         <!-- Uncommenting this bean requires configuration in saml-nameid.properties. -->
-{%- if shibidp_settings.persistent_id_source_attribute == None and
-       shibidp_settings.persistent_id_salt == None and
-       shibidp_settings.persistent_id_data_source == None and
-       shibidp_settings.persistent_id_store == None %}
+{%- if shibidp_settings.persistent_id_source_attribute == None
+    and shibidp_settings.persistent_id_salt == None
+    and shibidp_settings.persistent_id_data_source == None
+    and shibidp_settings.persistent_id_store == None %}
         <!--
         <ref bean="shibboleth.SAML2PersistentGenerator" />
         -->

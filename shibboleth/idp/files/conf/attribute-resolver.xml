@@ -105,10 +105,10 @@
             'name': attrenc['name'],
             'friendlyName': attrenc['friendly_name']|default(None),
             'nameFormat': attrenc['format']|default(None),
-            'encodeType': None
-                          if 'encode_type' not in attrenc else
-                          'true' if attrenc['encode_type'] else
-                          'false',
+            'encodeType':
+              None if 'encode_type' not in attrenc else
+              'true' if attrenc['encode_type'] else
+              'false',
           }|xmlattr }} />
         {%- endfor %}
         {%- if 'template' in attrdef %}
@@ -141,8 +141,10 @@
         'activationConditionRef': dataconn['activation_condition']|default(None),
         'springResources':
           None if 'spring_resources' not in dataconn else
-          dataconn['spring_resources'] if dataconn['spring_resources'] is string else
-          dataconn['spring_resources']|join(';'),
+          dataconn['spring_resources']|join(';')
+            if dataconn['spring_resources'] is sequence
+            and dataconn['spring_resources'] is not string else
+          dataconn['spring_resources'],
         'springResourcesRef': dataconn['spring_resources_reference']|default(None),
         'factoryPostProcessorsRef': dataconn['factory_post_processors']|default(None),
         'postProcessorsRef': dataconn['post_processors']|default(None),
@@ -169,12 +171,14 @@
         'maxResultSize': dataconn['max_result_size']|default(None),
         'noResultIsError':
           None if 'no_result_is_error' not in dataconn else
-          dataconn['no_result_is_error'] if dataconn['no_result_is_error'] is string else
+          dataconn['no_result_is_error']
+            if dataconn['no_result_is_error'] is string else
           'true' if dataconn['no_result_is_error'] else
           'false',
         'multipleResultsIsError':
           None if 'multiple_results_is_error' not in dataconn else
-          dataconn['multiple_results_is_error'] if dataconn['multiple_results_is_error'] is string else
+          dataconn['multiple_results_is_error']
+            if dataconn['multiple_results_is_error'] is string else
           'true' if dataconn['multiple_results_is_error'] else
           'false',
         'templateEngine': dataconn['template_engine']|default(None),
@@ -191,12 +195,13 @@
         <dc:Attribute{{ {
             'id': attrib['id'],
           }|xmlattr }}>
-            {%- if attrib['value'] is string %}
-            <dc:Value>{{ attrib['value'] }}</dc:Value>
-            {%- else %}
+            {%- if attrib['value'] is sequence
+                and attrib['value'] is not string %}
             {%- for value in attrib['value'] %}
             <dc:Value>{{ value }}</dc:Value>
             {%- endfor %}
+            {%- else %}
+            <dc:Value>{{ attrib['value'] }}</dc:Value>
             {%- endif %}
         </dc:Attribute>
         {%- endfor %}
@@ -209,18 +214,18 @@
         {%- endif %}
         {%- if 'return_attributes' in dataconn %}
         <dc:ReturnAttributes>{{
-          dataconn['return_attributes'] if dataconn['return_attributes'] is string else
           dataconn['return_attributes']|join(' ')
+            if dataconn['return_attributes'] is sequence
+            and dataconn['return_attributes'] is not string else
+          dataconn['return_attributes']
         }}</dc:ReturnAttributes>
         {%- endif %}
-        {%- if 'ldap_properties' in dataconn %}
-        {%- for property, value in dataconn['ldap_properties'] %}
+        {%- for property, value in dataconn['ldap_properties']|default({}) %}
         <dc:LDAPProperty{{ {
             'name': property,
             'value': value,
           }|xmlattr }}/>
         {%- endfor %}
-        {%- endif %}
         {#- TODO: write a generic renderer for security credentials #}
         {#- <dc:StartTLSTrustCredential>...</dc:StartTLSTrustCredential> #}
         {#- <dc:StartTLSAuthenticationCredential>...</dc:StartTLSAuthenticationCredential> #}

@@ -7,25 +7,30 @@
     mode,
     {
       'xsi:type':
-        (policy|dictsort)[0][0] if policy is mapping
-        else policy,
+        (policy|dictsort)[0][0] if policy is mapping else
+        policy,
       'value':
         (policy|dictsort)[0][1]
-        if policy is mapping and (policy|dictsort)[0][1] is string else
+          if policy is mapping
+          and (policy|dictsort)[0][1] is string else
         (policy|dictsort)[0][1].value
-        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+          if policy is mapping
+          and (policy|dictsort)[0][1] is mapping else
         None,
       'ignoreCase':
-        (policy|dictsort)[0][1].ignore_case|default(None)
-        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+        (policy|dictsort)[0][1]['ignore_case']|default(None)
+          if policy is mapping
+          and (policy|dictsort)[0][1] is mapping else
         None,
       'attributeName':
         (policy|dictsort)[0][1].attribute_name|default(None)
-        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+          if policy is mapping
+          and (policy|dictsort)[0][1] is mapping else
         None,
       'attributeValue':
         (policy|dictsort)[0][1].attribute_value|default(None)
-        if policy is mapping and (policy|dictsort)[0][1] is mapping else
+          if policy is mapping
+          and (policy|dictsort)[0][1] is mapping else
         None,
     }|xmlattr,
     '' if needs_end_tag else ' /'
@@ -46,14 +51,14 @@
         profile.parent,
       'p:postAuthenticationFlows':
         profile.post_authentication_flows|join(' ')
-        if 'post_authentication_flows' in profile else
+          if 'post_authentication_flows' in profile else
         None,
       'p:encryptAssertions':
         None if 'encrypt_assertions' not in profile else
         'true' if profile.encrypt_assertions else 'false',
       'p:nameIDFormatPrecedence':
         profile.name_id_format_precedence
-        if 'name_id_format_precedence' in profile else
+          if 'name_id_format_precedence' in profile else
         None,
     }|xmlattr
   )|indent(indent, True) }}

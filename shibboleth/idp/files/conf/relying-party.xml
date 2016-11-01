@@ -60,21 +60,29 @@
         -->
 {#- This manually generates XML attributes because SpEL isn't markup-safe. #}
 {%- for rp in shibidp_settings.rp_profile_overrides %}
-{%- set parent = rp.parent if 'parent' in rp and rp.parent is string else 'RelyingPartyByName' %}
+{%- set parent = rp['parent']|default('RelyingPartyByName') %}
 {%- if parent == 'RelyingPartyByName' %}
-{%- set rp_ids = rp.relying_parties
-                 if rp.relying_parties is string else
-                 rp.relying_parties[0]
-                 if rp.relying_parties is sequence and rp.relying_parties|length == 1 else
-                 '#{{\'%s\'}}'|format(rp.relying_parties|join('\', \'')) %}
+{%- set rp_ids =
+    rp['relying_parties'][0]
+      if rp['relying_parties'] is sequence
+      and rp['relying_parties'] is not string
+      and rp['relying_parties']|length == 1 else
+    '#{{\'%s\'}}'|format(rp['relying_parties']|join('\', \''))
+      if rp['relying_parties'] is sequence
+      and rp['relying_parties'] is not string else
+    rp['relying_parties'] %}
 
         <bean parent='RelyingPartyByName' c:relyingPartyIds="{{ rp_ids }}">
 {%- elif parent == 'RelyingPartyByGroup' %}
-{%- set groups = rp.group_names
-                 if rp.group_names is string else
-                 rp.group_names[0]
-                 if rp.group_names is sequence and rp.group_names|length == 1 else
-                 '#{{\'%s\'}}'|format(rp.group_names|join('\', \'')) %}
+{%- set groups =
+    rp['group_names'][0]
+      if rp['group_names'] is sequence
+      and rp['group_names'] is not string
+      and rp['group_names']|length == 1 else
+    '#{{\'%s\'}}'|format(rp['group_names']|join('\', \''))
+      if rp['group_names'] is sequence
+      and rp['group_names'] is not string else
+    rp['group_names'] %}
 
         <bean parent="RelyingPartyByGroup" c:groupNames="{{ groups }}">
 {%- elif parent == 'RelyingPartyByTag' %}
@@ -82,13 +90,17 @@
         <bean parent="RelyingPartyByTag">
             <constructor-arg name="candidates">
                 <list>
-{%- for tag_candidate in rp.tag_candidates %}
+{%- for tag_candidate in rp['tag_candidates'] %}
 {%- for tag_name, tag_values in tag_candidate %}
-{%- set values = tag_values
-                 if tag_values is string else
-                 tag_values[0]
-                 if tag_values is sequence and tag_values|length == 1 else
-                 '#{{\'%s\'}}'|format(tag_values|join('\', \'')) %}
+{%- set values =
+    tag_values[0]
+      if tag_values is sequence
+      and tag_values is not string
+      and tag_values|length == 1 else
+    '#{{\'%s\'}}'|format(tag_values|join('\', \''))
+      if tag_values is sequence
+      and tag_values is not string else
+    tag_values %}
                     <bean parent="TagCandidate" c:name="{{ tag_name }}" p:values="{{ values }}"/>
 {%- endfor %}
 {%- endfor %}
