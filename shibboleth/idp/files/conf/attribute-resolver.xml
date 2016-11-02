@@ -150,10 +150,10 @@
         'postProcessorsRef': dataconn['post_processors']|default(None),
         'profileContextStrategyRef': dataconn['profile_context_strategy']|default(None),
         'noRetryDelay': dataconn['no_retry_delay']|default(None),
-        'ldapURL': dataconn['ldap_url']|default(None),
+        'ldapURL': dataconn['url']|default(None),
         'baseDN': dataconn['base_dn']|default(None),
-        'principal': dataconn['principal']|default(None),
-        'principalCredential': dataconn['principal_credential']|default(None),
+        'principal': dataconn['bind_dn']|default(None),
+        'principalCredential': dataconn['bind_credential']|default(None),
         'lowercaseAttributeNames':
           None if 'lowercase_attribute_names' not in dataconn else
           'true' if dataconn['lowercase_attribute_names'] else
