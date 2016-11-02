@@ -13,7 +13,7 @@
         (policy|dictsort)[0][1]
           if policy is mapping
           and (policy|dictsort)[0][1] is string else
-        (policy|dictsort)[0][1].value
+        (policy|dictsort)[0][1]['value']|default(None)
           if policy is mapping
           and (policy|dictsort)[0][1] is mapping else
         None,
@@ -23,20 +23,26 @@
           and (policy|dictsort)[0][1] is mapping else
         None,
       'attributeName':
-        (policy|dictsort)[0][1].attribute_name|default(None)
+        (policy|dictsort)[0][1]['attribute_name']|default(None)
           if policy is mapping
           and (policy|dictsort)[0][1] is mapping else
         None,
       'attributeValue':
-        (policy|dictsort)[0][1].attribute_value|default(None)
+        (policy|dictsort)[0][1]['attribute_value']|default(None)
           if policy is mapping
           and (policy|dictsort)[0][1] is mapping else
         None,
     }|xmlattr,
     '' if needs_end_tag else ' /'
   )|indent(indent, True) }}
-  {#- TODO recursive call(s) to generate_policy() happen here #}
   {%- if needs_end_tag %}
+    {%- if (policy|dictsort)[0][1] is sequence %}
+      {%- for policy in (policy|dictsort)[0][1] %}
+{{ generate_policy('Rule', policy, indent+step, step) }}
+      {%- endfor %}
+    {%- else %}
+{{ generate_policy('Rule', (policy|dictsort)[0][1], indent+step, step) }}
+    {%- endif %}
 {{ '</%s>'|format(mode)|indent(indent, True) }}
   {%- endif %}
 {%- endmacro %}
