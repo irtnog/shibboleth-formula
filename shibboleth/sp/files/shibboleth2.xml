@@ -155,7 +155,7 @@
     {#- TODO: support other metadata provider types #}
     {%- set mp_id = salt['hashutil.digest'](mp.url) %}
         <MetadataProvider{{ {
-                              'type': mp.type,
+                              'type': mp.type|default('XML'),
                               'url': mp.url|default(None),
                               'backingFilePath': '_%s.xml'|format(mp_id),
                               'maxRefreshDelay': mp.max_refresh_delay|default(None),
