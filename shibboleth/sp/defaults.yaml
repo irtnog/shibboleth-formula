@@ -28,7 +28,7 @@ shibboleth:
     unsafe_chars: ~
     allowed_schemes: ~
     lang_from_client: ~
-    lang_priority: ~
+    lang_priority: []
 
     remote_user:
       - eppn
