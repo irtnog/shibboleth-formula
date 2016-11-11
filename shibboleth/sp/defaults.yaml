@@ -66,3 +66,5 @@ shibboleth:
     support_contact: 'root@localhost'
     help_location: /about.html
     style_sheet: /shibboleth-sp/main.css
+
+    relying_parties: []

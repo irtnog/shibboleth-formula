@@ -269,6 +269,17 @@
         <CredentialResolver type="File" use="encryption" certificate="sp-encryption.crt" key="sp-encryption.key" />
         <CredentialResolver type="File" use="signing"    certificate="sp-signing.crt"    key="sp-signing.key" />
 
+        {%- for rp in shibsp_settings['relying_parties'] %}
+
+        <RelyingParty{{ {
+            'name': rp['name'],
+            'signing':
+              None if 'signing' not in rp else
+              'true' if rp['signing'] else
+              'false',
+          }|xmlattr }}/>
+        {%- endfor %}
+
         <!--
         The default settings can be overridden by creating ApplicationOverride elements (see
         the https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApplicationOverride topic).
