@@ -395,29 +395,42 @@ shibboleth:
             max_validity_interval: 1209600
           ## Consume all IdP metadata in the aggregate.
           - type: EntityRoleWhiteList
-            entries:
+            retained_roles:
               - md:IDPSSODescriptor
               - md:AttributeAuthorityDescriptor
           ## Only trust IdPs tagged as supporting REFEDS R&S attribute
-          ## release.
-          - type: EntityRoleWhiteList
-            matcher: EntityAttributes
-            entries:            # FIXME: switch to a list of mappings
-              - http://macedir.org/entity-category-support:                # attribute
-                  http://id.incommon.org/category/research-and-scholarship # value
-              - http://macedir.org/entity-category-support:                # attribute
-                  urn:oasis:names:tc:SAML:2.0:attrname-format:uri:         # format (default shown here)
-                    http://refeds.org/category/research-and-scholarship    # value
+          ## release (plus a few others with whom we've negotiated the
+          ## the release of ePPN).
+          - type: WhiteList
+            attributes:
+              ## InCommon R&S (legacy?)
+              - name: http://macedir.org/entity-category-support
+                values:
+                  - http://id.incommon.org/category/research-and-scholarship
+              ## REFEDS R&S
+              - name: http://macedir.org/entity-category-support
+                values:
+                  - http://refeds.org/category/research-and-scholarship
+            include:            # also include these
+              - urn:mace:incommon:nih.gov
         ## Hiding an IdP from the discovery interface does NOT prevent
         ## the SP from accepting an assertion from the IdP.
-        discovery_filters:      # TODO
+        discovery_filters:
           - type: EntityRoleWhiteList
             matcher: EntityAttributes
-            entries:
-              - http://macedir.org/entity-category:
-                  http://refeds.org/category/hide-from-discovery
+            attributes:
+              - name: http://macedir.org/entity-category
+                values:
+                  - http://refeds.org/category/hide-from-discovery
 
-    ## TODO: manage SP keymat
+    relying_parties:
+      ## Interoperation with the NIH identity provider requires
+      ## signing SAML authentication requests.
+      - name:
+          urn:mace:incommon:nih.gov
+        signing:
+          true
+
     encryption_certificate: &spcert |
       -----BEGIN CERTIFICATE-----
       XoeaUnFuAXE73GlKja4LiBkXMyEe1QOMwqvQOP+dbUc7C4GVy11PFsR3srRC578l

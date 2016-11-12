@@ -172,11 +172,7 @@
           }|xmlattr }} />
     {%- endif %}
   {%- elif mp is mapping %}
-    {#- TODO: support other metadata provider types #}
     {%- set mp_id = salt['hashutil.digest'](mp['url']) %}
-    {%- set needs_end_tag =
-          mp['metadata_filters']|default([]) != [] or
-          mp['discovery_filters']|default([]) != [] %}
         <MetadataProvider{{ {
             'type': mp['type']|default('XML'),
             'url': mp['url']|default(None),
@@ -187,7 +183,8 @@
               'true' if mp['legacy_org_names'] else
               'false',
           }|xmlattr }}
-        {%- if needs_end_tag %}>
+        {%- if mp['metadata_filters']|default([]) != []
+            or mp['discovery_filters']|default([]) != [] %}>
             {%- for filter in mp['metadata_filters']|default([]) %}
             <MetadataFilter{{ {
                 'type': filter['type'],
@@ -213,44 +210,119 @@
                   'false',
                 'maxValidityInterval':
                   filter['max_validity_interval']|default(None),
+                'removeRolelessEntityDescriptors':
+                  None if 'remove_roleless_entity_descriptors' not in filter else
+                  'true' if filter['remove_roleless_entity_descriptors'] else
+                  'false',
+                'removeEmptyEntitiesDescriptors':
+                  None if 'remove_empty_entity_descriptors' not in filter else
+                  'true' if filter['remove_empty_entity_descriptors'] else
+                  'false',
               }|xmlattr }}
               {%- if filter['type'] in [
                   'Whitelist',
                   'Blacklist',
-                  'EntityRoleWhiteList'
+                  'EntityRoleWhiteList',
+                  'EntityAttributes',
               ] %}>
-                {%- for item in filter['entries'] %}
-                  {%- if filter['matcher']|default(None) == 'EntityAttributes' %}
-                    {%- set attribute = (item|dictsort)[0][0] %}
-                    {%- if (item|dictsort)[0][1] is mapping %}
-                      {%- set name_format = ((item|dictsort)[0][1]|dictsort)[0][0] %}
-                      {%- set attribute_values = ((item|dictsort)[0][1]|dictsort)[0][1] %}
-                    {%- else %}
-                      {%- set name_format = 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri' %}
-                      {%- set attribute_values = (item|dictsort)[0][1] %}
-                    {%- endif %}
-                    {%- if attribute_values is string %}
-                      {%- set attribute_values = [ attribute_values ] %}
-                    {%- endif %}
-                    {%- for attribute_value in attribute_values %}
-                <saml:Attribute name="{{ attribute }}" NameFormat="{{ name_format }}">
-                    <saml:AttributeValue>{{ attribute_value }}</saml:AttributeValue>
-                </saml:Attribute>
+                {%- for role in filter['retained_roles']|default([]) %}
+                <RetainedRole>{{ role }}</RetainedRole>
+                {%- endfor %}
+                {%- for attributes in filter['attributes']|default([]) %}
+                  {%- set version = attribute['version']|default('saml2') %}
+                <{{ version }}:Attribute{{ {
+                    'FriendlyName': attribute['friendly_name']|default(None),
+                    'Name': attribute['name'],
+                    'NameFormat': attribute['name_format']|default(None),
+                  }|xmlattr }}>
+                    {%- for value in attribute['values'] %}
+                      {%- if value is mapping and 'regex' in value %}
+                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
+                      {%- else %}
+                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
+                      {%- endif %}
                     {%- endfor %}
-                  {%- else %}
-                    {%- set tag =
-                        'Include' if filter.type == 'Whitelist' else
-                        'Exclude' if filter.type == 'Blacklist' else
-                        'RetainedRole' %}
-                <{{ tag }}>{{ item }}</{{ tag }}>
-                  {%- endif %}
+                </{{ version }}:Attribute>
+                {%- endfor %}
+                {%- for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
+                  {%- for attribute in attributes %}
+                  {%- set version = attribute['version']|default('saml2') %}
+                <{{ version }}:Attribute{{ {
+                    'FriendlyName': attribute['friendly_name']|default(None),
+                    'Name': attribute['name'],
+                    'NameFormat': attribute['name_format']|default(None),
+                  }|xmlattr }}>
+                    {%- for value in attribute['values'] %}
+                      {%- if value is mapping and 'regex' in value %}
+                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
+                      {%- else %}
+                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
+                      {%- endif %}
+                    {%- endfor %}
+                </{{ version }}:Attribute>
+                  {%- endfor %}
+                <Entity>{{ entity }}</Entity>
+                {%- endfor %}
+                {%- for include in filter['includes']|default([]) %}
+                <Include>{{ include }}</Include>
+                {%- endfor %}
+                {%- for exclude in filter['excludes']|default([]) %}
+                <Exclude>{{ exclude }}</Exclude>
                 {%- endfor %}
             </MetadataFilter>
               {%- else %} />
               {%- endif %}
             {%- endfor %}
             {%- for filter in mp.discovery_filter|default([]) %}
-            {#- TODO #}
+            <DiscoveryFilter{{ {
+                'type': filter['type'],
+                'matcher': filter['matcher'],
+              }|xmlattr }}>
+                {%- for role in filter['retained_roles']|default([]) %}
+                <RetainedRole>{{ role }}</RetainedRole>
+                {%- endfor %}
+                {%- for attributes in filter['attributes']|default([]) %}
+                  {%- set version = attribute['version']|default('saml2') %}
+                <{{ version }}:Attribute{{ {
+                    'FriendlyName': attribute['friendly_name']|default(None),
+                    'Name': attribute['name'],
+                    'NameFormat': attribute['name_format']|default(None),
+                  }|xmlattr }}>
+                    {%- for value in attribute['values'] %}
+                      {%- if value is mapping and 'regex' in value %}
+                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
+                      {%- else %}
+                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
+                      {%- endif %}
+                    {%- endfor %}
+                </{{ version }}:Attribute>
+                {%- endfor %}
+                {%- for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
+                  {%- for attribute in attributes %}
+                  {%- set version = attribute['version']|default('saml2') %}
+                <{{ version }}:Attribute{{ {
+                    'FriendlyName': attribute['friendly_name']|default(None),
+                    'Name': attribute['name'],
+                    'NameFormat': attribute['name_format']|default(None),
+                  }|xmlattr }}>
+                    {%- for value in attribute['values'] %}
+                      {%- if value is mapping and 'regex' in value %}
+                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
+                      {%- else %}
+                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
+                      {%- endif %}
+                    {%- endfor %}
+                </{{ version }}:Attribute>
+                  {%- endfor %}
+                <Entity>{{ entity }}</Entity>
+                {%- endfor %}
+                {%- for include in filter['includes']|default([]) %}
+                <Include>{{ include }}</Include>
+                {%- endfor %}
+                {%- for exclude in filter['excludes']|default([]) %}
+                <Exclude>{{ exclude }}</Exclude>
+                {%- endfor %}
+            </DiscoveryFilter>
             {%- endfor %}
         </MetadataProvider>
         {%- else %} />{% endif %}
