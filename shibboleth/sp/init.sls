@@ -27,6 +27,8 @@ shibsp:
     - name: {{ shibsp_settings.confdir|yaml_encode }}
     - source: salt://shibboleth/sp/files/
     - template: jinja
+    - include_empty: yes
+    - exclude_pat: E@(\.gitignore|sp-(encryption|signing).(crt|key))
     - user: root
     - group: {{ shibsp_settings.group }}
     - dir_mode: 751
@@ -50,10 +52,10 @@ shibsp_keymat:
     - source: salt://shibboleth/sp/keymat
     - template: jinja
     - include_empty: yes
-    - exclude_pat: E@\.gitignore
+    - exclude_pat: E@(\.gitignore|\.)
     - user: {{ shibsp_settings.user }}
     - group: {{ shibsp_settings.group }}
-    - dir_mode: 750
+    - dir_mode: 751
     - file_mode: 600
     - require:
         - file: shibsp
