@@ -36,6 +36,58 @@
     <ApplicationDefaults{{ {
         'entityID': shibsp_settings['entity_id'],
         'REMOTE_USER': shibsp_settings['remote_user']|join(' ') or None,
+        'authType': shibsp_settings['auth_type'],
+        'authUsername': shibsp_settings['auth_username'],
+        'authPassword': shibsp_settings['auth_password'],
+        'signing':
+          None
+            if shibsp_settings['signing'] == None else
+          shibsp_settings['signing']
+            if shibsp_settings['signing'] is string else
+          'true' if shibsp_settings['signing'] else
+          'false',
+        'signingAlg': shibsp_settings['signing_algorithm'],
+        'digestAlg': shibsp_settings['digest_algorithm'],
+        'encryption':
+          None
+            if shibsp_settings['encryption'] == None else
+          shibsp_settings['encryption']
+            if shibsp_settings['encryption'] is string else
+          'true' if shibsp_settings['encryption'] else
+          'false',
+        'encryptionAlg': shibsp_settings['encryption_algorithm'],
+        'keyName': shibsp_settings['key_name'],
+        'artifactEndpointIndex': shibsp_settings['artifact_endpoint_index'],
+        'chunkedEncoding':
+          None if shibsp_settings['chunked_encoding'] == None else
+          'true' if shibsp_settings['chunked_encoding'] else
+          'false',
+        'connectTimeout': shibsp_settings['backchannel_connect_timeout'],
+        'timeout': shibsp_settings['backchannel_operation_timeout'],
+        'requireConfidentiality':
+          None if shibsp_settings['backchannel_require_encryption'] == None else
+          'true' if shibsp_settings['backchannel_require_encryption'] else
+          'false',
+        'requireSignedAssertions':
+          None if shibsp_settings['require_signed_assertions'] == None else
+          'true' if shibsp_settings['require_signed_assertions'] else
+          'false',
+        'requireTransportAuth':
+          None if shibsp_settings['backchannel_require_transport_auth'] == None else
+          'true' if shibsp_settings['backchannel_require_transport_auth'] else
+          'false',
+        'sessionHook': shibsp_settings['session_hook'],
+        'artifactByFilesystem':
+          None if shibsp_settings['artifact_by_filesystem'] == None else
+          'true' if shibsp_settings['artifact_by_filesystem'] else
+          'false',
+        'cipherSuites': shibsp_settings['backchannel_cipher_suites'],
+        'authnContextClassRef':
+          shibsp_settings['authn_context_classes']|join(' ') or None,
+        'authnContextComparison':
+          shibsp_settings['authn_context_comparison'],
+        'NameIDFormat': shibsp_settings['nameid_format'],
+        'SPNameQualifier': shibsp_settings['sp_name_qualifier'],
       }|xmlattr }}>
 
         <!--
@@ -345,10 +397,58 @@
 
         <RelyingParty{{ {
             'name': rp['name'],
+            'authType': rp['auth_type']|default(None),
+            'authUsername': rp['auth_username']|default(None),
+            'authPassword': rp['auth_password']|default(None),
             'signing':
               None if 'signing' not in rp else
+              rp['signing'] if rp['signing'] is string else
               'true' if rp['signing'] else
               'false',
+            'signingAlg': rp['signing_algorithm']|default(None),
+            'digestAlg': rp['digest_algorithm']|default(None),
+            'encryption':
+              None if 'encryption' not in rp else
+              rp['encryption'] if rp['encryption'] is string else
+              'true' if rp['encryption'] else
+              'false',
+            'encryptionAlg': rp['encryption_algorithm']|default(None),
+            'keyName': rp['key_name']|default(None),
+            'artifactEndpointIndex':
+              rp['artifact_endpoint_index']|default(None),
+            'chunkedEncoding':
+              None if 'chunked_encoding' not in rp else
+              'true' if rp['chunked_encoding'] else
+              'false',
+            'connectTimeout':
+              rp['backchannel_connect_timeout']|default(None),
+            'timeout':
+              rp['backchannel_operation_timeout']|default(None),
+            'requireConfidentiality':
+              None if 'backchannel_require_encryption' not in rp else
+              'true' if rp['backchannel_require_encryption'] else
+              'false',
+            'requireSignedAssertions':
+              None if 'require_signed_assertions' not in rp else
+              'true' if rp['require_signed_assertions'] else
+              'false',
+            'requireTransportAuth':
+              None if 'backchannel_require_transport_auth' not in rp else
+              'true' if rp['backchannel_require_transport_auth'] else
+              'false',
+            'sessionHook': rp['session_hook']|default(None),
+            'artifactByFilesystem':
+              None if 'artifact_by_filesystem' not in rp else
+              'true' if rp['artifact_by_filesystem'] else
+              'false',
+            'cipherSuites':
+              rp['backchannel_cipher_suites']|default(None),
+            'authnContextClassRef':
+              rp['authn_context_classes']|default([])|join(' ') or None,
+            'authnContextComparison':
+              rp['authn_context_comparison']|default(None),
+            'NameIDFormat': rp['nameid_format']|default(None),
+            'SPNameQualifier': rp['sp_name_qualifier']|default(None),
           }|xmlattr }}/>
         {%- endfor %}
 

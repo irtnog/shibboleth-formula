@@ -34,6 +34,34 @@ shibboleth:
       - eppn
       - persistent-id
       - targeted-id
+    auth_type: ~
+    auth_username: ~
+    auth_password: ~
+    signing: ~
+    signing_algorithm: ~
+    digest_algorithm: ~
+    encryption: ~
+    encryption_algorithm: ~
+    key_name: ~
+    artifact_endpoint_index: ~
+    chunked_encoding: ~
+    backchannel_connect_timeout: ~
+    backchannel_operation_timeout: ~
+    backchannel_require_encryption: ~
+    backchannel_require_transport_auth: ~
+    require_signed_assertions: ~
+    session_hook: ~
+    artifact_by_filesystem: ~
+    ## For more information, refer to:
+    ## https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPRelyingParty
+    ## https://openssl.org/docs/man1.0.1/apps/ciphers.html
+    ## https://mozilla.github.io/server-side-tls/ssl-config-generator/
+    backchannel_cipher_suites:  # intermediate-strength profile
+      'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS'
+    authn_context_classes: []
+    authn_context_comparison: ~
+    nameid_format: ~
+    sp_name_qualifier: ~
 
     session_lifetime: 28800
     session_timeout: 3600
