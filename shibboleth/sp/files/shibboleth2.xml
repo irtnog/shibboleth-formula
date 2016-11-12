@@ -396,7 +396,12 @@
         {%- for rp in shibsp_settings['relying_parties'] %}
 
         <RelyingParty{{ {
-            'name': rp['name'],
+            'name': rp['name']|default(None),
+            'type': rp['type']|default(None),
+            'trimTags':
+              None if 'trim_tags' not in rp else
+              'true' if rp['trim_tags'] else
+              'false',
             'authType': rp['auth_type']|default(None),
             'authUsername': rp['auth_username']|default(None),
             'authPassword': rp['auth_password']|default(None),
@@ -449,7 +454,31 @@
               rp['authn_context_comparison']|default(None),
             'NameIDFormat': rp['nameid_format']|default(None),
             'SPNameQualifier': rp['sp_name_qualifier']|default(None),
-          }|xmlattr }}/>
+          }|xmlattr }}
+          {%- if 'attributes' in rp
+              or 'registration_authorities' in rp -%}
+        >
+            {%- for attribute in rp['attributes']|default([]) %}
+              {%- set version = attribute['version']|default('saml2') %}
+            <{{ version }}:Attribute{{ {
+                'FriendlyName': attribute['friendly_name']|default(None),
+                'Name': attribute['name'],
+                'NameFormat': attribute['name_format']|default(None),
+              }|xmlattr }}>
+              {%- for value in attribute['values'] %}
+                {%- if value is mapping and 'regex' in value %}
+                <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
+                {%- else %}
+                <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
+                {%- endif %}
+              {%- endfor %}
+            </{{ version }}:Attribute>
+            {%- endfor %}
+            {%- for ra in rp['registration_authorities']|default([]) %}
+            <registrationAuthority>{{ ra }}</registrationAuthority>
+            {%- endfor %}
+        </RelyingParty>
+          {%- else %} />{% endif %}
         {%- endfor %}
 
         <!--
