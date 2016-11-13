@@ -281,7 +281,7 @@
                 <RetainedRole>{{ role }}</RetainedRole>
                 {%- endfor %}
                 {%- for attribute in filter['attributes']|default([]) %}
-                  {%- set version = attribute['version']|default('saml2') %}
+                  {%- set version = attribute['version']|default('saml') %}
                 <{{ version }}:Attribute{{ {
                     'FriendlyName': attribute['friendly_name']|default(None),
                     'Name': attribute['name'],
@@ -298,7 +298,7 @@
                 {%- endfor %}
                 {%- for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
                   {%- for attribute in attributes %}
-                  {%- set version = attribute['version']|default('saml2') %}
+                  {%- set version = attribute['version']|default('saml') %}
                 <{{ version }}:Attribute{{ {
                     'FriendlyName': attribute['friendly_name']|default(None),
                     'Name': attribute['name'],
@@ -334,7 +334,7 @@
                 <RetainedRole>{{ role }}</RetainedRole>
                 {%- endfor %}
                 {%- for attribute in filter['attributes']|default([]) %}
-                  {%- set version = attribute['version']|default('saml2') %}
+                  {%- set version = attribute['version']|default('saml') %}
                 <{{ version }}:Attribute{{ {
                     'FriendlyName': attribute['friendly_name']|default(None),
                     'Name': attribute['name'],
@@ -351,7 +351,7 @@
                 {%- endfor %}
                 {%- for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
                   {%- for attribute in attributes %}
-                  {%- set version = attribute['version']|default('saml2') %}
+                  {%- set version = attribute['version']|default('saml') %}
                 <{{ version }}:Attribute{{ {
                     'FriendlyName': attribute['friendly_name']|default(None),
                     'Name': attribute['name'],
@@ -459,7 +459,7 @@
               or 'registration_authorities' in rp -%}
         >
             {%- for attribute in rp['attributes']|default([]) %}
-              {%- set version = attribute['version']|default('saml2') %}
+              {%- set version = attribute['version']|default('saml') %}
             <{{ version }}:Attribute{{ {
                 'FriendlyName': attribute['friendly_name']|default(None),
                 'Name': attribute['name'],
