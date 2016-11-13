@@ -15,7 +15,7 @@ shibsp:
     - name: {{ shibsp_settings.user }}
     - system: True
     - gid: {{ shibsp_settings.group }}
-    - home: /nonexistent
+    - home: /var/run/shibboleth
     - createhome: False
     - password: '*'
     - shell: /usr/sbin/nologin
