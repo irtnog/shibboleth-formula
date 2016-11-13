@@ -402,6 +402,7 @@ shibboleth:
           ## release (plus a few others with whom we've negotiated the
           ## the release of ePPN).
           - type: Whitelist
+            matcher: EntityAttributes
             attributes:
               ## InCommon R&S (legacy?)
               - name: http://macedir.org/entity-category-support
