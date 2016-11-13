@@ -29,7 +29,7 @@ shibsp:
     - template: jinja
     - include_empty: yes
     - exclude_pat: E@(\.gitignore|sp-(encryption|signing).(crt|key))
-    - user: root
+    - user: {{ shibsp_settings.user }}
     - group: {{ shibsp_settings.group }}
     - dir_mode: 751
     - file_mode: 640
@@ -52,7 +52,7 @@ shibsp_keymat:
     - source: salt://shibboleth/sp/keymat
     - template: jinja
     - include_empty: yes
-    - exclude_pat: E@(\.gitignore|\.)
+    - exclude_pat: E@\.gitignore
     - user: {{ shibsp_settings.user }}
     - group: {{ shibsp_settings.group }}
     - dir_mode: 751
