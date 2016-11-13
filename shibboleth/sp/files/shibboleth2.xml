@@ -315,10 +315,10 @@
                   {%- endfor %}
                 <Entity>{{ entity }}</Entity>
                 {%- endfor %}
-                {%- for include in filter['includes']|default([]) %}
+                {%- for include in filter['include']|default([]) %}
                 <Include>{{ include }}</Include>
                 {%- endfor %}
-                {%- for exclude in filter['excludes']|default([]) %}
+                {%- for exclude in filter['exclude']|default([]) %}
                 <Exclude>{{ exclude }}</Exclude>
                 {%- endfor %}
             </MetadataFilter>
@@ -368,10 +368,10 @@
                   {%- endfor %}
                 <Entity>{{ entity }}</Entity>
                 {%- endfor %}
-                {%- for include in filter['includes']|default([]) %}
+                {%- for include in filter['include']|default([]) %}
                 <Include>{{ include }}</Include>
                 {%- endfor %}
-                {%- for exclude in filter['excludes']|default([]) %}
+                {%- for exclude in filter['exclude']|default([]) %}
                 <Exclude>{{ exclude }}</Exclude>
                 {%- endfor %}
             </DiscoveryFilter>
