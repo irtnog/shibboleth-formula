@@ -280,7 +280,7 @@
                 {%- for role in filter['retained_roles']|default([]) %}
                 <RetainedRole>{{ role }}</RetainedRole>
                 {%- endfor %}
-                {%- for attributes in filter['attributes']|default([]) %}
+                {%- for attribute in filter['attributes']|default([]) %}
                   {%- set version = attribute['version']|default('saml2') %}
                 <{{ version }}:Attribute{{ {
                     'FriendlyName': attribute['friendly_name']|default(None),
@@ -333,7 +333,7 @@
                 {%- for role in filter['retained_roles']|default([]) %}
                 <RetainedRole>{{ role }}</RetainedRole>
                 {%- endfor %}
-                {%- for attributes in filter['attributes']|default([]) %}
+                {%- for attribute in filter['attributes']|default([]) %}
                   {%- set version = attribute['version']|default('saml2') %}
                 <{{ version }}:Attribute{{ {
                     'FriendlyName': attribute['friendly_name']|default(None),
