@@ -401,7 +401,7 @@ shibboleth:
           ## Only trust IdPs tagged as supporting REFEDS R&S attribute
           ## release (plus a few others with whom we've negotiated the
           ## the release of ePPN).
-          - type: WhiteList
+          - type: Whitelist
             attributes:
               ## InCommon R&S (legacy?)
               - name: http://macedir.org/entity-category-support
