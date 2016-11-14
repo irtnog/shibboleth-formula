@@ -396,7 +396,7 @@
         {%- for rp in shibsp_settings['relying_parties'] %}
 
         <RelyingParty{{ {
-            'name': rp['name']|default(None),
+            'Name': rp['name']|default(None),
             'type': rp['type']|default(None),
             'trimTags':
               None if 'trim_tags' not in rp else
