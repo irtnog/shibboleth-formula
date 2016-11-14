@@ -6,17 +6,17 @@ shibsp:
     - pkgs: {{ shibsp_settings.packages|yaml }}
 
   group.present:
-    - name: {{ shibsp_settings.group }}
+    - name: {{ shibsp_settings.group|yaml_encode }}
     - system: True
     - addusers:
-        - {{ shibsp_settings.mod_shib_user }}
+        - {{ shibsp_settings.mod_shib_user|yaml_encode }}
     - require:
         - pkg: shibsp
 
   user.present:
-    - name: {{ shibsp_settings.user }}
+    - name: {{ shibsp_settings.user|yaml_encode }}
     - system: True
-    - gid: {{ shibsp_settings.group }}
+    - gid: {{ shibsp_settings.group|yaml_encode }}
     - home: /var/run/shibboleth
     - createhome: False
     - password: '*'
@@ -31,8 +31,8 @@ shibsp:
     - template: jinja
     - include_empty: yes
     - exclude_pat: E@(\.gitignore|sp-(encryption|signing).(crt|key))
-    - user: {{ shibsp_settings.user }}
-    - group: {{ shibsp_settings.group }}
+    - user: {{ shibsp_settings.user|yaml_encode }}
+    - group: {{ shibsp_settings.group|yaml_encode }}
     - dir_mode: 751
     - file_mode: 640
     - require:
@@ -55,8 +55,8 @@ shibsp_keymat:
     - template: jinja
     - include_empty: yes
     - exclude_pat: E@\.gitignore
-    - user: {{ shibsp_settings.user }}
-    - group: {{ shibsp_settings.group }}
+    - user: {{ shibsp_settings.user|yaml_encode }}
+    - group: {{ shibsp_settings.group|yaml_encode }}
     - dir_mode: 751
     - file_mode: 600
     - require:
@@ -73,7 +73,7 @@ shibsp_{{ hash }}_signing_certificate:
     - name: {{ '%s%s_%s.pem'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
     - contents: {{ filter.certificate|yaml_encode }}
     - user: root
-    - group: {{ shibsp_settings.group }}
+    - group: {{ shibsp_settings.group|yaml_encode }}
     - dir_mode: 751
     - file_mode: 640
     - require:
@@ -91,16 +91,18 @@ shibsp_inline_metadata_{{ loop.index0 }}:
   file.managed:
     - name: {{ '%s%s_%s.xml'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
     - contents: {{ mp|yaml_encode }}
-    - user: {{ shibsp_settings.user }}
-    - group: {{ shibsp_settings.group }}
-    - file_mode: 640            # FIXME: too strict?
+    - user: {{ shibsp_settings.user|yaml_encode }}
+    - group: {{ shibsp_settings.group|yaml_encode }}
+    - file_mode: 640
     - require:
         - file: shibsp
     - watch_in:
         - service: shibsp
 {% endfor %}
 
-{% if grains['os_family'] in ['RedHat'] %}
+{% if grains['os_family'] in [
+    'RedHat',
+  ] %}
 ## Work around bug in the Shibboleth SELinux policy module that
 ## prevents httpd/mod_shib from communicating with shibd.
 shibsp_selinux_socket:
