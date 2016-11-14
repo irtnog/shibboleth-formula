@@ -10,6 +10,7 @@ shibboleth:
       /etc/shibboleth
     services:
       - shibd
+    mod_shib_user: ''
 
     ## The following must be set by the system operator.
     entity_id: ''

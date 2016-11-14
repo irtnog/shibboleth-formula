@@ -1,9 +1,22 @@
 {% import_yaml "shibboleth/sp/defaults.yaml" as default_settings %}
 
 {% set os_family_map = salt['grains.filter_by']({
-    'FreeBSD': { 'packages': [ 'shibboleth-sp', ],
-                 'confdir':  '/usr/local/etc/shibboleth',
-                 'services': [ 'shibboleth-sp', ], },
+    'FreeBSD': {
+      'packages': [
+        'shibboleth-sp',
+      ],
+      'confdir':
+        '/usr/local/etc/shibboleth',
+      'services': [
+        'shibboleth-sp',
+      ],
+      'mod_shib_user':
+        'www',
+    },
+    'RedHat': {
+      'mod_shib_user':
+        'apache',
+    },
     'default': {},
   }) %}
 

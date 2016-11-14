@@ -8,6 +8,8 @@ shibsp:
   group.present:
     - name: {{ shibsp_settings.group }}
     - system: True
+    - addusers:
+        - {{ shibsp_settings.mod_shib_user }}
     - require:
         - pkg: shibsp
 
