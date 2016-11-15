@@ -98,7 +98,7 @@
         'metadataURL': mp.url,
       }|xmlattr }}>
     {#- TODO: support for additional metadata filters #}
-    {%- for filter in mp.filters|default([]) %}
+    {%- for filter in mp['filters']|default([]) %}
       {%- set mf_needs_end_tag = 'public_key' in filter or 'retained_roles' in filter %}
       <MetadataFilter{{ {
           'xsi:type': filter.type,
