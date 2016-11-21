@@ -15,8 +15,8 @@
       if grains['os'] == 'SUSE' else
     'http://download.opensuse.org/repositories/security:/shibboleth/openSUSE_%s'|format(grains['osrelease'].replace(' ', '_'))
       if grains['os'] == 'openSUSE' else
-    'deb http://pkg.switch.ch/switchaai/debian %s main'|format(grains['oscodename'])
-      if grains['os_family'] in ['Debian', 'Ubuntu'] else
+    'deb http://pkg.switch.ch/switchaai/%s %s main'|format(grains['os']|lower, grains['oscodename'])
+      if grains['os'] in ['Debian', 'Ubuntu'] else
     False
   %}
 
@@ -32,6 +32,7 @@ shib_repo:
 {% elif repo_url and grains['os_family'] in ['Debian', 'Ubuntu'] %}
 shib_repo:
   pkgrepo.managed:
+    - file: /etc/apt/sources.list.d/SWITCHaai-swdistrib.list
     - name: {{ repo_url|yaml_encode }}
     - key_url: http://pkg.switch.ch/switchaai/SWITCHaai-swdistrib.asc
 
