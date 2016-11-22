@@ -10,8 +10,8 @@ of protected online resources in a privacy-preserving manner.
 
 * **shibboleth.repo**
 
-  Enables either the OpenSUSE Build Service (on RHEL/SUSE) or the
-  SWITCH AAI (on Debian/Ubuntu) binary package repositories.
+  Enables either the OpenSUSE Build Service (on CentOS/RHEL/SUSE) or
+  the SWITCHaai (on Debian/Ubuntu) binary package repositories.
 
 * **shibboleth.idp**
 
