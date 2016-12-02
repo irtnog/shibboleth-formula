@@ -73,6 +73,7 @@ shibboleth:
     session_logout:
       - SAML2
       - Local
+    async_logout: ~
     session_handlers:
       - type: MetadataGenerator # approx. metadata based on SP config
         location: /Metadata
