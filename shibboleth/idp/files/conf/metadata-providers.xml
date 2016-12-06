@@ -91,15 +91,24 @@
   {%- elif mp is mapping %}
     {#- TODO: support other metadata provider types #}
     {%- set mp_id = salt['hashutil.digest'](mp.url) %}
+    {%- set mp_type = mp['type']|default('FileBackedHTTPMetadataProvider') %}
     <MetadataProvider{{ {
         'id': '_%s'|format(mp_id),
-        'xsi:type': 'FileBackedHTTPMetadataProvider',
-        'backingFile': '%s/metadata/%s.xml'|format('%{idp.home}', mp_id),
-        'metadataURL': mp.url,
+        'xsi:type': mp_type,
+        'backingFile': 
+          '%s/metadata/%s.xml'|format('%{idp.home}', mp_id)
+            if mp_type == 'FileBackedHTTPMetadataProvider' else
+          None,
+        'metadataURL':
+          mp.url if mp_type == 'FileBackedHTTPMetadataProvider' else
+          None,
       }|xmlattr }}>
     {#- TODO: support for additional metadata filters #}
     {%- for filter in mp['filters']|default([]) %}
-      {%- set mf_needs_end_tag = 'public_key' in filter or 'retained_roles' in filter %}
+      {%- set mf_needs_end_tag =
+          'public_key' in filter or
+          'retained_roles' in filter
+        %}
       <MetadataFilter{{ {
           'xsi:type': filter.type,
           'requireSignedRoot':
@@ -120,6 +129,9 @@
       </MetadataFilter>
       {%- endif %}
     {%- endfor %}
+    {%- if mp_type == 'DynamicHTTPMetadataProvider' %}
+      <MetadataQueryProtocol>{{ mp.url }}</MetadataQueryProtocol>
+    {%- endif %}
     </MetadataProvider>
   {%- endif %}
 {% endfor %}
