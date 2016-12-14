@@ -220,10 +220,10 @@
           dataconn['return_attributes']
         }}</dc:ReturnAttributes>
         {%- endif %}
-        {%- for property, value in dataconn['ldap_properties']|default({}) %}
+        {%- for prop in dataconn['ldap_properties']|default([]) %}
         <dc:LDAPProperty{{ {
-            'name': property,
-            'value': value,
+            'name': prop['property'],
+            'value': prop['value'],
           }|xmlattr }}/>
         {%- endfor %}
         {#- TODO: write a generic renderer for security credentials #}
