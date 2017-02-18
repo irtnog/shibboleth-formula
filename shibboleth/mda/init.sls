@@ -52,7 +52,7 @@ shibmda:
   cron.present:
     - identifier: shibmda
     - name: cd {{ destdir|yaml_squote }} && chronic java {{ shibmda_settings.jvmopts }} -classpath {{ ['lib', '*']|join(dirsep)|yaml_squote }} net.shibboleth.metadata.cli.SimpleCommandLine {{ ['etc', 'config.xml']|join(dirsep)|yaml_squote }} main
-    - minute: 37
+    - minute: random
 {% else %}
 ## TODO
 {% endif %}
