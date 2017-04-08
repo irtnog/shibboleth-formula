@@ -81,7 +81,7 @@ shibmda_source_metadata:
 {% for schema in shibmda_settings.schemas %}
 shibmda_schema_{{ loop.index0 }}:
   file.managed:
-    - name: {{ [destdir, 'schemas', '%s.xsd'|format(loop.index0)]|join(dirsep)|yaml_encode }}
+    - name: {{ [destdir, 'schema', '%s.xsd'|format(loop.index0)]|join(dirsep)|yaml_encode }}
     - contents: {{ schema|yaml_encode }}
     - user: root
     - group: 0
