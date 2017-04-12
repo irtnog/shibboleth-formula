@@ -108,7 +108,10 @@ shibsp_inline_metadata_{{ loop.index0 }}:
 shibsp_selinux_socket:
   cmd.wait:
     - name:
-        semanage fcontext -a -t httpd_sys_rw_content_t /var/run/shibboleth
+        semanage fcontext -a -t httpd_sys_rw_content_t "/var/run/shibboleth(/.)?" &&
+        semanage fcontext -a -t httpd_sys_rw_content_t "/var/run/cache/shibboleth(/.)?" &&
+        restorecon -R -v /var/run/shibboleth &&
+        restorecon -R -v /var/cache/shibboleth
     - watch:
         - pkg: shibsp
     - require_in:
