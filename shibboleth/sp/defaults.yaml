@@ -94,3 +94,224 @@ shibboleth:
     style_sheet: /shibboleth-sp/main.css
 
     relying_parties: []
+
+    ## attribute-map.xml: The mappings are a mix of SAML 1.1 and SAML
+    ## 2.0 attribute names agreed to within the Shibboleth community.
+    ## The non-OID URNs are SAML 1.1 names and most of the OIDs are
+    ## SAML 2.0 names, with a few exceptions for newer attributes
+    ## where the name is the same for both versions.  You will usually
+    ## want to uncomment or map the names for both SAML versions as a
+    ## unit.
+    attribute_map:
+      ## some useful eduPerson attributes that many sites might use
+      - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.6
+        id: eppn
+        decoders:
+          - type: ScopedAttributeDecoder
+      - name: urn:mace:dir:attribute-def:eduPersonPrincipalName
+        id: eppn
+        decoders:
+          - type: ScopedAttributeDecoder
+      - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.9
+        id: affiliation
+        decoders:
+          - type: ScopedAttributeDecoder
+            case_sensitive: False
+      - name: urn:mace:dir:attribute-def:eduPersonScopedAffiliation
+        id: affiliation
+        decoders:
+          - type: ScopedAttributeDecoder
+            case_sensitive: False
+      - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.1
+        id: unscoped-affiliation
+        decoders:
+          - type: StringAttributeDecoder
+            case_sensitive: False
+      - name: urn:mace:dir:attribute-def:eduPersonAffiliation
+        id: unscoped-affiliation
+        decoders:
+          - type: StringAttributeDecoder
+            case_sensitive: False
+      - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.7
+        id: entitlement
+      - name: urn:mace:dir:attribute-def:eduPersonEntitlement
+        id: entitlement
+      ## a persistent id attribute that supports personalized
+      ## anonymous access; first, the deprecated/incorrect version,
+      ## decoded as a scoped string:
+      - name: urn:mace:dir:attribute-def:eduPersonTargetedID
+        id: targeted-id
+        decoders:
+          - type: ScopedAttributeDecoder
+          # - type: NameIDFromScopedAttributeDecoder
+          #   formatter: "$NameQualifier!$SPNameQualifier!$Name"
+          #   default_qualifiers: True
+      ## second, an alternate decoder that will decode the incorrect
+      ## form into the newer form:
+      # - name: urn:mace:dir:attribute-def:eduPersonTargetedID
+      #   id: persistent-id
+      #   decoders:
+      #     - type: NameIDFromScopedAttributeDecoder
+      #       formatter: "$NameQualifier!$SPNameQualifier!$Name"
+      #       default_qualifiers: True
+      ## third, the new version (note the OID-style name):
+      - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.10
+        id: persistent-id
+        decoders:
+          - type: NameIDAttributeDecoder
+            formatter: "$NameQualifier!$SPNameQualifier!$Name"
+            default_qualifiers: True
+      ## fourth, the SAML 2.0 NameID Format:
+      - name: urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        id: persistent-id
+        decoders:
+          - type: NameIDAttributeDecoder
+            formatter: "$NameQualifier!$SPNameQualifier!$Name"
+            default_qualifiers: True
+      ## more eduPerson attributes, uncomment these to use them
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.11
+      #   id: assurance    
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.5.1.1
+      #   id: member
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.6.1.1
+      #   id: eduCourseOffering
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.6.1.2
+      #   id: eduCourseMember
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.5
+      #   id: primary-affiliation
+      #   decoders:
+      #     - type: StringAttributeDecoder
+      #       case_sensitive: False
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.2
+      #   id: nickname
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.8
+      #   id: primary-orgunit-dn
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.4
+      #   id: orgunit-dn
+      # - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.3
+      #   id: org-dn
+      # - name: urn:mace:dir:attribute-def:eduPersonPrimaryAffiliation
+      #   id: primary-affiliation
+      #   decoders:
+      #     - type: StringAttributeDecoder
+      #       case_sensitive: False
+      # - name: urn:mace:dir:attribute-def:eduPersonNickname
+      #   id: nickname
+      # - name: urn:mace:dir:attribute-def:eduPersonPrimaryOrgUnitDN
+      #   id: primary-orgunit-dn
+      # - name: urn:mace:dir:attribute-def:eduPersonOrgUnitDN
+      #   id: orgunit-dn
+      # - name: urn:mace:dir:attribute-def:eduPersonOrgDN
+      #   id: org-dn
+      ## SCHAC attributes, uncomment to use
+      # - name: urn:oid:1.3.6.1.4.1.25178.1.2.9
+      #   id: schacHomeOrganization
+      ## examples of LDAP-based attributes, uncomment to use these
+      # - name: urn:oid:2.5.4.3
+      #   id: cn
+      # - name: urn:oid:2.5.4.4
+      #   id: sn
+      # - name: urn:oid:2.5.4.42
+      #   id: givenName
+      # - name: urn:oid:2.16.840.1.113730.3.1.241
+      #   id: displayName
+      # - name: urn:oid:0.9.2342.19200300.100.1.1
+      #   id: uid
+      # - name: urn:oid:0.9.2342.19200300.100.1.3
+      #   id: mail
+      # - name: urn:oid:2.5.4.20
+      #   id: telephoneNumber
+      # - name: urn:oid:2.5.4.12
+      #   id: title
+      # - name: urn:oid:2.5.4.43
+      #   id: initials
+      # - name: urn:oid:2.5.4.13
+      #   id: description
+      # - name: urn:oid:2.16.840.1.113730.3.1.1
+      #   id: carLicense
+      # - name: urn:oid:2.16.840.1.113730.3.1.2
+      #   id: departmentNumber
+      # - name: urn:oid:2.16.840.1.113730.3.1.3
+      #   id: employeeNumber
+      # - name: urn:oid:2.16.840.1.113730.3.1.4
+      #   id: employeeType
+      # - name: urn:oid:2.16.840.1.113730.3.1.39
+      #   id: preferredLanguage
+      # - name: urn:oid:0.9.2342.19200300.100.1.10
+      #   id: manager
+      # - name: urn:oid:2.5.4.34
+      #   id: seeAlso
+      # - name: urn:oid:2.5.4.23
+      #   id: facsimileTelephoneNumber
+      # - name: urn:oid:2.5.4.9
+      #   id: street
+      # - name: urn:oid:2.5.4.18
+      #   id: postOfficeBox
+      # - name: urn:oid:2.5.4.17
+      #   id: postalCode
+      # - name: urn:oid:2.5.4.8
+      #   id: st
+      # - name: urn:oid:2.5.4.7
+      #   id: l
+      # - name: urn:oid:2.5.4.10
+      #   id: o
+      # - name: urn:oid:2.5.4.11
+      #   id: ou
+      # - name: urn:oid:2.5.4.15
+      #   id: businessCategory
+      # - name: urn:oid:2.5.4.19
+      #   id: physicalDeliveryOfficeName
+      # - name: urn:mace:dir:attribute-def:cn
+      #   id: cn
+      # - name: urn:mace:dir:attribute-def:sn
+      #   id: sn
+      # - name: urn:mace:dir:attribute-def:givenName
+      #   id: givenName
+      # - name: urn:mace:dir:attribute-def:displayName
+      #   id: displayName
+      # - name: urn:mace:dir:attribute-def:uid
+      #   id: uid
+      # - name: urn:mace:dir:attribute-def:mail
+      #   id: mail
+      # - name: urn:mace:dir:attribute-def:telephoneNumber
+      #   id: telephoneNumber
+      # - name: urn:mace:dir:attribute-def:title
+      #   id: title
+      # - name: urn:mace:dir:attribute-def:initials
+      #   id: initials
+      # - name: urn:mace:dir:attribute-def:description
+      #   id: description
+      # - name: urn:mace:dir:attribute-def:carLicense
+      #   id: carLicense
+      # - name: urn:mace:dir:attribute-def:departmentNumber
+      #   id: departmentNumber
+      # - name: urn:mace:dir:attribute-def:employeeNumber
+      #   id: employeeNumber
+      # - name: urn:mace:dir:attribute-def:employeeType
+      #   id: employeeType
+      # - name: urn:mace:dir:attribute-def:preferredLanguage
+      #   id: preferredLanguage
+      # - name: urn:mace:dir:attribute-def:manager
+      #   id: manager
+      # - name: urn:mace:dir:attribute-def:seeAlso
+      #   id: seeAlso
+      # - name: urn:mace:dir:attribute-def:facsimileTelephoneNumber
+      #   id: facsimileTelephoneNumber
+      # - name: urn:mace:dir:attribute-def:street
+      #   id: street
+      # - name: urn:mace:dir:attribute-def:postOfficeBox
+      #   id: postOfficeBox
+      # - name: urn:mace:dir:attribute-def:postalCode
+      #   id: postalCode
+      # - name: urn:mace:dir:attribute-def:st
+      #   id: st
+      # - name: urn:mace:dir:attribute-def:l
+      #   id: l
+      # - name: urn:mace:dir:attribute-def:o
+      #   id: o
+      # - name: urn:mace:dir:attribute-def:ou
+      #   id: ou
+      # - name: urn:mace:dir:attribute-def:businessCategory
+      #   id: businessCategory
+      # - name: urn:mace:dir:attribute-def:physicalDeliveryOfficeName
+      #   id: physicalDeliveryOfficeName

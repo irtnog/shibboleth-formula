@@ -1,0 +1,29 @@
+{%- from "shibboleth/sp/map.jinja" import shibsp_settings with context -%}
+<Attributes xmlns="urn:mace:shibboleth:2.0:attribute-map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+{%- for mapping in shibsp_settings.attribute_map %}
+    <Attribute{{ {
+        'name': mapping.name,
+        'id':   mapping.id,
+    }|xmlattr }}
+{%-   if 'decoders' not in mapping -%}
+    />
+{%-   else -%}
+    >
+{%-     for decoder in mapping.decoders %}
+        <AttributeDecoder{{ {
+            'xsi:type':
+              decoder.type,
+            'caseSensitive':
+              None if 'case_sensitive' not in decoder else
+              'true' if decoder.case_sensitive else 'false',
+            'formatter':
+              decoder['formatter']|default(None),
+            'defaultQualifiers':
+              None if 'default_qualifiers' not in decoder else
+              'true' if decoder.default_qualifiers else 'false',
+        }|xmlattr }}/>
+{%-     endfor %}
+    </Attribute>
+{%-   endif %}
+{%- endfor %}
+</Attributes>
