@@ -1,11 +1,11 @@
 shibboleth:
   idp:
-    version: 3.2.1
+    version: 3.3.1
     master_site: http://shibboleth.net/downloads/identity-provider
     suffix: .tar.gz
     source_hash:
-      .tar.gz: sha256=231d100c81f3039f08782cc46067718b2fedf2d988fccc543250fb1813a2bc20
-      .zip: sha256=9d509e4c54cba5de8b63fba9a59c90138f289f8126ab7849f8a42392432a1317
+      .tar.gz: sha256=8bd852dcdc7e6729ee645c0374a3c476b152fa24506fb86ffec33dfd190e607c
+      .zip: sha256=99f944c7fc8e0037385b6516b5a384b2ae3b3b5516e3843a6b2b7839c7c7182a
     jstl_version: 1.2
     jstl_source_template:
       https://build.shibboleth.net/nexus/service/local/repositories/thirdparty/content/javax/servlet/jstl/%s/jstl-%s.jar
