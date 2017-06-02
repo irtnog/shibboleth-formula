@@ -109,7 +109,7 @@ shibsp_selinux_socket:
   cmd.wait:
     - name:
         semanage fcontext -a -t httpd_sys_rw_content_t "/var/run/shibboleth(/.)?" &&
-        semanage fcontext -a -t httpd_sys_rw_content_t "/var/run/cache/shibboleth(/.)?" &&
+        semanage fcontext -a -t httpd_sys_rw_content_t "/var/cache/shibboleth(/.)?" &&
         restorecon -R -v /var/run/shibboleth &&
         restorecon -R -v /var/cache/shibboleth
     - watch:
