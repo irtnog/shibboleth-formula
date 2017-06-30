@@ -1,6 +1,7 @@
 shibboleth:
   sp:
     packages:
+      - httpd
       - shibboleth
     group:
       shibd

@@ -3,6 +3,7 @@
 {% set os_family_map = salt['grains.filter_by']({
     'Debian': {
       'packages': [
+        'apache2',
         'shibboleth',
       ],
       'group':
@@ -14,6 +15,7 @@
     },
     'FreeBSD': {
       'packages': [
+        'apache24',
         'shibboleth-sp',
       ],
       'confdir':
