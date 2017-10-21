@@ -1,5 +1,5 @@
-{% from "shibboleth/sp/map.jinja" import shibsp_settings with context %}
-{% set dirsep = '\\' if grains['os_family'] == 'Windows' else '/' %}
+{%- from "shibboleth/sp/map.jinja" import shibsp_settings with context %}
+{%- set dirsep = '\\' if grains['os_family'] == 'Windows' else '/' %}
 
 shibsp:
   pkg.installed:
@@ -63,11 +63,9 @@ shibsp_keymat:
         - file: shibsp
 
 ## Handle inline signing certificates.
-{% for mp in shibsp_settings.metadata_providers
-   if mp is mapping %}
-{% for filter in mp.metadata_filters|default([])
-   if filter.type == 'Signature' %}
-{% set hash = salt['hashutil.digest'](mp.url) %}
+{%- for mp in shibsp_settings.metadata_providers if mp is mapping %}
+{%-   for filter in mp.metadata_filters|default([]) if filter.type == 'Signature' %}
+{%-     set hash = salt['hashutil.digest'](mp.url) %}
 shibsp_{{ hash }}_signing_certificate:
   file.managed:
     - name: {{ '%s%s_%s.pem'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
@@ -80,13 +78,12 @@ shibsp_{{ hash }}_signing_certificate:
         - file: shibsp
     - watch_in:
         - service: shibsp
-{% endfor %}
-{% endfor %}
+{%-   endfor %}
+{%- endfor %}
 
 ## Handle inline metadata.
-{% for mp in shibsp_settings.metadata_providers
-   if mp is string and not mp.startswith('http') %}
-{% set hash = salt['hashutil.digest'](mp) %}
+{%- for mp in shibsp_settings.metadata_providers if mp is string and not mp.startswith('http') %}
+{%-   set hash = salt['hashutil.digest'](mp) %}
 shibsp_inline_metadata_{{ loop.index0 }}:
   file.managed:
     - name: {{ '%s%s_%s.xml'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
@@ -98,14 +95,14 @@ shibsp_inline_metadata_{{ loop.index0 }}:
         - file: shibsp
     - watch_in:
         - service: shibsp
-{% endfor %}
+{%- endfor %}
 
-{% if grains['os_family'] in [
-    'RedHat',
-  ] %}
 ## Work around bug in the Shibboleth SELinux policy module that
 ## prevents httpd/mod_shib from communicating with shibd.
-shibsp_selinux_socket:
+{%- if grains['os_family'] in [
+      'RedHat',
+    ] %}
+shibsp_selinux:
   cmd.wait:
     - name:
         semanage fcontext -a -t httpd_sys_rw_content_t "/var/run/shibboleth(/.)?" &&
@@ -116,4 +113,4 @@ shibsp_selinux_socket:
         - pkg: shibsp
     - require_in:
         - service: shibsp
-{% endif %}
+{%- endif %}
