@@ -16,10 +16,10 @@ shibboleth:
 
     ## The following must be set by the system operator.
     entity_id: ''
-    encryption_certificate: ''
-    encryption_key: ''
-    signing_certificate: ''
-    signing_key: ''
+    encryption_certificate: ~
+    encryption_key: ~
+    signing_certificate: ~
+    signing_key: ~
     sso_default_idp: ~             # Either set a default IdP, or
     sso_discovery_protocol: ~      # configure a discovery service.
     sso_discovery_url: ~

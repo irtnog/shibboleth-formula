@@ -1,38 +1,38 @@
-{% import_yaml "shibboleth/sp/defaults.yaml" as default_settings %}
+{%- import_yaml "shibboleth/sp/defaults.yaml" as default_settings %}
 
-{% set os_family_map = salt['grains.filter_by']({
-    'Debian': {
-      'packages': [
-        'apache2',
-        'shibboleth',
-      ],
-      'group':
-        '_shibd',
-      'user':
-        '_shibd',
-      'mod_shib_user':
-        'www-data',
-    },
-    'FreeBSD': {
-      'packages': [
-        'apache24',
-        'shibboleth-sp',
-      ],
-      'confdir':
-        '/usr/local/etc/shibboleth',
-      'services': [
-        'shibboleth-sp',
-      ],
-      'mod_shib_user':
-        'www',
-    },
-    'default': {},
-  }) %}
+{%- set os_family_map = salt['grains.filter_by']({
+      'Debian': {
+        'packages': [
+          'apache2',
+          'shibboleth',
+        ],
+        'group':
+          '_shibd',
+        'user':
+          '_shibd',
+        'mod_shib_user':
+          'www-data',
+      },
+      'FreeBSD': {
+        'packages': [
+          'apache24',
+          'shibboleth-sp',
+        ],
+        'confdir':
+          '/usr/local/etc/shibboleth',
+        'services': [
+          'shibboleth-sp',
+        ],
+        'mod_shib_user':
+          'www',
+      },
+      'default': {},
+    }) %}
 
-{% do default_settings.shibboleth.sp.update(os_family_map) %}
+{%- do default_settings.shibboleth.sp.update(os_family_map) %}
 
-{% set shibsp_settings = salt['pillar.get'](
-    'shibboleth:sp',
-    default=default_settings.shibboleth.sp,
-    merge=True
-  ) %}
+{%- set shibsp_settings = salt['pillar.get'](
+      'shibboleth:sp',
+      default=default_settings.shibboleth.sp,
+      merge=True,
+    ) %}

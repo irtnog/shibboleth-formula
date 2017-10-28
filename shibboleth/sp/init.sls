@@ -1,4 +1,5 @@
 {%- from "shibboleth/sp/map.jinja" import shibsp_settings with context %}
+{%- from "shibboleth/sp/lib.jinja" import generate_sp_keymat_states with context %}
 {%- set dirsep = '\\' if grains['os_family'] == 'Windows' else '/' %}
 
 shibsp:
@@ -46,23 +47,21 @@ shibsp:
     - watch:
         - pkg: shibsp
         - file: shibsp
-        - file: shibsp_keymat
 
-shibsp_keymat:
-  file.recurse:
-    - name: {{ shibsp_settings.confdir|yaml_encode }}
-    - source: salt://shibboleth/sp/keymat
-    - template: jinja
-    - include_empty: yes
-    - exclude_pat: E@\.gitignore
-    - user: {{ shibsp_settings.user|yaml_encode }}
-    - group: {{ shibsp_settings.group|yaml_encode }}
-    - dir_mode: 751
-    - file_mode: 600
-    - require:
-        - file: shibsp
+## Handle optional SP keying material.
+{{ generate_sp_keymat_states(
+     app_overrides=shibsp_settings.application_overrides,
+     confdir=shibsp_settings.confdir,
+     dirsep=dirsep,
+     encryption_certificate=shibsp_settings.encryption_certificate,
+     encryption_key=shibsp_settings.encryption_key,
+     group=shibsp_settings.group,
+     signing_certificate=shibsp_settings.signing_certificate,
+     signing_key=shibsp_settings.signing_key,
+     user=shibsp_settings.user,
+   ) }}
 
-## Handle inline signing certificates.
+## Handle inline metadata signing certificates.
 {%- for mp in shibsp_settings.metadata_providers if mp is mapping %}
 {%-   for filter in mp.metadata_filters|default([]) if filter.type == 'Signature' %}
 {%-     set hash = salt['hashutil.digest'](mp.url) %}

@@ -1,4 +1,5 @@
 {%- from "shibboleth/sp/map.jinja" import shibsp_settings with context -%}
+{%- from "shibboleth/sp/lib.jinja" import generate_application_settings with context %}
 <SPConfig{{ {
     'xmlns': 'urn:mace:shibboleth:2.0:native:sp:config',
     'xmlns:conf': 'urn:mace:shibboleth:2.0:native:sp:config',
@@ -34,7 +35,6 @@
 
     <!-- The ApplicationDefaults element is where most of Shibboleth's SAML bits are defined. -->
 {{  generate_application_settings(
-      shibsp_settings.entity_id,
       app_overrides=shibsp_settings.app_overrides,
       artifact_by_filesystem=shibsp_settings.artifact_by_filesystem,
       async_logout=shibsp_settings.async_logout,
@@ -56,6 +56,7 @@
       ecp_enabled=shibsp_settings.ecp_enabled,
       encryption=shibsp_settings.encryption,
       encryption_algorithm=shibsp_settings.encryption_algorithm,
+      entity_id=shibsp_settings.entity_id,
       help_location=shibsp_settings.help_location,
       metadata_providers=shibsp_settings.metadata_providers,
       relying_parties=shibsp_settings.relying_parties,

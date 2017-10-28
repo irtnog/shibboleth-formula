@@ -1,9 +1,95 @@
+{%- macro generate_sp_keymat_states(
+      app_id=None,
+      app_overrides=None,
+      confdir=None,
+      dirsep=None,
+      encryption_certificate=None,
+      encryption_key=None,
+      group=None,
+      signing_certificate=None,
+      signing_key=None,
+      user=None
+    ) %}
+{%-   set state_prefix = '' if app_id == None else app_id ~ '_' %}
+{%-   set file_prefix = '' if app_id == None else app_id ~ '-' %}
+{%-   if encryption_certificate != None %}
+shibsp_keymat_{{ state_prefix }}encryption_certificate:
+  file.managed:
+    - name: {{ '%s%s%sencryption.crt'|format(confdir, dirsep, file_prefix)|yaml_encode }}
+    - contents: {{ encryption_certificate|yaml_encode }}
+    - user: {{ user|yaml_encode }}
+    - group: {{ group|yaml_encode }}
+    - dir_mode: 751
+    - file_mode: 600
+    - require:
+        - file: shibsp
+    - watch_in:
+        - service: shibsp
+shibsp_keymat_{{ state_prefix }}encryption_key:
+  file.managed:
+    - name: {{ '%s%s%sencryption.key'|format(confdir, dirsep, file_prefix)|yaml_encode }}
+    - contents: {{ encryption_key|yaml_encode }}
+    - user: {{ user|yaml_encode }}
+    - group: {{ group|yaml_encode }}
+    - dir_mode: 751
+    - file_mode: 600
+    - require:
+        - file: shibsp
+    - watch_in:
+        - service: shibsp
+{%-   endif %}
+{%-   if signing_certificate != None %}
+shibsp_keymat_{{ state_prefix }}signing_certificate:
+  file.managed:
+    - name: {{ '%s%s%ssigning.crt'|format(confdir, dirsep, file_prefix)|yaml_encode }}
+    - contents: {{ signing_certificate|yaml_encode }}
+    - user: {{ user|yaml_encode }}
+    - group: {{ group|yaml_encode }}
+    - dir_mode: 751
+    - file_mode: 600
+    - require:
+        - file: shibsp
+    - watch_in:
+        - service: shibsp
+shibsp_keymat_{{ state_prefix }}signing_key:
+  file.managed:
+    - name: {{ '%s%s%ssigning.key'|format(confdir, dirsep, file_prefix)|yaml_encode }}
+    - contents: {{ signing_key|yaml_encode }}
+    - user: {{ user|yaml_encode }}
+    - group: {{ group|yaml_encode }}
+    - dir_mode: 751
+    - file_mode: 600
+    - require:
+        - file: shibsp
+    - watch_in:
+        - service: shibsp
+{%-   endif %}
+{%-   if app_id == None %}
+{%-     for app_id, overrides in app_overrides|default({})|dictsort
+        if 'encryption_certificate' in overrides
+        or 'signing_certificate' in overrides %}
+{{        generate_sp_keymat_states(
+            app_id=app_id,
+            confdir=confdir,
+            dirsep=dirsep,
+            encryption_certificate=overrides['encryption_certificate']|default(None),
+            encryption_key=overrides['encryption_key']|default(None),
+            group=group,
+            signing_certificate=overrides['signing_certificate']|default(None),
+            signing_key=overrides['signing_key']|default(None),
+            user=user,
+          ) }}
+{%-     endfor %}
+{%-   endif %}
+{%- endmacro %}  
+
 {%- macro generate_filter_rule(
-  filter,
-  indent=4,
-  step=4)%}
+      filter,
+      indent=4,
+      step=4
+    ) %}
 {%-   for role in filter['retained_roles']|default([]) %}
-{{      '<RetainedRole>%s</RetainedRole>'|format(role)|indent(first=True, width=indent) }}
+{{      '<RetainedRole>%s</RetainedRole>'|format(role)|indent(indentfirst=True, width=indent) }}
 {%-   endfor %}
 {%-   for attribute in filter['attributes']|default([]) %}
 {%-     set version = attribute['version']|default('saml') %}
@@ -11,15 +97,15 @@
         'FriendlyName': attribute['friendly_name']|default(None),
         'Name': attribute['name'],
         'NameFormat': attribute['name_format']|default(None),
-      }|xmlattr)|indent(first=True, width=indent) }}
+      }|xmlattr)|indent(indentfirst=True, width=indent) }}
 {%-     for value in attribute['values'] %}
 {%-       if value is mapping and 'regex' in value %}
-{{          '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(first=True, width=indent+step) }}
+{{          '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(indentfirst=True, width=indent+step) }}
 {%-       else %}
-{{          '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, version)|indent(first=True, widdth=indent+step) }}
+{{          '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, version)|indent(indentfirst=True, widdth=indent+step) }}
 {%-       endif %}
 {%-     endfor %}
-{{      '</%s:Attribute>'|format(version)|indent(first=True, width=indent) }}
+{{      '</%s:Attribute>'|format(version)|indent(indentfirst=True, width=indent) }}
 {%-   endfor %}
 {%-   for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
 {%-     for attribute in attributes %}
@@ -28,23 +114,23 @@
           'FriendlyName': attribute['friendly_name']|default(None),
           'Name': attribute['name'],
           'NameFormat': attribute['name_format']|default(None),
-        }|xmlattr)|indent(first=True, width=indent) }}
+        }|xmlattr)|indent(indentfirst=True, width=indent) }}
 {%-       for value in attribute['values'] %}
 {%-         if value is mapping and 'regex' in value %}
-{{            '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(first=True, width=indent+step) }}
+{{            '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(indentfirst=True, width=indent+step) }}
 {%-         else %}
-{{            '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(first=True, width=indent+step) }}
+{{            '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(indentfirst=True, width=indent+step) }}
 {%-         endif %}
 {%-       endfor %}
-{{        '</%s:Attribute>'|format(version)|indent(first=True, width=indent) }}
+{{        '</%s:Attribute>'|format(version)|indent(indentfirst=True, width=indent) }}
 {%-     endfor %}
-{{      '<Entity>%s</Entity>'|format(entity)|indent(first=True, width=indent) }}
+{{      '<Entity>%s</Entity>'|format(entity)|indent(indentfirst=True, width=indent) }}
 {%-   endfor %}
 {%-   for include in filter['include']|default([]) %}
-{{      '<Include>%s</Include>'|format(include)|indent(first=True, width=indent) }}
+{{      '<Include>%s</Include>'|format(include)|indent(indentfirst=True, width=indent) }}
 {%-   endfor %}
 {%-   for exclude in filter['exclude']|default([]) %}
-{{      '<Exclude>%s</Exclude>'|format(exclude)|indent(first=True, width=indent) }}
+{{      '<Exclude>%s</Exclude>'|format(exclude)|indent(indentfirst=True, width=indent) }}
 {%-   endfor %}
 {%- endmacro %}
 
@@ -52,54 +138,59 @@
     ApplicationOverride elements of the Shibboleth service provider
     configuration. #}
 {%- macro generate_application_settings(
-  entity_id,
-  app_id=None,
-  app_overrides=None,
-  artifact_by_filesystem=None,
-  async_logout=None,
-  attribute_map=None,
-  attribute_policy=None,
-  attribute_resolver=None,
-  auth_context_comparison=None,
-  auth_password=None,
-  auth_type=None,
-  auth_username=None,
-  authn_context_classes=None,
-  backchannel_cipher_suites=None,
-  backchannel_connect_timeout=None,
-  backchannel_operation_timeout=None,
-  backchannel_require_encryption=None,
-  backchannel_require_transport_auth=None,
-  chunked_encoding=None,
-  digest_algorithm=None,
-  ecp_enabled=None,
-  encryption=None,
-  encryption_algorithm=None,
-  help_location=None,
-  metadata_providers=None,
-  relying_parties=None,
-  remote_user=None,
-  require_signed_assertions=None,
-  session_check_address=None,
-  session_cookie_properties=None,
-  session_handler_ssl=None,
-  session_handlers=None,
-  session_hook=None,
-  session_idp_history=None,
-  session_lifetime=None,
-  session_logout=None,
-  session_relay_state=None,
-  session_sso=None,
-  session_timeout=None,
-  signing=None,
-  signing_algorithm=None,
-  sp_name_qualifier=None,
-  sso_default_idp=None,
-  sso_discovery_protocol=None,
-  style_sheet=None,
-  support_contact=None,
-  indent=4,
-  indent_step=4) %}
+      app_id=None,
+      app_overrides=None,
+      artifact_by_filesystem=None,
+      async_logout=None,
+      attribute_map=None,
+      attribute_policy=None,
+      attribute_resolver=None,
+      auth_context_comparison=None,
+      auth_password=None,
+      auth_type=None,
+      auth_username=None,
+      authn_context_classes=None,
+      backchannel_cipher_suites=None,
+      backchannel_connect_timeout=None,
+      backchannel_operation_timeout=None,
+      backchannel_require_encryption=None,
+      backchannel_require_transport_auth=None,
+      chunked_encoding=None,
+      digest_algorithm=None,
+      ecp_enabled=None,
+      encryption=None,
+      encryption_algorithm=None,
+      encryption_certificate=None,
+      encryption_key=None,
+      entity_id=None,
+      help_location=None,
+      metadata_providers=None,
+      relying_parties=None,
+      remote_user=None,
+      require_signed_assertions=None,
+      session_check_address=None,
+      session_cookie_properties=None,
+      session_handler_ssl=None,
+      session_handlers=None,
+      session_hook=None,
+      session_idp_history=None,
+      session_lifetime=None,
+      session_logout=None,
+      session_relay_state=None,
+      session_sso=None,
+      session_timeout=None,
+      signing=None,
+      signing_algorithm=None,
+      signing_certificate=None,
+      signing_key=None,
+      sp_name_qualifier=None,
+      sso_default_idp=None,
+      sso_discovery_protocol=None,
+      style_sheet=None,
+      support_contact=None,
+      indent=4,
+      step=4
+    ) %}
 {%-   set app_tag = 'ApplicationOverride' if app_id else 'ApplicationDefaults' %}
 
 {{    '<%s%s>'|format(app_tag, {
@@ -129,7 +220,7 @@
         'signing': None if signing == None else signing if signing is string else 'true' if signing else 'false',
         'signingAlg': signing_algorithm,
         'timeout': backchannel_operation_timeout,
-      }|xmlattr)|indent(first=True, width=indent) }}
+      }|xmlattr)|indent(indentfirst=True, width=indent) }}
 
 {%-   if async_logout != None
       or ecp_enabled != None
@@ -154,22 +245,22 @@
           'handlerSSL': None if session_handler_ssl == None else 'true' if session_handler_ssl else 'false',
           'cookieProps': session_cookie_properties,
           'idpHistory': None if session_idp_history == None else 'true' if session_idp_history else 'false',
-        }|xmlattr)|indent(first=True, width=indent+step) }}
+        }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 
 {%-     if ecp_enabled != None
         or session_sso != None
         or sso_default_idp != None
         or sso_discovery_protocol != None
-        or sso_discovery_url != None
+        or sso_discovery_url != None %}
 
 {{        '<SSO%s>'|format({
             'ECP': None if ecp_enabled == None else 'true' if ecp_enabled else 'false',
             'discoveryProtocol': sso_discovery_protocol,
             'discoveryURL': sso_discovery_url,
             'entityID': sso_default_idp,
-          }|xmlattr)|indent(first=True, width=indent+step+step) }}
-{{        session_sso|default([])|join(' ')|indent(first=True, width=indent+step+step+step) }}
-{{        '</SSO>'|indent(first=True, width=indent+step+step) }}
+          }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
+{{        session_sso|default([])|join(' ')|indent(indentfirst=True, width=indent+step+step+step) }}
+{{        '</SSO>'|indent(indentfirst=True, width=indent+step+step) }}
 
 {%-     endif %}
 
@@ -178,9 +269,9 @@
 
 {{        '<Logout%s>'|format({
             'asynchronous': None if async_logout == None else 'true' if async_logout else 'false',
-          }|xmlattr|indent(first=True, width=indent+step+step) }}
-{{          '%s'|format(session_logout|join(' '))|indent(first=True, width=indent+step+step+step) }}
-{{        '</Logout>'|indent(first=True, width=indent+step+step) }}
+          }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
+{{          '%s'|format(session_logout|join(' '))|indent(indentfirst=True, width=indent+step+step+step) }}
+{{        '</Logout>'|indent(indentfirst=True, width=indent+step+step) }}
 
 {%-     endif %}
 
@@ -192,11 +283,11 @@
             'showAttributeValues': None if 'show_attribute_values' not in handler else 'true' if handler.show_attribute_values else 'false',
             'signing': None if 'signing' not in handler else 'true' if handler['signing'] else 'false',
             'type': handler['type'],
-          }|xmlattr)|indent(first=True, width=indent+step+step) }}
+          }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
 
 {%-     endfor %}
 
-{{      '</Session>'|indent(first=True, width=indent+step) }}
+{{      '</Sessions>'|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
 
@@ -208,7 +299,7 @@
             'helpLocation': help_location,
             'styleSheet': style_sheet,
             'supportContact': support_contact,
-        }|xmlattr)|indent(first=True, width=indent+step) }}
+        }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
 
@@ -224,7 +315,7 @@
               'type': 'XML',
               'uri': mp,
               'validate': 'true',
-            }|xmlattr)|indent(first=True, width=indent+step) }}
+            }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 
 {%-       else %}
 {#- assume this is inline metadata (XML) #}
@@ -233,7 +324,7 @@
               'file': '_%s.xml'|format(mp_id),
               'type': 'XML',
               'validate': 'true',
-            }|xmlattr)|indent(first=True, width=indent+step) }}
+            }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 
 {%-       endif %}
 {%-     elif mp is mapping %}
@@ -245,7 +336,7 @@
             'maxRefreshDelay': mp['max_refresh_delay']|default(None),
             'type': mp['type']|default('XML'),
             'url': mp['url']|default(None),
-          }|xmlattr)|indent(first=True, width=indent+step) }}
+          }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 {%-       if mp['metadata_filters']|default([]) != []
           or mp['discovery_filters']|default([]) != [] %}>
 {%-         for filter in mp['metadata_filters']|default([]) %}
@@ -260,7 +351,7 @@
                 'maxValidityInterval': filter['max_validity_interval']|default(None),
                 'removeRolelessEntityDescriptors': None if 'remove_roleless_entity_descriptors' not in filter else 'true' if filter['remove_roleless_entity_descriptors'] else 'false',
                 'removeEmptyEntitiesDescriptors': None if 'remove_empty_entity_descriptors' not in filter else 'true' if filter['remove_empty_entity_descriptors'] else 'false',
-              }|xmlattr)|indent(first=True, width=indent+step+step) }}
+              }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
 {%-           if filter['type'] in [
                 'Whitelist',
                 'Blacklist',
@@ -268,7 +359,7 @@
                 'EntityRoleBlackList',
               ] %}>
 {{              generate_filter_rule(filter, indent=indent+step+step+step, step=step) }}
-{{            '</MetadataFilter>'|indent(first=True, width=indent+step+step) }}
+{{            '</MetadataFilter>'|indent(indentfirst=True, width=indent+step+step) }}
 {%-           else %} />
 {%-           endif %}
 {%-         endfor %}
@@ -276,11 +367,11 @@
 {{            '<DiscoveryFilter%s>'|format({
                 'matcher': filter['matcher'],
                 'type': filter['type'],
-              }|xmlattr)|indent(first=True, width=indent+step+step) }}
+              }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
 {{            generate_filter_rule(filter, indent=indent+step+step+step, step=step) }}
-{{            '</DiscoveryFilter>'|indent(first=True, width=indent+step+step) }}
+{{            '</DiscoveryFilter>'|indent(indentfirst=True, width=indent+step+step) }}
 {%-         endfor %}
-{{        '</MetadataProvider>'|indent(first=True, width=indent+step) }}
+{{        '</MetadataProvider>'|indent(indentfirst=True, width=indent+step) }}
 {%-       else %} />
 {%-       endif %}
 {%-     endif %}
@@ -291,7 +382,7 @@
 
 {{      '<AttributeExtractor type="XML" validate="true" reloadChanges="false" path="%s.xml" />'|format(
           'attribute-map-%s'|format(app_id) if app_id else 'attribute_map',
-        )|indent(first=True, width=indent+step) }}
+        )|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
 
@@ -300,7 +391,7 @@
 {{      '<AttributeResolver%s />'|format({
           'subjectMatch': attribute_resolver['subject_match']|default(None),
           'type': attribute_resolver['type']|default(None),
-        }|xmlattr)|indent(first=True, width=indent+step) }}
+        }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
 
@@ -309,15 +400,21 @@
 
 {{      '<AttributeFilter type="XML" validate="true" path="%s.xml" />'|format(
           'attribute-policy-%s'|format(app_id) if app_id else 'attribute_map',
-        )|indent(first=True, width=indent+step) }}
+        )|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
 
-{%-   if app_id == None %}
-{#- TODO: per app credentials #}
+{%-   set cred_file_prefix = '' if app_id == None else app_id ~ '-' %}
+{%-   if encryption_certificate != None %}
 
-{{      '<CredentialResolver type="File" use="encryption" certificate="sp-encryption.crt" key="sp-encryption.key" />'|indent(first=True, width=indent+step) }}
-{{      '<CredentialResolver type="File" use="signing"    certificate="sp-signing.crt"    key="sp-signing.key" />'   |indent(first=True, width=indent+step) }}
+{{      '<CredentialResolver type="File" use="encryption" certificate="%sencryption.crt" key="%sencryption.key" />'|format(
+          cred_file_prefix, cred_file_prefix)|indent(indentfirst=True, width=indent+step) }}
+
+{%-   endif %}
+{%-   if signing_certificate != None %}
+
+{{      '<CredentialResolver type="File" use="signing" certificate="%ssigning.crt" key="%ssigning.key" />'|format(
+          cred_file_prefix, cred_file_prefix)|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
 
@@ -350,29 +447,29 @@
           'timeout': rp['backchannel_operation_timeout']|default(None),
           'trimTags': None if 'trim_tags' not in rp else 'true' if rp['trim_tags'] else 'false',
           'type': rp['type']|default(None),
-        }|xmlattr)|indent(first=True, width=indent+step) }}
+        }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 {%-     if 'attributes' in rp
-        or 'registration_authorities in rp %}>
+        or 'registration_authorities' in rp %}>
 {%-       for attribute in rp['attributes']|default([]) %}
 {%-         set version = attribute['version']|default('saml') %}
 {{          '<%s:Attribute%s>'|format(version, {
               'FriendlyName': attribute['friendly_name']|default(None),
               'Name': attribute['name'],
               'NameFormat': attribute['name_format']|default(None),
-            }|xmlattr)|indent(first=True, width=indent+step+step) }}
+            }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
 {%-         for value in attribute['values'] %}
 {%-           if value is mapping and 'regex' in value %}
-{{              '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(first=True, width=indent+step+step+step) }}
+{{              '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(indentfirst=True, width=indent+step+step+step) }}
 {%-           else %}
-{{              '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(first=True, width=indent+step+step+step) }}
+{{              '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(indentfirst=True, width=indent+step+step+step) }}
 {%-           endif %}
 {%-         endfor %}
-{{          '</%s:Attribute>'|format(version)|indent(first=True, width=indent+step+step) }}
+{{          '</%s:Attribute>'|format(version)|indent(indentfirst=True, width=indent+step+step) }}
 {%-       endfor %}
 {%-       for ra in rp['registration_authorities']|default([]) %}
-{{          '<registrationAuthority>%s</registrationAuthority>'|format(ra)|indent(first=True, width=indent+step+step) }}
+{{          '<registrationAuthority>%s</registrationAuthority>'|format(ra)|indent(indentfirst=True, width=indent+step+step) }}
 {%-       endfor %}
-{{        '</RelyingParty>'|indent(first=True, width=indent+step) }}
+{{        '</RelyingParty>'|indent(indentfirst=True, width=indent+step) }}
 {%-     else %} />
 {%-     endif %}
 {%-   endfor %}
@@ -380,7 +477,6 @@
 {%-   for app_id, overrides in application_overrides|default({})|dictsort %}
 
 {{      generate_application_settings(
-          entity_id=overrides['entity_id'],
           app_id=app_id,
           artifact_by_filesystem=overrides['artifact_by_filesystem']|default(None),
           async_logout=overrides['async_logout']|default(None),
@@ -402,6 +498,9 @@
           ecp_enabled=overrides['ecp_enabled']|default(None),
           encryption=overrides['encryption']|default(None),
           encryption_algorithm=overrides['encryption_algorithm']|default(None),
+          encryption_certificate=overrides['encryption_certificate']|default(None),
+          encryption_key=overrides['encryption_key']|default(None),
+          entity_id=overrides['entity_id']|default(None),
           help_location=overrides['help_location']|default(None),
           metadata_providers=overrides['metadata_providers']|default(None),
           relying_parties=overrides['relying_parties']|default(None),
@@ -420,15 +519,18 @@
           session_timeout=overrides['session_timeout']|default(None),
           signing=overrides['signing']|default(None),
           signing_algorithm=overrides['signing_algorithm']|default(None),
+          signing_certificate=overrides['signing_certificate']|default(None),
+          signing_key=overrides['signing_key']|default(None),
           sp_name_qualifier=overrides['sp_name_qualifier']|default(None),
           sso_default_idp=overrides['sso_default_idp']|default(None),
           sso_discovery_protocol=overrides['sso_discovery_protocol']|default(None),
           style_sheet=overrides['style_sheet']|default(None),
           support_contact=overrides['support_contact']|default(None),
           indent=indent+step,
-          step=step) }}
+          step=step
+        ) }}
 
 {%-   endfor %}
-{{    '</%s>'|format(app_tag)|indent(first=True, width=indent) }}
+{{    '</%s>'|format(app_tag)|indent(indentfirst=True, width=indent) }}
 
 {%- endmacro %}
