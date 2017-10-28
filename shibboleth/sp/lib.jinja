@@ -1,0 +1,434 @@
+{%- macro generate_filter_rule(
+  filter,
+  indent=4,
+  step=4)%}
+{%-   for role in filter['retained_roles']|default([]) %}
+{{      '<RetainedRole>%s</RetainedRole>'|format(role)|indent(first=True, width=indent) }}
+{%-   endfor %}
+{%-   for attribute in filter['attributes']|default([]) %}
+{%-     set version = attribute['version']|default('saml') %}
+{{      '<%s:Attribute%s>'|format(version, {
+        'FriendlyName': attribute['friendly_name']|default(None),
+        'Name': attribute['name'],
+        'NameFormat': attribute['name_format']|default(None),
+      }|xmlattr)|indent(first=True, width=indent) }}
+{%-     for value in attribute['values'] %}
+{%-       if value is mapping and 'regex' in value %}
+{{          '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(first=True, width=indent+step) }}
+{%-       else %}
+{{          '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, version)|indent(first=True, widdth=indent+step) }}
+{%-       endif %}
+{%-     endfor %}
+{{      '</%s:Attribute>'|format(version)|indent(first=True, width=indent) }}
+{%-   endfor %}
+{%-   for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
+{%-     for attribute in attributes %}
+{%-       set version = attribute['version']|default('saml') %}
+{{        '<%s:Attribute%s>'|format(version, {
+          'FriendlyName': attribute['friendly_name']|default(None),
+          'Name': attribute['name'],
+          'NameFormat': attribute['name_format']|default(None),
+        }|xmlattr)|indent(first=True, width=indent) }}
+{%-       for value in attribute['values'] %}
+{%-         if value is mapping and 'regex' in value %}
+{{            '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(first=True, width=indent+step) }}
+{%-         else %}
+{{            '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(first=True, width=indent+step) }}
+{%-         endif %}
+{%-       endfor %}
+{{        '</%s:Attribute>'|format(version)|indent(first=True, width=indent) }}
+{%-     endfor %}
+{{      '<Entity>%s</Entity>'|format(entity)|indent(first=True, width=indent) }}
+{%-   endfor %}
+{%-   for include in filter['include']|default([]) %}
+{{      '<Include>%s</Include>'|format(include)|indent(first=True, width=indent) }}
+{%-   endfor %}
+{%-   for exclude in filter['exclude']|default([]) %}
+{{      '<Exclude>%s</Exclude>'|format(exclude)|indent(first=True, width=indent) }}
+{%-   endfor %}
+{%- endmacro %}
+
+{#- This macro generates the ApplicationDefaults and nested
+    ApplicationOverride elements of the Shibboleth service provider
+    configuration. #}
+{%- macro generate_application_settings(
+  entity_id,
+  app_id=None,
+  app_overrides=None,
+  artifact_by_filesystem=None,
+  async_logout=None,
+  attribute_map=None,
+  attribute_policy=None,
+  attribute_resolver=None,
+  auth_context_comparison=None,
+  auth_password=None,
+  auth_type=None,
+  auth_username=None,
+  authn_context_classes=None,
+  backchannel_cipher_suites=None,
+  backchannel_connect_timeout=None,
+  backchannel_operation_timeout=None,
+  backchannel_require_encryption=None,
+  backchannel_require_transport_auth=None,
+  chunked_encoding=None,
+  digest_algorithm=None,
+  ecp_enabled=None,
+  encryption=None,
+  encryption_algorithm=None,
+  help_location=None,
+  metadata_providers=None,
+  relying_parties=None,
+  remote_user=None,
+  require_signed_assertions=None,
+  session_check_address=None,
+  session_cookie_properties=None,
+  session_handler_ssl=None,
+  session_handlers=None,
+  session_hook=None,
+  session_idp_history=None,
+  session_lifetime=None,
+  session_logout=None,
+  session_relay_state=None,
+  session_sso=None,
+  session_timeout=None,
+  signing=None,
+  signing_algorithm=None,
+  sp_name_qualifier=None,
+  sso_default_idp=None,
+  sso_discovery_protocol=None,
+  style_sheet=None,
+  support_contact=None,
+  indent=4,
+  indent_step=4) %}
+{%-   set app_tag = 'ApplicationOverride' if app_id else 'ApplicationDefaults' %}
+
+{{    '<%s%s>'|format(app_tag, {
+        'NameIDFormat': nameid_format,
+        'REMOTE_USER': remote_user|join(' ') or None,
+        'SPNameQualifier': sp_name_qualifier,
+        'artifactByFilesystem': None if artifact_by_filesystem == None else 'true' if artifact_by_filesystem else 'false',
+        'artifactEndpointIndex': artifact_endpoint_index,
+        'authPassword': auth_password,
+        'authType': auth_type,
+        'authUsername': auth_username,
+        'authnContextClassRef': None if authn_context_classes == None else authn_context_classes|join(' '),
+        'authnContextComparison': authn_context_comparison,
+        'chunkedEncoding': None if chunked_encoding == None else 'true' if chunked_encoding else 'false',
+        'cipherSuites': backchannel_cipher_suites,
+        'connectTimeout': backchannel_connect_timeout,
+        'digestAlg': digest_algorithm,
+        'encryption': None if encryption == None else encryption if encryption is string else 'true' if encryption else 'false',
+        'encryptionAlg': encryption_algorithm,
+        'entityID': entity_id,
+        'id': app_id,
+        'keyName': key_name,
+        'requireConfidentiality': None if backchannel_require_encryption == None else 'true' if backchannel_require_encryption else 'false',
+        'requireSignedAssertions': None if require_signed_assertions == None else 'true' if require_signed_assertions else 'false',
+        'requireTransportAuth': None if backchannel_require_transport_auth == None else 'true' if backchannel_require_transport_auth else 'false',
+        'sessionHook': session_hook,
+        'signing': None if signing == None else signing if signing is string else 'true' if signing else 'false',
+        'signingAlg': signing_algorithm,
+        'timeout': backchannel_operation_timeout,
+      }|xmlattr)|indent(first=True, width=indent) }}
+
+{%-   if async_logout != None
+      or ecp_enabled != None
+      or session_check_address != None
+      or session_cookie_properties != None
+      or session_handler_ssl != None
+      or session_handlers != None
+      or session_idp_history != None
+      or session_lifetime != None
+      or session_logout != None
+      or session_relay_state != None
+      or session_sso != None
+      or session_timeout != None
+      or sso_default_idp != None
+      or sso_discovery_protocol != None %}
+
+{{      '<Sessions%s>'|format({
+          'lifetime': session_lifetime,
+          'timeout': session_timeout,
+          'relayState': session_relay_state,
+          'checkAddress': None if session_check_address == None else 'true' if session_check_address else 'false',
+          'handlerSSL': None if session_handler_ssl == None else 'true' if session_handler_ssl else 'false',
+          'cookieProps': session_cookie_properties,
+          'idpHistory': None if session_idp_history == None else 'true' if session_idp_history else 'false',
+        }|xmlattr)|indent(first=True, width=indent+step) }}
+
+{%-     if ecp_enabled != None
+        or session_sso != None
+        or sso_default_idp != None
+        or sso_discovery_protocol != None
+        or sso_discovery_url != None
+
+{{        '<SSO%s>'|format({
+            'ECP': None if ecp_enabled == None else 'true' if ecp_enabled else 'false',
+            'discoveryProtocol': sso_discovery_protocol,
+            'discoveryURL': sso_discovery_url,
+            'entityID': sso_default_idp,
+          }|xmlattr)|indent(first=True, width=indent+step+step) }}
+{{        session_sso|default([])|join(' ')|indent(first=True, width=indent+step+step+step) }}
+{{        '</SSO>'|indent(first=True, width=indent+step+step) }}
+
+{%-     endif %}
+
+{%-     if async_logout != None
+        or session_logout != None %}
+
+{{        '<Logout%s>'|format({
+            'asynchronous': None if async_logout == None else 'true' if async_logout else 'false',
+          }|xmlattr|indent(first=True, width=indent+step+step) }}
+{{          '%s'|format(session_logout|join(' '))|indent(first=True, width=indent+step+step+step) }}
+{{        '</Logout>'|indent(first=True, width=indent+step+step) }}
+
+{%-     endif %}
+
+{%-     for handler in session_handlers|default([]) %}
+
+{{        '<Handler%s/>'|format({
+            'Location': handler['location'],
+            'acl': None if 'acl' not in handler else handler.acl|join(' '),
+            'showAttributeValues': None if 'show_attribute_values' not in handler else 'true' if handler.show_attribute_values else 'false',
+            'signing': None if 'signing' not in handler else 'true' if handler['signing'] else 'false',
+            'type': handler['type'],
+          }|xmlattr)|indent(first=True, width=indent+step+step) }}
+
+{%-     endfor %}
+
+{{      '</Session>'|indent(first=True, width=indent+step) }}
+
+{%-   endif %}
+
+{%-   if help_location != None
+      or style_sheet != None
+      or support_contact != None %}
+
+{{      '<Errors%s/>'|format({
+            'helpLocation': help_location,
+            'styleSheet': style_sheet,
+            'supportContact': support_contact,
+        }|xmlattr)|indent(first=True, width=indent+step) }}
+
+{%-   endif %}
+
+{%-   for mp in metadata_providers %}
+{%-     if mp is string %}
+{%-       set mp_id = salt.hashutil.digest(mp) %}
+{%-       if mp.startswith('http') %}
+{#- just a URL, OK for testing but use HTTPS if possible #}
+
+{{          '<MetadataProvider%s/>'|format({
+              'backingFilePath': '_%s.xml'|format(mp_id),
+              'reloadInterval': 86400,
+              'type': 'XML',
+              'uri': mp,
+              'validate': 'true',
+            }|xmlattr)|indent(first=True, width=indent+step) }}
+
+{%-       else %}
+{#- assume this is inline metadata (XML) #}
+
+{{          '<MetadataProvider%s/>'|format({
+              'file': '_%s.xml'|format(mp_id),
+              'type': 'XML',
+              'validate': 'true',
+            }|xmlattr)|indent(first=True, width=indent+step) }}
+
+{%-       endif %}
+{%-     elif mp is mapping %}
+{%-       set mp_id = salt.hashutil.digest(mp['url']) %}
+
+{{        '<MetadataProvider%s'|format({
+            'backingFilePath': '_%s.xml'|format(mp_id),
+            'legacyOrgNames': None if 'legacy_org_names' not in mp else 'true' if mp['legacy_org_names'] else 'false',
+            'maxRefreshDelay': mp['max_refresh_delay']|default(None),
+            'type': mp['type']|default('XML'),
+            'url': mp['url']|default(None),
+          }|xmlattr)|indent(first=True, width=indent+step) }}
+{%-       if mp['metadata_filters']|default([]) != []
+          or mp['discovery_filters']|default([]) != [] %}>
+{%-         for filter in mp['metadata_filters']|default([]) %}
+{{            '<MetadataFilter%s'|format({
+                'type': filter['type'],
+                'certificate': '_%s.pem'|format(mp_id) if 'certificate' in filter else None,
+                'verifyRoles': None if 'verify_roles' not in filter else 'true' if filter['verify_roles'] else 'false',
+                'verifyName': None if 'verify_name' not in filter else 'true' if filter['verify_name'] else 'false',
+                'verifyBackup': None if 'verify_backup' not in filter else 'true' if filter['verify_backup'] else 'false',
+                'matcher': filter['matcher']|default(None),
+                'trimTags': None if 'trim_tags' not in filter else 'true' if filter['trim_tags'] else 'false',
+                'maxValidityInterval': filter['max_validity_interval']|default(None),
+                'removeRolelessEntityDescriptors': None if 'remove_roleless_entity_descriptors' not in filter else 'true' if filter['remove_roleless_entity_descriptors'] else 'false',
+                'removeEmptyEntitiesDescriptors': None if 'remove_empty_entity_descriptors' not in filter else 'true' if filter['remove_empty_entity_descriptors'] else 'false',
+              }|xmlattr)|indent(first=True, width=indent+step+step) }}
+{%-           if filter['type'] in [
+                'Whitelist',
+                'Blacklist',
+                'EntityRoleWhiteList',
+                'EntityRoleBlackList',
+              ] %}>
+{{              generate_filter_rule(filter, indent=indent+step+step+step, step=step) }}
+{{            '</MetadataFilter>'|indent(first=True, width=indent+step+step) }}
+{%-           else %} />
+{%-           endif %}
+{%-         endfor %}
+{%-         for filter in mp['discovery_filters']|default([]) %}
+{{            '<DiscoveryFilter%s>'|format({
+                'matcher': filter['matcher'],
+                'type': filter['type'],
+              }|xmlattr)|indent(first=True, width=indent+step+step) }}
+{{            generate_filter_rule(filter, indent=indent+step+step+step, step=step) }}
+{{            '</DiscoveryFilter>'|indent(first=True, width=indent+step+step) }}
+{%-         endfor %}
+{{        '</MetadataProvider>'|indent(first=True, width=indent+step) }}
+{%-       else %} />
+{%-       endif %}
+{%-     endif %}
+
+{%-   endfor %}
+
+{%-   if attribute_map != None %}
+
+{{      '<AttributeExtractor type="XML" validate="true" reloadChanges="false" path="%s.xml" />'|format(
+          'attribute-map-%s'|format(app_id) if app_id else 'attribute_map',
+        )|indent(first=True, width=indent+step) }}
+
+{%-   endif %}
+
+{%-   if attribute_resolver != None %}
+
+{{      '<AttributeResolver%s />'|format({
+          'subjectMatch': attribute_resolver['subject_match']|default(None),
+          'type': attribute_resolver['type']|default(None),
+        }|xmlattr)|indent(first=True, width=indent+step) }}
+
+{%-   endif %}
+
+{%-   if attribute_policy != None %}
+{#- TODO: attribute policies, per-app attribute policies #}
+
+{{      '<AttributeFilter type="XML" validate="true" path="%s.xml" />'|format(
+          'attribute-policy-%s'|format(app_id) if app_id else 'attribute_map',
+        )|indent(first=True, width=indent+step) }}
+
+{%-   endif %}
+
+{%-   if app_id == None %}
+{#- TODO: per app credentials #}
+
+{{      '<CredentialResolver type="File" use="encryption" certificate="sp-encryption.crt" key="sp-encryption.key" />'|indent(first=True, width=indent+step) }}
+{{      '<CredentialResolver type="File" use="signing"    certificate="sp-signing.crt"    key="sp-signing.key" />'   |indent(first=True, width=indent+step) }}
+
+{%-   endif %}
+
+{%-   for rp in relying_parties|default([]) %}
+
+{{      '<RelyingParty%s'|format({
+          'Name': rp['name']|default(None),
+          'NameIDFormat': rp['nameid_format']|default(None),
+          'SPNameQualifier': rp['sp_name_qualifier']|default(None),
+          'artifactByFilesystem': None if 'artifact_by_filesystem' not in rp else 'true' if rp['artifact_by_filesystem'] else 'false',
+          'artifactEndpointIndex': rp['artifact_endpoint_index']|default(None),
+          'authPassword': rp['auth_password']|default(None),
+          'authType': rp['auth_type']|default(None),
+          'authUsername': rp['auth_username']|default(None),
+          'authnContextClassRef': rp['authn_context_classes']|default([])|join(' ') or None,
+          'authnContextComparison': rp['authn_context_comparison']|default(None),
+          'chunkedEncoding': None if 'chunked_encoding' not in rp else 'true' if rp['chunked_encoding'] else 'false',
+          'cipherSuites': rp['backchannel_cipher_suites']|default(None),
+          'connectTimeout': rp['backchannel_connect_timeout']|default(None),
+          'digestAlg': rp['digest_algorithm']|default(None),
+          'encryption': None if 'encryption' not in rp else rp['encryption'] if rp['encryption'] is string else 'true' if rp['encryption'] else 'false',
+          'encryptionAlg': rp['encryption_algorithm']|default(None),
+          'keyName': rp['key_name']|default(None),
+          'requireConfidentiality': None if 'backchannel_require_encryption' not in rp else 'true' if rp['backchannel_require_encryption'] else 'false',
+          'requireSignedAssertions': None if 'require_signed_assertions' not in rp else 'true' if rp['require_signed_assertions'] else 'false',
+          'requireTransportAuth': None if 'backchannel_require_transport_auth' not in rp else 'true' if rp['backchannel_require_transport_auth'] else 'false',
+          'sessionHook': rp['session_hook']|default(None),
+          'signing': None if 'signing' not in rp else rp['signing'] if rp['signing'] is string else 'true' if rp['signing'] else 'false',
+          'signingAlg': rp['signing_algorithm']|default(None),
+          'timeout': rp['backchannel_operation_timeout']|default(None),
+          'trimTags': None if 'trim_tags' not in rp else 'true' if rp['trim_tags'] else 'false',
+          'type': rp['type']|default(None),
+        }|xmlattr)|indent(first=True, width=indent+step) }}
+{%-     if 'attributes' in rp
+        or 'registration_authorities in rp %}>
+{%-       for attribute in rp['attributes']|default([]) %}
+{%-         set version = attribute['version']|default('saml') %}
+{{          '<%s:Attribute%s>'|format(version, {
+              'FriendlyName': attribute['friendly_name']|default(None),
+              'Name': attribute['name'],
+              'NameFormat': attribute['name_format']|default(None),
+            }|xmlattr)|indent(first=True, width=indent+step+step) }}
+{%-         for value in attribute['values'] %}
+{%-           if value is mapping and 'regex' in value %}
+{{              '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(first=True, width=indent+step+step+step) }}
+{%-           else %}
+{{              '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(first=True, width=indent+step+step+step) }}
+{%-           endif %}
+{%-         endfor %}
+{{          '</%s:Attribute>'|format(version)|indent(first=True, width=indent+step+step) }}
+{%-       endfor %}
+{%-       for ra in rp['registration_authorities']|default([]) %}
+{{          '<registrationAuthority>%s</registrationAuthority>'|format(ra)|indent(first=True, width=indent+step+step) }}
+{%-       endfor %}
+{{        '</RelyingParty>'|indent(first=True, width=indent+step) }}
+{%-     else %} />
+{%-     endif %}
+{%-   endfor %}
+
+{%-   for app_id, overrides in application_overrides|default({})|dictsort %}
+
+{{      generate_application_settings(
+          entity_id=overrides['entity_id'],
+          app_id=app_id,
+          artifact_by_filesystem=overrides['artifact_by_filesystem']|default(None),
+          async_logout=overrides['async_logout']|default(None),
+          attribute_map=overrides['attribute_map']|default(None),
+          attribute_policy=overrides['attribute_policy']|default(None),
+          attribute_resolver=overrides['attribute_resolver']|default(None),
+          auth_context_comparison=overrides['auth_context_comparison']|default(None),
+          auth_password=overrides['auth_password']|default(None),
+          auth_type=overrides['auth_type']|default(None),
+          auth_username=overrides['auth_username']|default(None),
+          authn_context_classes=overrides['authn_context_classes']|default(None),
+          backchannel_cipher_suites=overrides['backchannel_cipher_suites']|default(None),
+          backchannel_connect_timeout=overrides['backchannel_connect_timeout']|default(None),
+          backchannel_operation_timeout=overrides['backchannel_operation_timeout']|default(None),
+          backchannel_require_encryption=overrides['backchannel_require_encryption']|default(None),
+          backchannel_require_transport_auth=overrides['backchannel_require_transport_auth']|default(None),
+          chunked_encoding=overrides['chunked_encoding']|default(None),
+          digest_algorithm=overrides['digest_algorithm']|default(None),
+          ecp_enabled=overrides['ecp_enabled']|default(None),
+          encryption=overrides['encryption']|default(None),
+          encryption_algorithm=overrides['encryption_algorithm']|default(None),
+          help_location=overrides['help_location']|default(None),
+          metadata_providers=overrides['metadata_providers']|default(None),
+          relying_parties=overrides['relying_parties']|default(None),
+          remote_user=overrides['remote_user']|default(None),
+          require_signed_assertions=overrides['require_signed_assertions']|default(None),
+          session_check_address=overrides['session_check_address']|default(None),
+          session_cookie_properties=overrides['session_cookie_properties']|default(None),
+          session_handler_ssl=overrides['session_handler_ssl']|default(None),
+          session_handlers=overrides['session_handlers']|default(None),
+          session_hook=overrides['session_hook']|default(None),
+          session_idp_history=overrides['session_idp_history']|default(None),
+          session_lifetime=overrides['session_lifetime']|default(None),
+          session_logout=overrides['session_logout']|default(None),
+          session_relay_state=overrides['session_relay_state']|default(None),
+          session_sso=overrides['session_sso']|default(None),
+          session_timeout=overrides['session_timeout']|default(None),
+          signing=overrides['signing']|default(None),
+          signing_algorithm=overrides['signing_algorithm']|default(None),
+          sp_name_qualifier=overrides['sp_name_qualifier']|default(None),
+          sso_default_idp=overrides['sso_default_idp']|default(None),
+          sso_discovery_protocol=overrides['sso_discovery_protocol']|default(None),
+          style_sheet=overrides['style_sheet']|default(None),
+          support_contact=overrides['support_contact']|default(None),
+          indent=indent+step,
+          step=step) }}
+
+{%-   endfor %}
+{{    '</%s>'|format(app_tag)|indent(first=True, width=indent) }}
+
+{%- endmacro %}

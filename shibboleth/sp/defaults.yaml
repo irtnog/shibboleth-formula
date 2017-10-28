@@ -56,7 +56,7 @@ shibboleth:
     session_hook: ~
     artifact_by_filesystem: ~
     backchannel_cipher_suites: ~
-    authn_context_classes: []
+    authn_context_classes: ~
     authn_context_comparison: ~
     nameid_format: ~
     sp_name_qualifier: ~
@@ -94,15 +94,12 @@ shibboleth:
     help_location: /about.html
     style_sheet: /shibboleth-sp/main.css
 
-    relying_parties: []
-
-    ## attribute-map.xml: The mappings are a mix of SAML 1.1 and SAML
-    ## 2.0 attribute names agreed to within the Shibboleth community.
-    ## The non-OID URNs are SAML 1.1 names and most of the OIDs are
-    ## SAML 2.0 names, with a few exceptions for newer attributes
-    ## where the name is the same for both versions.  You will usually
-    ## want to uncomment or map the names for both SAML versions as a
-    ## unit.
+    ## Attribute mappings are a mix of SAML 1.1 and SAML 2.0 attribute
+    ## names agreed to within the Shibboleth community.  The non-OID
+    ## URNs are SAML 1.1 names and most of the OIDs are SAML 2.0
+    ## names, with a few exceptions for newer attributes where the
+    ## name is the same for both versions.  You will usually want to
+    ## map the names for both SAML versions as a unit.
     attribute_map:
       ## some useful eduPerson attributes that many sites might use
       - name: urn:oid:1.3.6.1.4.1.5923.1.1.1.6
@@ -316,3 +313,20 @@ shibboleth:
       #   id: businessCategory
       # - name: urn:mace:dir:attribute-def:physicalDeliveryOfficeName
       #   id: physicalDeliveryOfficeName
+
+    ## TODO: attribute resolution settings
+    attribute_resolver:         # use SAML query if no attributes supplied during SSO
+      type: Query
+      subject_match: True
+
+    ## TODO: attribute filtering policy
+    attribute_policy: {}
+
+    ## TODO: per-relying party overrides
+    relying_parties: []
+
+    ## An override is a way to assign non-default sets of
+    ## configuration rules to content by grouping the content into
+    ## units called "applications" and then creating settings for
+    ## those applications here.
+    application_overrides: {}

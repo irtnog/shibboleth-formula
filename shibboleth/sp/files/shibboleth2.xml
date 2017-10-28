@@ -33,467 +33,53 @@
     -->
 
     <!-- The ApplicationDefaults element is where most of Shibboleth's SAML bits are defined. -->
-    <ApplicationDefaults{{ {
-        'entityID': shibsp_settings['entity_id'],
-        'REMOTE_USER': shibsp_settings['remote_user']|join(' ') or None,
-        'authType': shibsp_settings['auth_type'],
-        'authUsername': shibsp_settings['auth_username'],
-        'authPassword': shibsp_settings['auth_password'],
-        'signing':
-          None
-            if shibsp_settings['signing'] == None else
-          shibsp_settings['signing']
-            if shibsp_settings['signing'] is string else
-          'true' if shibsp_settings['signing'] else
-          'false',
-        'signingAlg': shibsp_settings['signing_algorithm'],
-        'digestAlg': shibsp_settings['digest_algorithm'],
-        'encryption':
-          None
-            if shibsp_settings['encryption'] == None else
-          shibsp_settings['encryption']
-            if shibsp_settings['encryption'] is string else
-          'true' if shibsp_settings['encryption'] else
-          'false',
-        'encryptionAlg': shibsp_settings['encryption_algorithm'],
-        'keyName': shibsp_settings['key_name'],
-        'artifactEndpointIndex': shibsp_settings['artifact_endpoint_index'],
-        'chunkedEncoding':
-          None if shibsp_settings['chunked_encoding'] == None else
-          'true' if shibsp_settings['chunked_encoding'] else
-          'false',
-        'connectTimeout': shibsp_settings['backchannel_connect_timeout'],
-        'timeout': shibsp_settings['backchannel_operation_timeout'],
-        'requireConfidentiality':
-          None if shibsp_settings['backchannel_require_encryption'] == None else
-          'true' if shibsp_settings['backchannel_require_encryption'] else
-          'false',
-        'requireSignedAssertions':
-          None if shibsp_settings['require_signed_assertions'] == None else
-          'true' if shibsp_settings['require_signed_assertions'] else
-          'false',
-        'requireTransportAuth':
-          None if shibsp_settings['backchannel_require_transport_auth'] == None else
-          'true' if shibsp_settings['backchannel_require_transport_auth'] else
-          'false',
-        'sessionHook': shibsp_settings['session_hook'],
-        'artifactByFilesystem':
-          None if shibsp_settings['artifact_by_filesystem'] == None else
-          'true' if shibsp_settings['artifact_by_filesystem'] else
-          'false',
-        'cipherSuites': shibsp_settings['backchannel_cipher_suites'],
-        'authnContextClassRef':
-          shibsp_settings['authn_context_classes']|join(' ') or None,
-        'authnContextComparison':
-          shibsp_settings['authn_context_comparison'],
-        'NameIDFormat': shibsp_settings['nameid_format'],
-        'SPNameQualifier': shibsp_settings['sp_name_qualifier'],
-      }|xmlattr }}>
-
-        <!--
-        Controls session lifetimes, address checks, cookie handling, and the protocol handlers.
-        You MUST supply an effectively unique handlerURL value for each of your applications.
-        The value defaults to /Shibboleth.sso, and should be a relative path, with the SP computing
-        a relative value based on the virtual host. Using handlerSSL="true", the default, will force
-        the protocol to be https. You should also set cookieProps to "https" for SSL-only sites.
-        Note that while we default checkAddress to "false", this has a negative impact on the
-        security of your site. Stealing sessions via cookie theft is much easier with this disabled.
-        -->
-        <Sessions{{ {
-            'lifetime': shibsp_settings['session_lifetime'],
-            'timeout': shibsp_settings['session_timeout'],
-            'relayState': shibsp_settings['session_relay_state'],
-            'checkAddress':
-              None if shibsp_settings['session_check_address'] == None else
-              'true' if shibsp_settings['session_check_address'] else
-              'false',
-            'handlerSSL':
-              None if shibsp_settings['session_handler_ssl'] == None else
-              'true' if shibsp_settings['session_handler_ssl'] else
-              'false',
-            'cookieProps': shibsp_settings['session_cookie_properties'],
-            'idpHistory':
-              None if shibsp_settings['session_idp_history'] == None else
-              'true' if shibsp_settings['session_idp_history'] else
-              'false',
-          }|xmlattr }}>
-
-            <!--
-            Configures SSO for a default IdP. To allow for >1 IdP, remove
-            entityID property and adjust discoveryURL to point to discovery service.
-            (Set discoveryProtocol to "WAYF" for legacy Shibboleth WAYF support.)
-            You can also override entityID on /Login query string, or in RequestMap/htaccess.
-            -->
-            <SSO{{ {
-                'entityID': shibsp_settings['sso_default_idp'],
-                'discoveryProtocol':
-                  shibsp_settings['sso_discovery_protocol'],
-                'discoveryURL': shibsp_settings['sso_discovery_url'],
-                'ECP':
-                  None if shibsp_settings['ecp_enabled'] == None else
-                  'true' if shibsp_settings['ecp_enabled'] else
-                  'false',
-              }|xmlattr }}>
-              {{ shibsp_settings['session_sso']|join(' ') }}
-            </SSO>
-
-            <!-- SAML and local-only logout. -->
-            <Logout{{ {
-                'asynchronous':
-                  None if shibsp_settings['async_logout'] == None else
-                  'true' if shibsp_settings['async_logout'] else
-                  'false',
-              }|xmlattr }}>{{ shibsp_settings.session_logout|join(' ') }}</Logout>
-            
-            <!-- Extension service that generates "approximate" metadata based on SP configuration. -->
-            <!-- <Handler type="MetadataGenerator" Location="/Metadata" signing="false"/> -->
-
-            <!-- Status reporting service. -->
-            <!-- <Handler type="Status" Location="/Status" acl="127.0.0.1 ::1"/> -->
-
-            <!-- Session diagnostic service. -->
-            <!-- <Handler type="Session" Location="/Session" showAttributeValues="false"/> -->
-
-            <!-- JSON feed of discovery information. -->
-            <!-- <Handler type="DiscoveryFeed" Location="/DiscoFeed"/> -->
-            {% for handler in shibsp_settings.session_handlers %}
-            <Handler{{ {
-                'type': handler['type'],
-                'Location': handler['location'],
-                'signing':
-                  None if 'signing' not in handler else
-                  'true' if handler['signing'] else
-                  'false',
-                'showAttributeValues':
-                  None if 'show_attribute_values' not in handler else
-                  'true' if handler.show_attribute_values else
-                  'false',
-                'acl':
-                  None if 'acl' not in handler else
-                  handler.acl|join(' '),
-              }|xmlattr }} />
-            {% endfor %}
-        </Sessions>
-
-        <!--
-        Allows overriding of error template information/filenames. You can
-        also add attributes with values that can be plugged into the templates.
-        -->
-        <Errors{{ {
-            'supportContact': shibsp_settings['support_contact'],
-            'helpLocation': shibsp_settings['help_location'],
-            'styleSheet': shibsp_settings['style_sheet'],
-          }|xmlattr }} />
-        
-        <!-- Example of remotely supplied batch of signed metadata. -->
-        <!--
-        <MetadataProvider type="XML" validate="true"
-	      uri="http://example.org/federation-metadata.xml"
-              backingFilePath="federation-metadata.xml" reloadInterval="7200">
-            <MetadataFilter type="RequireValidUntil" maxValidityInterval="2419200"/>
-            <MetadataFilter type="Signature" certificate="fedsigner.pem"/>
-            <DiscoveryFilter type="Blacklist" matcher="EntityAttributes" trimTags="true" 
-              attributeName="http://macedir.org/entity-category"
-              attributeNameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
-              attributeValue="http://refeds.org/category/hide-from-discovery" />
-        </MetadataProvider>
-        -->
-
-        <!-- Example of locally maintained metadata. -->
-        <!--
-        <MetadataProvider type="XML" validate="true" file="partner-metadata.xml"/>
-        -->
-{% for mp in shibsp_settings.metadata_providers %}
-  {%- if mp is string %}
-    {%- set mp_id = salt['hashutil.digest'](mp) %}
-    {%- if mp.startswith('http') %}
-      {#- just a URL, OK for testing, use HTTPS if possible #}
-        <MetadataProvider{{ {
-            'type': 'XML',
-            'validate': 'true',
-            'uri': mp,
-            'backingFilePath': '_%s.xml'|format(mp_id),
-            'reloadInterval': 86400,
-          }|xmlattr }} />
-    {%- else %}
-      {#- assume inline metadata #}
-        <MetadataProvider{{ {
-            'type': 'XML',
-            'validate': 'true',
-            'file': '_%s.xml'|format(mp_id),
-          }|xmlattr }} />
-    {%- endif %}
-  {%- elif mp is mapping %}
-    {%- set mp_id = salt['hashutil.digest'](mp['url']) %}
-        <MetadataProvider{{ {
-            'type': mp['type']|default('XML'),
-            'url': mp['url']|default(None),
-            'backingFilePath': '_%s.xml'|format(mp_id),
-            'maxRefreshDelay': mp['max_refresh_delay']|default(None),
-            'legacyOrgNames':
-              None if 'legacy_org_names' not in mp else
-              'true' if mp['legacy_org_names'] else
-              'false',
-          }|xmlattr }}
-        {%- if mp['metadata_filters']|default([]) != []
-            or mp['discovery_filters']|default([]) != [] %}>
-            {%- for filter in mp['metadata_filters']|default([]) %}
-            <MetadataFilter{{ {
-                'type': filter['type'],
-                'certificate':
-                  '_%s.pem'|format(mp_id) if 'certificate' in filter else
-                  None,
-                'verifyRoles':
-                  None if 'verify_roles' not in filter else
-                  'true' if filter['verify_roles'] else
-                  'false',
-                'verifyName':
-                  None if 'verify_name' not in filter else
-                  'true' if filter['verify_name'] else
-                  'false',
-                'verifyBackup':
-                  None if 'verify_backup' not in filter else
-                  'true' if filter['verify_backup'] else
-                  'false',
-                'matcher': filter['matcher']|default(None),
-                'trimTags':
-                  None if 'trim_tags' not in filter else
-                  'true' if filter['trim_tags'] else
-                  'false',
-                'maxValidityInterval':
-                  filter['max_validity_interval']|default(None),
-                'removeRolelessEntityDescriptors':
-                  None if 'remove_roleless_entity_descriptors' not in filter else
-                  'true' if filter['remove_roleless_entity_descriptors'] else
-                  'false',
-                'removeEmptyEntitiesDescriptors':
-                  None if 'remove_empty_entity_descriptors' not in filter else
-                  'true' if filter['remove_empty_entity_descriptors'] else
-                  'false',
-              }|xmlattr }}
-              {%- if filter['type'] in [
-                  'Whitelist',
-                  'Blacklist',
-                  'EntityRoleWhiteList',
-                  'EntityAttributes',
-              ] %}>
-                {%- for role in filter['retained_roles']|default([]) %}
-                <RetainedRole>{{ role }}</RetainedRole>
-                {%- endfor %}
-                {%- for attribute in filter['attributes']|default([]) %}
-                  {%- set version = attribute['version']|default('saml') %}
-                <{{ version }}:Attribute{{ {
-                    'FriendlyName': attribute['friendly_name']|default(None),
-                    'Name': attribute['name'],
-                    'NameFormat': attribute['name_format']|default(None),
-                  }|xmlattr }}>
-                    {%- for value in attribute['values'] %}
-                      {%- if value is mapping and 'regex' in value %}
-                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
-                      {%- else %}
-                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
-                      {%- endif %}
-                    {%- endfor %}
-                </{{ version }}:Attribute>
-                {%- endfor %}
-                {%- for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
-                  {%- for attribute in attributes %}
-                  {%- set version = attribute['version']|default('saml') %}
-                <{{ version }}:Attribute{{ {
-                    'FriendlyName': attribute['friendly_name']|default(None),
-                    'Name': attribute['name'],
-                    'NameFormat': attribute['name_format']|default(None),
-                  }|xmlattr }}>
-                    {%- for value in attribute['values'] %}
-                      {%- if value is mapping and 'regex' in value %}
-                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
-                      {%- else %}
-                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
-                      {%- endif %}
-                    {%- endfor %}
-                </{{ version }}:Attribute>
-                  {%- endfor %}
-                <Entity>{{ entity }}</Entity>
-                {%- endfor %}
-                {%- for include in filter['include']|default([]) %}
-                <Include>{{ include }}</Include>
-                {%- endfor %}
-                {%- for exclude in filter['exclude']|default([]) %}
-                <Exclude>{{ exclude }}</Exclude>
-                {%- endfor %}
-            </MetadataFilter>
-              {%- else %} />
-              {%- endif %}
-            {%- endfor %}
-            {%- for filter in mp.discovery_filter|default([]) %}
-            <DiscoveryFilter{{ {
-                'type': filter['type'],
-                'matcher': filter['matcher'],
-              }|xmlattr }}>
-                {%- for role in filter['retained_roles']|default([]) %}
-                <RetainedRole>{{ role }}</RetainedRole>
-                {%- endfor %}
-                {%- for attribute in filter['attributes']|default([]) %}
-                  {%- set version = attribute['version']|default('saml') %}
-                <{{ version }}:Attribute{{ {
-                    'FriendlyName': attribute['friendly_name']|default(None),
-                    'Name': attribute['name'],
-                    'NameFormat': attribute['name_format']|default(None),
-                  }|xmlattr }}>
-                    {%- for value in attribute['values'] %}
-                      {%- if value is mapping and 'regex' in value %}
-                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
-                      {%- else %}
-                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
-                      {%- endif %}
-                    {%- endfor %}
-                </{{ version }}:Attribute>
-                {%- endfor %}
-                {%- for entity, attributes in filter['entity_attributes']|default({})|dictsort %}
-                  {%- for attribute in attributes %}
-                  {%- set version = attribute['version']|default('saml') %}
-                <{{ version }}:Attribute{{ {
-                    'FriendlyName': attribute['friendly_name']|default(None),
-                    'Name': attribute['name'],
-                    'NameFormat': attribute['name_format']|default(None),
-                  }|xmlattr }}>
-                    {%- for value in attribute['values'] %}
-                      {%- if value is mapping and 'regex' in value %}
-                    <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
-                      {%- else %}
-                    <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
-                      {%- endif %}
-                    {%- endfor %}
-                </{{ version }}:Attribute>
-                  {%- endfor %}
-                <Entity>{{ entity }}</Entity>
-                {%- endfor %}
-                {%- for include in filter['include']|default([]) %}
-                <Include>{{ include }}</Include>
-                {%- endfor %}
-                {%- for exclude in filter['exclude']|default([]) %}
-                <Exclude>{{ exclude }}</Exclude>
-                {%- endfor %}
-            </DiscoveryFilter>
-            {%- endfor %}
-        </MetadataProvider>
-        {%- else %} />{% endif %}
-  {%- endif %}
-{% endfor %}
-        <!-- Map to extract attributes from SAML assertions. -->
-        <AttributeExtractor type="XML" validate="true" reloadChanges="false" path="attribute-map.xml"/>
-        
-        <!-- Use a SAML query if no attributes are supplied during SSO. -->
-        <AttributeResolver type="Query" subjectMatch="true"/>
-
-        <!-- Default filtering policy for recognized attributes, lets other data pass. -->
-        <AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>
-
-        <!-- Simple file-based resolver for using a single keypair. -->
-        <CredentialResolver type="File" use="encryption" certificate="sp-encryption.crt" key="sp-encryption.key" />
-        <CredentialResolver type="File" use="signing"    certificate="sp-signing.crt"    key="sp-signing.key" />
-
-        {%- for rp in shibsp_settings['relying_parties'] %}
-
-        <RelyingParty{{ {
-            'Name': rp['name']|default(None),
-            'type': rp['type']|default(None),
-            'trimTags':
-              None if 'trim_tags' not in rp else
-              'true' if rp['trim_tags'] else
-              'false',
-            'authType': rp['auth_type']|default(None),
-            'authUsername': rp['auth_username']|default(None),
-            'authPassword': rp['auth_password']|default(None),
-            'signing':
-              None if 'signing' not in rp else
-              rp['signing'] if rp['signing'] is string else
-              'true' if rp['signing'] else
-              'false',
-            'signingAlg': rp['signing_algorithm']|default(None),
-            'digestAlg': rp['digest_algorithm']|default(None),
-            'encryption':
-              None if 'encryption' not in rp else
-              rp['encryption'] if rp['encryption'] is string else
-              'true' if rp['encryption'] else
-              'false',
-            'encryptionAlg': rp['encryption_algorithm']|default(None),
-            'keyName': rp['key_name']|default(None),
-            'artifactEndpointIndex':
-              rp['artifact_endpoint_index']|default(None),
-            'chunkedEncoding':
-              None if 'chunked_encoding' not in rp else
-              'true' if rp['chunked_encoding'] else
-              'false',
-            'connectTimeout':
-              rp['backchannel_connect_timeout']|default(None),
-            'timeout':
-              rp['backchannel_operation_timeout']|default(None),
-            'requireConfidentiality':
-              None if 'backchannel_require_encryption' not in rp else
-              'true' if rp['backchannel_require_encryption'] else
-              'false',
-            'requireSignedAssertions':
-              None if 'require_signed_assertions' not in rp else
-              'true' if rp['require_signed_assertions'] else
-              'false',
-            'requireTransportAuth':
-              None if 'backchannel_require_transport_auth' not in rp else
-              'true' if rp['backchannel_require_transport_auth'] else
-              'false',
-            'sessionHook': rp['session_hook']|default(None),
-            'artifactByFilesystem':
-              None if 'artifact_by_filesystem' not in rp else
-              'true' if rp['artifact_by_filesystem'] else
-              'false',
-            'cipherSuites':
-              rp['backchannel_cipher_suites']|default(None),
-            'authnContextClassRef':
-              rp['authn_context_classes']|default([])|join(' ') or None,
-            'authnContextComparison':
-              rp['authn_context_comparison']|default(None),
-            'NameIDFormat': rp['nameid_format']|default(None),
-            'SPNameQualifier': rp['sp_name_qualifier']|default(None),
-          }|xmlattr }}
-          {%- if 'attributes' in rp
-              or 'registration_authorities' in rp -%}
-        >
-            {%- for attribute in rp['attributes']|default([]) %}
-              {%- set version = attribute['version']|default('saml') %}
-            <{{ version }}:Attribute{{ {
-                'FriendlyName': attribute['friendly_name']|default(None),
-                'Name': attribute['name'],
-                'NameFormat': attribute['name_format']|default(None),
-              }|xmlattr }}>
-              {%- for value in attribute['values'] %}
-                {%- if value is mapping and 'regex' in value %}
-                <{{ version }}:AttributeValue regex="true">{{ value['regex'] }}</{{ version }}:AttributeValue>
-                {%- else %}
-                <{{ version }}:AttributeValue>{{ value }}</{{ version }}:AttributeValue>
-                {%- endif %}
-              {%- endfor %}
-            </{{ version }}:Attribute>
-            {%- endfor %}
-            {%- for ra in rp['registration_authorities']|default([]) %}
-            <registrationAuthority>{{ ra }}</registrationAuthority>
-            {%- endfor %}
-        </RelyingParty>
-          {%- else %} />{% endif %}
-        {%- endfor %}
-
-        <!--
-        The default settings can be overridden by creating ApplicationOverride elements (see
-        the https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApplicationOverride topic).
-        Resource requests are mapped by web server commands, or the RequestMapper, to an
-        applicationId setting.
-        
-        Example of a second application (for a second vhost) that has a different entityID.
-        Resources on the vhost would map to an applicationId of "admin":
-        -->
-        <!--
-        <ApplicationOverride id="admin" entityID="https://admin.example.org/shibboleth"/>
-        -->
-    </ApplicationDefaults>
+{{  generate_application_settings(
+      shibsp_settings.entity_id,
+      app_overrides=shibsp_settings.app_overrides,
+      artifact_by_filesystem=shibsp_settings.artifact_by_filesystem,
+      async_logout=shibsp_settings.async_logout,
+      attribute_map=shibsp_settings.attribute_map,
+      attribute_policy=shibsp_settings.attribute_policy,
+      attribute_resolver=shibsp_settings.attribute_resolver,
+      auth_context_comparison=shibsp_settings.auth_context_comparison,
+      auth_password=shibsp_settings.auth_password,
+      auth_type=shibsp_settings.auth_type,
+      auth_username=shibsp_settings.auth_username,
+      authn_context_classes=shibsp_settings.authn_context_classes,
+      backchannel_cipher_suites=shibsp_settings.backchannel_cipher_suites,
+      backchannel_connect_timeout=shibsp_settings.backchannel_connect_timeout,
+      backchannel_operation_timeout=shibsp_settings.backchannel_operation_timeout,
+      backchannel_require_encryption=shibsp_settings.backchannel_require_encryption,
+      backchannel_require_transport_auth=shibsp_settings.backchannel_require_transport_auth,
+      chunked_encoding=shibsp_settings.chunked_encoding,
+      digest_algorithm=shibsp_settings.digest_algorithm,
+      ecp_enabled=shibsp_settings.ecp_enabled,
+      encryption=shibsp_settings.encryption,
+      encryption_algorithm=shibsp_settings.encryption_algorithm,
+      help_location=shibsp_settings.help_location,
+      metadata_providers=shibsp_settings.metadata_providers,
+      relying_parties=shibsp_settings.relying_parties,
+      remote_user=shibsp_settings.remote_user,
+      require_signed_assertions=shibsp_settings.require_signed_assertions,
+      session_check_address=shibsp_settings.session_check_address,
+      session_cookie_properties=shibsp_settings.session_cookie_properties,
+      session_handler_ssl=shibsp_settings.session_handler_ssl,
+      session_handlers=shibsp_settings.session_handlers,
+      session_hook=shibsp_settings.session_hook,
+      session_idp_history=shibsp_settings.session_idp_history,
+      session_lifetime=shibsp_settings.session_lifetime,
+      session_logout=shibsp_settings.session_logout,
+      session_relay_state=shibsp_settings.session_relay_state,
+      session_sso=shibsp_settings.session_sso,
+      session_timeout=shibsp_settings.session_timeout,
+      signing=shibsp_settings.signing,
+      signing_algorithm=shibsp_settings.signing_algorithm,
+      sp_name_qualifier=shibsp_settings.sp_name_qualifier,
+      sso_default_idp=shibsp_settings.sso_default_idp,
+      sso_discovery_protocol=shibsp_settings.sso_discovery_protocol,
+      style_sheet=shibsp_settings.style_sheet,
+      support_contact=shibsp_settings.support_contact,
+   ) }}
     
     <!-- Policies that determine how to process and authenticate runtime messages. -->
     <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
