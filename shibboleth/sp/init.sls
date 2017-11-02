@@ -50,7 +50,7 @@ shibsp:
 
 ## Handle optional SP keying material.
 {{ generate_sp_keymat_states(
-     app_overrides=shibsp_settings.application_overrides,
+     app_overrides=shibsp_settings.app_overrides,
      confdir=shibsp_settings.confdir,
      dirsep=dirsep,
      encryption_certificate=shibsp_settings.encryption_certificate,

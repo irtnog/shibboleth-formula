@@ -329,4 +329,4 @@ shibboleth:
     ## configuration rules to content by grouping the content into
     ## units called "applications" and then creating settings for
     ## those applications here.
-    application_overrides: {}
+    app_overrides: {}

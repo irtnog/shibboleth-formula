@@ -474,7 +474,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 {%-     endif %}
 {%-   endfor %}
 
-{%-   for app_id, overrides in application_overrides|default({})|dictsort %}
+{%-   for app_id, overrides in app_overrides|default({})|dictsort %}
 
 {{      generate_application_settings(
           app_id=app_id,
