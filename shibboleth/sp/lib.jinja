@@ -307,7 +307,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 
 {%-   endif %}
 
-{%-   for mp in metadata_providers %}
+{%-   for mp in metadata_providers|default([], true) %}
 {%-     if mp is string %}
 {%-       set mp_id = salt.hashutil.digest(mp) %}
 {%-       if mp.startswith('http') %}
