@@ -65,7 +65,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
         - service: shibsp
 {%-   endif %}
 {%-   if app_id == None %}
-{%-     for app_id, overrides in app_overrides|default({})|dictsort
+{%-     for app_id, overrides in app_overrides|default({}, true)|dictsort
         if 'encryption_certificate' in overrides
         or 'signing_certificate' in overrides %}
 {{        generate_sp_keymat_states(
@@ -478,7 +478,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 {%-     endif %}
 {%-   endfor %}
 
-{%-   for app_id, overrides in app_overrides|default({})|dictsort %}
+{%-   for app_id, overrides in app_overrides|default({}, true)|dictsort %}
 
 {{      generate_application_settings(
           app_id=app_id,
