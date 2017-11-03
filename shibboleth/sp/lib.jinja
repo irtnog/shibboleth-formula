@@ -199,7 +199,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 
 {{    '<%s%s>'|format(app_tag, {
         'NameIDFormat': nameid_format,
-        'REMOTE_USER': remote_user|join(' ') or None,
+        'REMOTE_USER': None if remote_user == None else remote_user|join(' '),
         'SPNameQualifier': sp_name_qualifier,
         'artifactByFilesystem': None if artifact_by_filesystem == None else 'true' if artifact_by_filesystem else 'false',
         'artifactEndpointIndex': artifact_endpoint_index,
