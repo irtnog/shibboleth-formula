@@ -263,7 +263,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
             'discoveryURL': sso_discovery_url,
             'entityID': sso_default_idp,
           }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
-{{        session_sso|default([])|join(' ')|indent(indentfirst=True, width=indent+step+step+step) }}
+{{        session_sso|default([], true)|join(' ')|indent(indentfirst=True, width=indent+step+step+step) }}
 {{        '</SSO>'|indent(indentfirst=True, width=indent+step+step) }}
 
 {%-     endif %}
