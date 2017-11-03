@@ -279,7 +279,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 
 {%-     endif %}
 
-{%-     for handler in session_handlers|default([]) %}
+{%-     for handler in session_handlers|default([], true) %}
 
 {{        '<Handler%s/>'|format({
             'Location': handler['location'],
