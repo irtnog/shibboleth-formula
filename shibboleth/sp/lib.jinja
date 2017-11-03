@@ -422,7 +422,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 
 {%-   endif %}
 
-{%-   for rp in relying_parties|default([]) %}
+{%-   for rp in relying_parties|default([], true) %}
 
 {{      '<RelyingParty%s'|format({
           'Name': rp['name']|default(None),
