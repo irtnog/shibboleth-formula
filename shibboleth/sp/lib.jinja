@@ -385,7 +385,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 {%-   if attribute_map != None %}
 
 {{      '<AttributeExtractor type="XML" validate="true" reloadChanges="false" path="%s.xml" />'|format(
-          'attribute-map-%s'|format(app_id) if app_id else 'attribute_map',
+          'attribute-map-%s'|format(app_id) if app_id else 'attribute-map',
         )|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
@@ -403,7 +403,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 {#- TODO: attribute policies, per-app attribute policies #}
 
 {{      '<AttributeFilter type="XML" validate="true" path="%s.xml" />'|format(
-          'attribute-policy-%s'|format(app_id) if app_id else 'attribute_map',
+          'attribute-policy-%s'|format(app_id) if app_id else 'attribute-policy,
         )|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
