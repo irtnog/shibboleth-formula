@@ -309,7 +309,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 
 {%-   for mp in metadata_providers|default([], true) %}
 {%-     if mp is string %}
-{%-       set mp_id = salt.hashutil.digest(mp) %}
+{%-       set mp_id = salt['hashutil.digest'](mp) %}
 {%-       if mp.startswith('http') %}
 {#- just a URL, OK for testing but use HTTPS if possible #}
 
@@ -332,7 +332,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
 
 {%-       endif %}
 {%-     elif mp is mapping %}
-{%-       set mp_id = salt.hashutil.digest(mp['url']) %}
+{%-       set mp_id = salt['hashutil.digest'](mp['url']) %}
 
 {{        '<MetadataProvider%s'|format({
             'backingFilePath': '_%s.xml'|format(mp_id),
