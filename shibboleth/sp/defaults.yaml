@@ -66,6 +66,7 @@ shibboleth:
     session_relay_state: ss:mem
     session_check_address: False
     session_handler_ssl: False
+    session_handler_url: ~
     session_cookie_properties: http
     session_idp_history: ~
     session_sso:

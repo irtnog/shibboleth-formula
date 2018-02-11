@@ -71,6 +71,7 @@
       session_check_address=shibsp_settings.session_check_address,
       session_cookie_properties=shibsp_settings.session_cookie_properties,
       session_handler_ssl=shibsp_settings.session_handler_ssl,
+      session_handler_url=shibsp_settings.session_handler_url,
       session_handlers=shibsp_settings.session_handlers,
       session_hook=shibsp_settings.session_hook,
       session_idp_history=shibsp_settings.session_idp_history,

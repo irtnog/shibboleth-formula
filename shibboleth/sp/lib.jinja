@@ -175,6 +175,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
       session_check_address=None,
       session_cookie_properties=None,
       session_handler_ssl=None,
+      session_handler_url=None,
       session_handlers=None,
       session_hook=None,
       session_idp_history=None,
@@ -231,6 +232,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
       or session_check_address != None
       or session_cookie_properties != None
       or session_handler_ssl != None
+      or session_handler_url != None
       or session_handlers != None
       or session_idp_history != None
       or session_lifetime != None
@@ -247,6 +249,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
           'relayState': session_relay_state,
           'checkAddress': None if session_check_address == None else 'true' if session_check_address else 'false',
           'handlerSSL': None if session_handler_ssl == None else 'true' if session_handler_ssl else 'false',
+          'handlerURL': session_handler_url,
           'cookieProps': session_cookie_properties,
           'idpHistory': None if session_idp_history == None else 'true' if session_idp_history else 'false',
         }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
@@ -517,6 +520,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
           session_check_address=overrides['session_check_address']|default(None),
           session_cookie_properties=overrides['session_cookie_properties']|default(None),
           session_handler_ssl=overrides['session_handler_ssl']|default(None),
+          session_handler_url=overrides['session_handler_url']|default(None),
           session_handlers=overrides['session_handlers']|default(None),
           session_hook=overrides['session_hook']|default(None),
           session_idp_history=overrides['session_idp_history']|default(None),
