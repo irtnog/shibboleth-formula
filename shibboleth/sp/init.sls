@@ -48,7 +48,7 @@ shibsp:
         - pkg: shibsp
         - file: shibsp
 
-## Handle optional SP keying material.
+## Handle SP keying material.
 {{ generate_sp_keymat_states(
      app_overrides=shibsp_settings.app_overrides,
      confdir=shibsp_settings.confdir,
@@ -62,39 +62,22 @@ shibsp:
    ) }}
 
 ## Handle inline metadata signing certificates.
-{%- for mp in shibsp_settings.metadata_providers if mp is mapping %}
-{%-   for filter in mp.metadata_filters|default([]) if filter.type == 'Signature' %}
-{%-     set hash = salt['hashutil.digest'](mp.url) %}
-shibsp_{{ hash }}_signing_certificate:
-  file.managed:
-    - name: {{ '%s%s_%s.pem'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
-    - contents: {{ filter.certificate|yaml_encode }}
-    - user: root
-    - group: {{ shibsp_settings.group|yaml_encode }}
-    - dir_mode: 751
-    - file_mode: 640
-    - require:
-        - file: shibsp
-    - watch_in:
-        - service: shibsp
-{%-   endfor %}
-{%- endfor %}
+{{  generate_sp_metadata_signing_cert_states(
+      app_overrides=shibsp_settings.app_overrides,
+      confdir=shibsp_settings.confdir,
+      dirsep=dirsep,
+      group=shibsp_settings.group,
+      metadata_providers=shibsp_settings.metadata_providers,
+    ) }}
 
 ## Handle inline metadata.
-{%- for mp in shibsp_settings.metadata_providers if mp is string and not mp.startswith('http') %}
-{%-   set hash = salt['hashutil.digest'](mp) %}
-shibsp_inline_metadata_{{ loop.index0 }}:
-  file.managed:
-    - name: {{ '%s%s_%s.xml'|format(shibsp_settings.confdir, dirsep, hash)|yaml_encode }}
-    - contents: {{ mp|yaml_encode }}
-    - user: {{ shibsp_settings.user|yaml_encode }}
-    - group: {{ shibsp_settings.group|yaml_encode }}
-    - file_mode: 640
-    - require:
-        - file: shibsp
-    - watch_in:
-        - service: shibsp
-{%- endfor %}
+{{  generate_sp_inline_metadata_states(
+      app_overrides=shibsp_settings.app_overrides,
+      confdir=shibsp_settings.confdir,
+      dirsep=dirsep,
+      group=shibsp_settings.group,
+      metadata_providers=shibsp_settings.metadata_providers,
+    ) }}
 
 ## Work around bug in the Shibboleth SELinux policy module that
 ## prevents httpd/mod_shib from communicating with shibd.
