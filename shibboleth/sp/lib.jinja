@@ -89,7 +89,7 @@ shibsp_keymat_{{ state_prefix }}signing_key:
       confdir=None,
       dirsep=None,
       group=None,
-      metadata_providers=[],
+      metadata_providers=[]
     ) %}
 {%-   set state_prefix = '' if app_id == None else app_id ~ '_' %}
 {%-   for mp in metadata_providers if mp is mapping %}
@@ -129,7 +129,7 @@ shibsp_metadata_signing_cert_{{ state_prefix }}{{ hash }}:
       confdir=None,
       dirsep=None,
       group=None,
-      metadata_providers=[],
+      metadata_providers=[]
     ) %}
 {%-   set state_prefix = '' if app_id == None else app_id ~ '_' %}
 {%-   for mp in shibsp_settings.metadata_providers
