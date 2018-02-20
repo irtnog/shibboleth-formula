@@ -114,7 +114,7 @@ shibsp_metadata_signing_cert_{{ state_prefix }}{{ hash }}:
         if 'metadata_providers' in overrides %}
 {{        generate_sp_metadata_signing_cert_states(
             app_id=app_id,
-            confdir=confdir
+            confdir=confdir,
             dirsep=dirsep,
             group=group,
             metadata_providers=overrides['metadata_providers'],
@@ -152,7 +152,7 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
         if 'metadata_providers' in overrides %}
 {{        generate_sp_inline_metadata_states(
             app_id=app_id,
-            confdir=confdir
+            confdir=confdir,
             dirsep=dirsep,
             group=group,
             metadata_providers=overrides['metadata_providers'],
