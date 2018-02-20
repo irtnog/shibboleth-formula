@@ -132,7 +132,7 @@ shibsp_metadata_signing_cert_{{ state_prefix }}{{ hash }}:
       metadata_providers=[]
     ) %}
 {%-   set state_prefix = '' if app_id == None else app_id ~ '_' %}
-{%-   for mp in shibsp_settings.metadata_providers
+{%-   for mp in metadata_providers
       if mp is string and not mp.startswith('http') %}
 {%-     set hash = salt['hashutil.digest'](mp) %}
 shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
