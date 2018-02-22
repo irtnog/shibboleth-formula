@@ -47,7 +47,7 @@ shibidp:
     - file_mode: 640
 
   archive.extracted:
-    - name: {{ shibidp_settings.prefix }}/vendor/shibboleth-identity-provider-{{ shibidp_settings.version }}
+    - name: {{ shibidp_settings.prefix }}/vendor
     - source: {{ shibidp_settings.master_site}}/{{ shibidp_settings.version }}/shibboleth-identity-provider-{{ shibidp_settings.version }}{{ shibidp_settings.suffix }}
     - source_hash: {{ shibidp_settings.source_hash[shibidp_settings.suffix] }}
     - user: {{ shibidp_settings.user }}
