@@ -1,19 +1,19 @@
 {% set repo_url =
-    'http://download.opensuse.org/repositories/security:/shibboleth/CentOS_%s'|format(grains['osmajorrelease'])
+    'http://downloadcontent.opensuse.org/repositories/security:/shibboleth/CentOS_%s'|format(grains['osmajorrelease'])
       if grains['os'] in ['CentOS', 'RedHat']
       and grains['osmajorrelease'] >= 7 else
-    'http://download.opensuse.org/repositories/security:/shibboleth/CentOS_CentOS-6'
+    'http://downloadcontent.opensuse.org/repositories/security:/shibboleth/CentOS_CentOS-6'
       if grains['os'] == 'CentOS'
       and grains['osmajorrelease'] == 6 else
-    'http://download.opensuse.org/repositories/security:/shibboleth/CentOS_5'
+    'http://downloadcontent.opensuse.org/repositories/security:/shibboleth/CentOS_5'
       if grains['os'] == 'CentOS'
       and grains['osmajorrelease'] == 5 else
-    'http://download.opensuse.org/repositories/security:/shibboleth/RHEL_%s'|format(grains['osmajorrelease'])
+    'http://downloadcontent.opensuse.org/repositories/security:/shibboleth/RHEL_%s'|format(grains['osmajorrelease'])
       if grains['os'] == 'RedHat'
       and grains['osmajorrelease'] <= 6 else
-    'http://download.opensuse.org/repositories/security:/shibboleth/SLE_%s'|format(grains['osrelease'].replace(' ', '_'))
+    'http://downloadcontent.opensuse.org/repositories/security:/shibboleth/SLE_%s'|format(grains['osrelease'].replace(' ', '_'))
       if grains['os'] == 'SUSE' else
-    'http://download.opensuse.org/repositories/security:/shibboleth/openSUSE_%s'|format(grains['osrelease'].replace(' ', '_'))
+    'http://downloadcontent.opensuse.org/repositories/security:/shibboleth/openSUSE_%s'|format(grains['osrelease'].replace(' ', '_'))
       if grains['os'] == 'openSUSE' else
     'deb http://pkg.switch.ch/switchaai/%s %s main'|format(grains['os']|lower, grains['oscodename'])
       if grains['os'] in ['Debian', 'Ubuntu'] else
