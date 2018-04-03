@@ -180,7 +180,7 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
 {%-       if value is mapping and 'regex' in value %}
 {{          '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(indentfirst=True, width=indent+step) }}
 {%-       else %}
-{{          '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(indentfirst=True, widdth=indent+step) }}
+{{          '<%s:AttributeValue>%s</%s:AttributeValue>'|format(version, value, version)|indent(indentfirst=True, width=indent+step) }}
 {%-       endif %}
 {%-     endfor %}
 {{      '</%s:Attribute>'|format(version)|indent(indentfirst=True, width=indent) }}
