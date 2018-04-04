@@ -172,10 +172,10 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
 {%-   for attribute in filter['attributes']|default([]) %}
 {%-     set version = attribute['version']|default('saml') %}
 {{      '<%s:Attribute%s>'|format(version, {
-        'FriendlyName': attribute['friendly_name']|default(None),
-        'Name': attribute['name'],
-        'NameFormat': attribute['name_format']|default(None),
-      }|xmlattr)|indent(indentfirst=True, width=indent) }}
+          'FriendlyName': attribute['friendly_name']|default(None),
+          'Name': attribute['name'],
+          'NameFormat': attribute['name_format']|default(None),
+        }|xmlattr)|indent(indentfirst=True, width=indent) }}
 {%-     for value in attribute['values'] %}
 {%-       if value is mapping and 'regex' in value %}
 {{          '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(indentfirst=True, width=indent+step) }}
@@ -189,10 +189,10 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
 {%-     for attribute in attributes %}
 {%-       set version = attribute['version']|default('saml') %}
 {{        '<%s:Attribute%s>'|format(version, {
-          'FriendlyName': attribute['friendly_name']|default(None),
-          'Name': attribute['name'],
-          'NameFormat': attribute['name_format']|default(None),
-        }|xmlattr)|indent(indentfirst=True, width=indent) }}
+            'FriendlyName': attribute['friendly_name']|default(None),
+            'Name': attribute['name'],
+            'NameFormat': attribute['name_format']|default(None),
+          }|xmlattr)|indent(indentfirst=True, width=indent) }}
 {%-       for value in attribute['values'] %}
 {%-         if value is mapping and 'regex' in value %}
 {{            '<%s:AttributeValue regex="true">%s</%s:AttributeValue>'|format(version, value['regex'], version)|indent(indentfirst=True, width=indent+step) }}
@@ -355,7 +355,7 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
 {{        '<Logout%s>'|format({
             'asynchronous': None if async_logout == None else 'true' if async_logout else 'false',
           }|xmlattr)|indent(indentfirst=True, width=indent+step+step) }}
-{{          '%s'|format(session_logout|join(' '))|indent(indentfirst=True, width=indent+step+step+step) }}
+{{        '%s'|format(session_logout|join(' '))|indent(indentfirst=True, width=indent+step+step+step) }}
 {{        '</Logout>'|indent(indentfirst=True, width=indent+step+step) }}
 
 {%-     endif %}
@@ -381,9 +381,9 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
       or support_contact != None %}
 
 {{      '<Errors%s/>'|format({
-            'helpLocation': help_location,
-            'styleSheet': style_sheet,
-            'supportContact': support_contact,
+          'helpLocation': help_location,
+          'styleSheet': style_sheet,
+          'supportContact': support_contact,
         }|xmlattr)|indent(indentfirst=True, width=indent+step) }}
 
 {%-   endif %}
