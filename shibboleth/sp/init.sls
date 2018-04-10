@@ -79,6 +79,15 @@ shibsp:
       metadata_providers=shibsp_settings.metadata_providers,
     ) }}
 
+## Handle per-application attribute maps.
+{{  generate_sp_attribute_map_states(
+      app_overrides=shibsp_settings.app_overrides,
+      confdir=shibsp_settings.confdir,
+      dirsep=dirsep,
+      user=shibsp_settings.user,
+      group=shibsp_settings.group,
+    ) }}
+
 ## Work around bug in the Shibboleth SELinux policy module that
 ## prevents httpd/mod_shib from communicating with shibd.
 {%- if grains['os_family'] in [

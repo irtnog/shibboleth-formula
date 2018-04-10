@@ -161,6 +161,33 @@ shibsp_inline_metadata_{{ state_prefix }}{{ hash }}:
 {%-   endif %}
 {%- endmacro %}
 
+{%- macro generate_sp_attribute_map_states(
+      app_overrides={},
+      confdir=None,
+      dirsep=None,
+      user=None,
+      group=None
+    ) %}
+{%- for app_id, overrides in app_overrides|dictsort
+    if 'attribute_map' in overrides %}
+shibsp_attribute_map_{{ app_id }}:
+  file.managed:
+    - name: {{ '%s%sattribute-map-%s.xml'|format(confdir, dirsep, app_id)|yaml_encode }}
+    - source: salt://shibboleth/sp/files/attribute-map.xml
+    - template: jinja
+    - context:
+        attribute_map: {{ overrides['attribute_map']|yaml }}
+    - user: {{ user|yaml_encode }}
+    - group: {{ group|yaml_encode }}
+    - dir_mode: 751
+    - file_mode: 640
+    - require:
+        - file: shibsp
+    - watch_in:
+        - service: shibsp
+{%-   endfor %}
+{%- endmacro %}
+
 {%- macro generate_filter_rule(
       filter,
       indent=4,
