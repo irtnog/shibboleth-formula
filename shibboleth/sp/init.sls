@@ -1,5 +1,5 @@
 {%- from "shibboleth/sp/map.jinja" import shibsp_settings with context %}
-{%- from "shibboleth/sp/lib.jinja" import generate_sp_keymat_states, generate_sp_metadata_signing_cert_states, generate_sp_inline_metadata_states with context %}
+{%- from "shibboleth/sp/lib.jinja" import generate_sp_keymat_states, generate_sp_metadata_signing_cert_states, generate_sp_inline_metadata_states, generate_sp_attribute_map_states with context %}
 {%- set dirsep = '\\' if grains['os_family'] == 'Windows' else '/' %}
 
 shibsp:
