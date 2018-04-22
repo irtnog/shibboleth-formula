@@ -29,29 +29,29 @@
 ### described in OSHA 1910.145,
 ### https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_table=standards&p_id=9794.
 
-{%- from "shibboleth/idp/map.jinja" import shibidp_settings with context %}
+{%- from "shibboleth/idp/map.jinja" import shibidp with context %}
 
 shibidp:
   pkg.installed:
-    - pkgs: {{ shibidp_settings.packages|yaml }}
+    - pkgs: {{ shibidp.packages|yaml }}
 
   file.recurse:
-    - name: {{ shibidp_settings.prefix }}
+    - name: {{ shibidp.prefix }}
     - source: salt://shibboleth/idp/files
     - template: jinja
     - include_empty: yes
     - exclude_pat: E@\.gitignore
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
+    - user: {{ shibidp.user }}
+    - group: {{ shibidp.group }}
     - dir_mode: 750
     - file_mode: 640
 
   archive.extracted:
-    - name: {{ shibidp_settings.prefix }}/vendor
-    - source: {{ shibidp_settings.master_site}}/{{ shibidp_settings.version }}/shibboleth-identity-provider-{{ shibidp_settings.version }}{{ shibidp_settings.suffix }}
-    - source_hash: {{ shibidp_settings.source_hash[shibidp_settings.suffix] }}
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
+    - name: {{ shibidp.prefix }}/vendor
+    - source: {{ shibidp.master_site}}/{{ shibidp.version }}/shibboleth-identity-provider-{{ shibidp.version }}{{ shibidp.suffix }}
+    - source_hash: {{ shibidp.source_hash[shibidp.suffix] }}
+    - user: {{ shibidp.user }}
+    - group: {{ shibidp.group }}
     - keep: yes
     - require:
         - file: shibidp
@@ -59,8 +59,8 @@ shibidp:
   cmd.script:
     - source: salt://shibboleth/idp/scripts/install.sh
     - template: jinja
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
+    - user: {{ shibidp.user }}
+    - group: {{ shibidp.group }}
     - require:
         - pkg: shibidp
     - onchanges:
@@ -68,8 +68,8 @@ shibidp:
 
   cron.present:
     - identifier: shibidp_update_sealer_key
-    - name: /bin/sh {{ shibidp_settings.prefix }}/bin/update-sealer-key.sh
-    - user: {{ shibidp_settings.user }}
+    - name: /bin/sh {{ shibidp.prefix }}/bin/update-sealer-key.sh
+    - user: {{ shibidp.user }}
     - minute: random
     - hour: random
     - comment: "Update the Shibboleth Identity Provider data sealer key once per day."
@@ -82,13 +82,13 @@ shibidp:
 ## installer-generated keymat with the real keymat stored in Pillar.
 shibidp_keymat:
   file.recurse:
-    - name: {{ shibidp_settings.prefix }}/credentials
+    - name: {{ shibidp.prefix }}/credentials
     - source: salt://shibboleth/idp/keymat
     - template: jinja
     - include_empty: yes
     - exclude_pat: E@\.gitignore
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
+    - user: {{ shibidp.user }}
+    - group: {{ shibidp.group }}
     - dir_mode: 750
     - file_mode: 640
     - require:
@@ -106,13 +106,13 @@ shibidp_keymat:
   cmd.run:
     - name:
         openssl pkcs12 -export -password env:SHIBIDP_KEYSTORE_PASSWORD
-          -out   {{ shibidp_settings.prefix }}/credentials/idp-backchannel.p12
-          -in    {{ shibidp_settings.prefix }}/credentials/idp-backchannel.crt
-          -inkey {{ shibidp_settings.prefix }}/credentials/idp-backchannel.key
+          -out   {{ shibidp.prefix }}/credentials/idp-backchannel.p12
+          -in    {{ shibidp.prefix }}/credentials/idp-backchannel.crt
+          -inkey {{ shibidp.prefix }}/credentials/idp-backchannel.key
     - env:
         - SHIBIDP_KEYSTORE_PASSWORD:
-            {{ shibidp_settings.keystore_password|yaml_encode }}
-    - runas: {{ shibidp_settings.user }}
+            {{ shibidp.keystore_password|yaml_encode }}
+    - runas: {{ shibidp.user }}
     - onchanges:
         - file: shibidp_keymat
 
@@ -134,15 +134,15 @@ shibidp_bash_symlink:
 {%- endif %}
 
 ## Handle inline metadata.
-{%- for mp in shibidp_settings.metadata_providers
+{%- for mp in shibidp.metadata_providers
     if mp is string and not mp.startswith('http') %}
 {%-   set mp_id = salt['hashutil.digest'](mp) %}
 shibidp_inline_metadata_{{ loop.index0 }}:
   file.managed:
-    - name: {{ shibidp_settings.prefix }}/metadata/{{ mp_id }}.xml
+    - name: {{ shibidp.prefix }}/metadata/{{ mp_id }}.xml
     - contents: {{ mp|yaml_encode }}
-    - user: {{ shibidp_settings.user }}
-    - group: {{ shibidp_settings.group }}
+    - user: {{ shibidp.user }}
+    - group: {{ shibidp.group }}
     - file_mode: 640            # FIXME: too strict?
     - require:
         - file: shibidp

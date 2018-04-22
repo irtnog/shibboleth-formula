@@ -1,2 +1,2 @@
-{%- from "xmlsectool/map.jinja" import xmlsectool_settings with context -%}
-{{ xmlsectool_settings.signing_certificate }}
+{%- from "xmlsectool/map.jinja" import xmlsectool with context -%}
+{{ xmlsectool.signing_certificate }}

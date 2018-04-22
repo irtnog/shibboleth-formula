@@ -1,4 +1,4 @@
-{%- from "shibboleth/idp/map.jinja" import shibidp_settings with context -%}
+{%- from "shibboleth/idp/map.jinja" import shibidp with context -%}
 {%- from "shibboleth/idp/lib.jinja" import generate_rp_profile with context -%}
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -24,7 +24,7 @@
         <property name="profileConfigurations">
             <list>
             <!-- <bean parent="SAML2.SSO" p:encryptAssertions="false" /> -->
-{%- for profile in shibidp_settings.unverified_rp_profiles %}{{ generate_rp_profile(profile, indent=16) }}{%- endfor %}
+{%- for profile in shibidp.unverified_rp_profiles %}{{ generate_rp_profile(profile, indent=16) }}{%- endfor %}
             </list>
         </property>
     </bean>
@@ -36,7 +36,7 @@
     <bean id="shibboleth.DefaultRelyingParty" parent="RelyingParty">
         <property name="profileConfigurations">
             <list>
-{%- for profile in shibidp_settings.default_rp_profiles %}{{ generate_rp_profile(profile, indent=16) }}{%- endfor %}
+{%- for profile in shibidp.default_rp_profiles %}{{ generate_rp_profile(profile, indent=16) }}{%- endfor %}
             </list>
         </property>
     </bean>
@@ -59,7 +59,7 @@
         </bean>
         -->
 {#- This manually generates XML attributes because SpEL isn't markup-safe. #}
-{%- for rp in shibidp_settings.rp_profile_overrides %}
+{%- for rp in shibidp.rp_profile_overrides %}
 {%- set parent = rp['parent']|default('RelyingPartyByName') %}
 {%- if parent == 'RelyingPartyByName' %}
 {%- set rp_ids =

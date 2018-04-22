@@ -1,4 +1,4 @@
-{%- from "shibboleth/idp/map.jinja" import shibidp_settings with context -%}
+{%- from "shibboleth/idp/map.jinja" import shibidp with context -%}
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This file is an EXAMPLE metadata configuration file. -->
 <MetadataProvider id="ShibbolethMetadata" xsi:type="ChainingMetadataProvider"
@@ -68,7 +68,7 @@
     <!--
     <MetadataProvider id="LocalMetadata"  xsi:type="FilesystemMetadataProvider" metadataFile="PATH_TO_YOUR_METADATA"/>
     -->
-{% for mp in shibidp_settings.metadata_providers %}
+{% for mp in shibidp.metadata_providers %}
   {%- if mp is string %}
     {%- set mp_id = salt['hashutil.digest'](mp) %}
     {%- if mp.startswith('http') %}

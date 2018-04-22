@@ -8,5 +8,8 @@
 
 {% do default_settings.shibboleth.mda.update(os_family_map) %}
 
-{% set shibmda_settings = salt['pillar.get']('shibboleth:mda',
+{% set shibmda = salt['pillar.get']('shibboleth:mda',
   default=default_settings.shibboleth.mda, merge=True) %}
+
+{#- NOTE: for backwards compatibility #}
+{% set shibmda_settings = shibmda %}

@@ -2,20 +2,20 @@
 
    THIS FILE IS MANAGED BY SALT.  Any changes to it will be
    overwritten during the next state run. */
-{%- from "shibboleth/ds/map.jinja" import shibds_settings %}
+{%- from "shibboleth/ds/map.jinja" import shibds %}
 
 /** @class IdP Selector UI */
 function IdPSelectUIParms(){
-    this.alwaysShow = {{ 'true' if shibds_settings.always_show else 'false' }};
-    this.dataSource = '{{ shibds_settings.data_source }}';
-    this.defaultLanguage = '{{ shibds_settings.default_language }}';
-    this.defaultLogo = '{{ shibds_settings.default_logo }}';
-    this.defaultLogoWidth = {{ shibds_settings.default_logo_width }};
-    this.defaultLogoHeight = {{ shibds_settings.default_logo_height }};
-    this.defaultReturn = {{ 'null' if shibds_settings.default_return == None else "'%s'"|format(shibds_settings.default_return) }};
-    this.defaultReturnIDParam = {{ 'null' if shibds_settings.default_return_id_param == None else "'%s'"|format(shibds_settings.default_return) }};
-    this.helpURL = '{{ shibds_settings.help_url }}';
-{%- for hack in shibds_settings.ie6_hack %}
+    this.alwaysShow = {{ 'true' if shibds.always_show else 'false' }};
+    this.dataSource = '{{ shibds.data_source }}';
+    this.defaultLanguage = '{{ shibds.default_language }}';
+    this.defaultLogo = '{{ shibds.default_logo }}';
+    this.defaultLogoWidth = {{ shibds.default_logo_width }};
+    this.defaultLogoHeight = {{ shibds.default_logo_height }};
+    this.defaultReturn = {{ 'null' if shibds.default_return == None else "'%s'"|format(shibds.default_return) }};
+    this.defaultReturnIDParam = {{ 'null' if shibds.default_return_id_param == None else "'%s'"|format(shibds.default_return) }};
+    this.helpURL = '{{ shibds.help_url }}';
+{%- for hack in shibds.ie6_hack %}
 {%- if loop.first %}
     this.ie6Hack = [
 {%- endif %}
@@ -28,10 +28,10 @@ function IdPSelectUIParms(){
 {%- else %}
     this.ie6Hack = null;
 {%- endfor %}
-    this.insertAtDiv = '{{ shibds_settings.insert_at_div }}';
-    this.maxResults = {{ shibds_settings.max_results }};
-    this.myEntityID = {{ 'null' if shibds_settings.my_entity_id == None else "'%s'"|format(shibds_settings.my_entity_id) }};
-{%- for entity_id in shibds_settings.preferred_idps %}
+    this.insertAtDiv = '{{ shibds.insert_at_div }}';
+    this.maxResults = {{ shibds.max_results }};
+    this.myEntityID = {{ 'null' if shibds.my_entity_id == None else "'%s'"|format(shibds.my_entity_id) }};
+{%- for entity_id in shibds.preferred_idps %}
 {%- if loop.first %}
     this.preferredIdP = [
 {%- endif %}
@@ -44,7 +44,7 @@ function IdPSelectUIParms(){
 {%- else %}
     this.preferredIdP = null;
 {%- endfor %}
-{%- for entity_id in shibds_settings.hidden_idps %}
+{%- for entity_id in shibds.hidden_idps %}
 {%- if loop.first %}
     this.hiddenIdPs = [
 {%- endif %}
@@ -57,11 +57,11 @@ function IdPSelectUIParms(){
 {%- else %}
     this.hiddenIdPs = null;
 {%- endfor %}
-    this.ignoreKeywords = {{ 'true' if shibds_settings.ignore_keywords else 'false' }};
-    this.showListFirst = {{ 'true' if shibds_settings.show_list_first else 'false' }};
-    this.samlIdPCookieTTL = {{ shibds_settings.saml_idp_cookie_ttl }};
-    this.setFocusTextBox = {{ 'true' if shibds_settings.set_focus_text_box else 'false' }};
-    this.testGUI = {{ 'true' if shibds_settings.test_gui else 'false' }};
+    this.ignoreKeywords = {{ 'true' if shibds.ignore_keywords else 'false' }};
+    this.showListFirst = {{ 'true' if shibds.show_list_first else 'false' }};
+    this.samlIdPCookieTTL = {{ shibds.saml_idp_cookie_ttl }};
+    this.setFocusTextBox = {{ 'true' if shibds.set_focus_text_box else 'false' }};
+    this.testGUI = {{ 'true' if shibds.test_gui else 'false' }};
 
 {%- set language_bundle_setting_map = {
     'fatal_div_missing': 'fatal.divMissing',
@@ -85,7 +85,7 @@ function IdPSelectUIParms(){
     'help_text': 'helpText',
     'default_logo_alt': 'defaultLogoAlt'
   } %}
-{%- for lang, settings in shibds_settings.language_bundles|dictsort %}
+{%- for lang, settings in shibds.language_bundles|dictsort %}
 {%- if loop.first %}
     this.langBundles = {
 {%- endif %}
@@ -129,16 +129,16 @@ function IdPSelectUIParms(){
     //};
 {%- endfor %}
 
-    this.maxPreferredIdPs = {{ shibds_settings.max_preferred_idps }};
-    this.maxIdPCharsButton = {{ shibds_settings.max_idp_chars_button }};
-    this.maxIdPCharsDropDown = {{ shibds_settings.max_idp_chars_dropdown }};
-    this.maxIdPCharsAltTxt = {{ shibds_settings.max_idp_chars_alt_text }};
+    this.maxPreferredIdPs = {{ shibds.max_preferred_idps }};
+    this.maxIdPCharsButton = {{ shibds.max_idp_chars_button }};
+    this.maxIdPCharsDropDown = {{ shibds.max_idp_chars_dropdown }};
+    this.maxIdPCharsAltTxt = {{ shibds.max_idp_chars_alt_text }};
 
-    this.minWidth = {{ shibds_settings.min_width }};
-    this.minHeight = {{ shibds_settings.min_height }};
-    this.maxWidth = {{ shibds_settings.max_width }};
-    this.maxHeight = {{ shibds_settings.max_height }};
-    this.bestRatio = {{ shibds_settings.best_ratio }};
+    this.minWidth = {{ shibds.min_width }};
+    this.minHeight = {{ shibds.min_height }};
+    this.maxWidth = {{ shibds.max_width }};
+    this.maxHeight = {{ shibds.max_height }};
+    this.bestRatio = {{ shibds.best_ratio }};
 }
 
 /* IDPSELECT_CONFIG.JS ends here. */

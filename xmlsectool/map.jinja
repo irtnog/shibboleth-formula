@@ -8,5 +8,8 @@
 
 {% do default_settings.xmlsectool.update(os_family_map) %}
 
-{% set xmlsectool_settings = salt['pillar.get']('xmlsectool',
+{% set xmlsectool = salt['pillar.get']('xmlsectool',
   default=default_settings.xmlsectool, merge=True) %}
+
+{#- NOTE: for backwards compatibility #}
+{% set xmlsectool_settings = xmlsectool %}

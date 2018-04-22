@@ -1,4 +1,4 @@
-{%- from "shibboleth/idp/map.jinja" import shibidp_settings with context -%}
+{%- from "shibboleth/idp/map.jinja" import shibidp with context -%}
 {%- from "shibboleth/idp/lib.jinja" import generate_policy with context -%}
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
@@ -47,7 +47,7 @@
         </AttributeRule>
     </AttributeFilterPolicy>
     -->
-    {% for afp in shibidp_settings.attribute_filter_policies %}
+    {% for afp in shibidp.attribute_filter_policies %}
     <AttributeFilterPolicy{{ {
         'id': '_%s'|format(loop.index),
       }|xmlattr }}>{{ generate_policy('PolicyRequirementRule', afp.if) }}

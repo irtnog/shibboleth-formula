@@ -8,5 +8,8 @@
 
 {% do default_settings.shibboleth.idp.update(os_family_map) %}
 
-{% set shibidp_settings = salt['pillar.get']('shibboleth:idp',
+{% set shibidp = salt['pillar.get']('shibboleth:idp',
   default=default_settings.shibboleth.idp, merge=True) %}
+
+{#- NOTE: for backwards compatibility #}
+{% set shibidp_settings = shibidp %}

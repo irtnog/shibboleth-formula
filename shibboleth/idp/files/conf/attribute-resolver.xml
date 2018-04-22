@@ -1,4 +1,4 @@
-{%- from "shibboleth/idp/map.jinja" import shibidp_settings with context -%}
+{%- from "shibboleth/idp/map.jinja" import shibidp with context -%}
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
     This file is an EXAMPLE configuration file. While the configuration
@@ -89,7 +89,7 @@
         <resolver:AttributeEncoder xsi:type="enc:SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.9" friendlyName="eduPersonScopedAffiliation" encodeType="false" />
     </resolver:AttributeDefinition>
     -->
-{% for attrdef in shibidp_settings.resolver_attribute_definitions %}
+{% for attrdef in shibidp.resolver_attribute_definitions %}
     <resolver:AttributeDefinition{{ {
         'id': attrdef['id'],
         'xsi:type': attrdef['type'],
@@ -134,7 +134,7 @@
         </dc:Attribute>
     </resolver:DataConnector>
     -->
-{% for dataconn in shibidp_settings.resolver_data_connectors %}
+{% for dataconn in shibidp.resolver_data_connectors %}
     <resolver:DataConnector{{ {
         'id': dataconn['id'],
         'xsi:type': dataconn['type'],

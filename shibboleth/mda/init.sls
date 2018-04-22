@@ -1,16 +1,16 @@
-{% from "shibboleth/mda/map.jinja" import shibmda_settings with context %}
+{% from "shibboleth/mda/map.jinja" import shibmda with context %}
 {% set dirsep = '\\' if grains['os'] == 'Windows' else '/' %}
-{% set destdir = '%s%saggregator-cli-%s'|format(shibmda_settings.prefix, dirsep, shibmda_settings.dist_version) %}
+{% set destdir = '%s%saggregator-cli-%s'|format(shibmda.prefix, dirsep, shibmda.dist_version) %}
 
 shibmda:
   pkg.installed:
-    - pkgs: {{ shibmda_settings.packages|yaml }}
+    - pkgs: {{ shibmda.packages|yaml }}
 
   archive.extracted:
     - if_missing: {{ destdir }}
-    - name: {{ shibmda_settings.prefix }}
-    - source: {{ shibmda_settings.master_site }}/aggregator-cli-{{ shibmda_settings.dist_version }}-bin.zip
-    - source_hash: {{ shibmda_settings.source_hash }}
+    - name: {{ shibmda.prefix }}
+    - source: {{ shibmda.master_site }}/aggregator-cli-{{ shibmda.dist_version }}-bin.zip
+    - source_hash: {{ shibmda.source_hash }}
     - archive_format: zip
     - keep: yes
 
@@ -21,12 +21,12 @@ shibmda:
     - context:
         dirsep: {{ dirsep|yaml_encode }}
         destdir: {{ destdir|yaml_encode }}
-        schemas: {{ shibmda_settings.schemas|yaml }}
-        private_key: {{ shibmda_settings.signing_key|yaml_encode }}
-        all_entities_aggregate: {{ shibmda_settings.all_entities_aggregate|yaml_encode }}
-        idp_entities_aggregate: {{ shibmda_settings.idp_entities_aggregate|yaml_encode }}
-        sp_entities_aggregate: {{ shibmda_settings.sp_entities_aggregate|yaml_encode }}
-        validity_period: {{ shibmda_settings.validity_period|yaml_encode }}
+        schemas: {{ shibmda.schemas|yaml }}
+        private_key: {{ shibmda.signing_key|yaml_encode }}
+        all_entities_aggregate: {{ shibmda.all_entities_aggregate|yaml_encode }}
+        idp_entities_aggregate: {{ shibmda.idp_entities_aggregate|yaml_encode }}
+        sp_entities_aggregate: {{ shibmda.sp_entities_aggregate|yaml_encode }}
+        validity_period: {{ shibmda.validity_period|yaml_encode }}
     - include_empty: yes
     - exclude_pat: E@\.gitignore
     - user: root
@@ -38,7 +38,7 @@ shibmda:
 
   ## Refresh the aggregates now instead of waiting for the cron job.
   cmd.run:
-    - name: java {{ shibmda_settings.jvmopts }} -classpath {{ ['lib', '*']|join(dirsep)|yaml_squote }} net.shibboleth.metadata.cli.SimpleCommandLine {{ ['etc', 'config.xml']|join(dirsep)|yaml_squote }} main
+    - name: java {{ shibmda.jvmopts }} -classpath {{ ['lib', '*']|join(dirsep)|yaml_squote }} net.shibboleth.metadata.cli.SimpleCommandLine {{ ['etc', 'config.xml']|join(dirsep)|yaml_squote }} main
     - cwd: {{ destdir|yaml_encode }}
     - env:
         UMASK: '022'
@@ -51,7 +51,7 @@ shibmda:
 {% if grains['os'] != 'Windows' %}
   cron.present:
     - identifier: shibmda
-    - name: cd {{ destdir|yaml_squote }} && chronic java {{ shibmda_settings.jvmopts }} -classpath {{ ['lib', '*']|join(dirsep)|yaml_squote }} net.shibboleth.metadata.cli.SimpleCommandLine {{ ['etc', 'config.xml']|join(dirsep)|yaml_squote }} main
+    - name: cd {{ destdir|yaml_squote }} && chronic java {{ shibmda.jvmopts }} -classpath {{ ['lib', '*']|join(dirsep)|yaml_squote }} net.shibboleth.metadata.cli.SimpleCommandLine {{ ['etc', 'config.xml']|join(dirsep)|yaml_squote }} main
     - minute: random
 {% else %}
 ## TODO
@@ -78,7 +78,7 @@ shibmda_source_metadata:
 ## Don't bother cleaning up stale schema definitions because only the
 ## files referenced directly in config.xml get used for validation
 ## (unlike source metadata).
-{% for schema in shibmda_settings.schemas %}
+{% for schema in shibmda.schemas %}
 shibmda_schema_{{ loop.index0 }}:
   file.managed:
     - name: {{ [destdir, 'schema', '%s.xsd'|format(loop.index0)]|join(dirsep)|yaml_encode }}

@@ -31,8 +31,11 @@
 
 {%- do default_settings.shibboleth.sp.update(os_family_map) %}
 
-{%- set shibsp_settings = salt['pillar.get'](
+{%- set shibsp = salt['pillar.get'](
       'shibboleth:sp',
       default=default_settings.shibboleth.sp,
       merge=True,
     ) %}
+
+{#- NOTE: for backwards compatibility #}
+{% set shibsp_settings = shibsp %}

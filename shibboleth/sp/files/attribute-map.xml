@@ -1,7 +1,7 @@
-{%- from "shibboleth/sp/map.jinja" import shibsp_settings with context -%}
+{%- from "shibboleth/sp/map.jinja" import shibsp with context -%}
 
 {%- if attribute_map is not defined -%}
-{%-   set attribute_map = shibsp_settings.attribute_map -%}
+{%-   set attribute_map = shibsp.attribute_map -%}
 {%- endif -%}
 
 <Attributes xmlns="urn:mace:shibboleth:2.0:attribute-map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">

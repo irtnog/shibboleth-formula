@@ -1,15 +1,15 @@
-{% from "xmlsectool/map.jinja" import xmlsectool_settings with context %}
-{% set destdir = '%s/xmlsectool-%s'|format(xmlsectool_settings.prefix, xmlsectool_settings.dist_version) %}
+{% from "xmlsectool/map.jinja" import xmlsectool with context %}
+{% set destdir = '%s/xmlsectool-%s'|format(xmlsectool.prefix, xmlsectool.dist_version) %}
 
 xmlsectool:
   pkg.installed:
-    - pkgs: {{ xmlsectool_settings.packages|yaml }}
+    - pkgs: {{ xmlsectool.packages|yaml }}
 
   archive.extracted:
     - if_missing: {{ destdir }}
-    - name: {{ xmlsectool_settings.prefix }}
-    - source: {{ xmlsectool_settings.master_site }}/xmlsectool-{{ xmlsectool_settings.dist_version }}-bin.zip
-    - source_hash: {{ xmlsectool_settings.source_hash }}
+    - name: {{ xmlsectool.prefix }}
+    - source: {{ xmlsectool.master_site }}/xmlsectool-{{ xmlsectool.dist_version }}-bin.zip
+    - source_hash: {{ xmlsectool.source_hash }}
     - archive_format: zip
     - keep: yes
 
@@ -26,7 +26,7 @@ xmlsectool:
     - require:
         - archive: xmlsectool
 
-{% for entity, metadata in xmlsectool_settings.entities|dictsort %}
+{% for entity, metadata in xmlsectool.entities|dictsort %}
 xmlsectool_entity_{{ loop.index0 }}:
   file.managed:
     - name: {{ destdir }}/metadata/unsigned/{{ entity }}.xml

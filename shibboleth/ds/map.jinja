@@ -11,5 +11,8 @@
 
 {% do default_settings.shibboleth.ds.update(os_family_map) %}
 
-{% set shibds_settings = salt['pillar.get']('shibboleth:ds',
+{% set shibds = salt['pillar.get']('shibboleth:ds',
   default=default_settings.shibboleth.ds, merge=True) %}
+
+{#- NOTE: for backwards compatibility #}
+{% set shibds_settings = shibds %}
