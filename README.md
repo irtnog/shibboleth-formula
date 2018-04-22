@@ -18,6 +18,11 @@ of protected online resources in a privacy-preserving manner.
   Installs and configures the Shibboleth Identity Provider (IdP).
   Currently, only very simple attribute generation and attribute
   release rules are supported.
+  
+* **tomcat.shibboleth-idp**
+
+  Deploys the Shibboleth IdP using Tomcat; requires
+  [tomcat-formula](https://github.com/saltstack-formulas/tomcat-formula).
 
 * **shibboleth.mda**
 
@@ -193,9 +198,9 @@ One must set the following Pillar keys in order to use this state:
 The IdP must be hosted by a suitable Java servlet container, such as
 Tomcat's Catalina or Jetty.  For an example Tomcat configuration,
 please refer to
-[pillar.example from tomcat-formula](https://github.com/irtnog/tomcat-formula/blob/master/pillar.example)
+[pillar.example from tomcat-formula](https://github.com/saltstack-formulas/tomcat-formula/blob/master/pillar.example)
 as well as the "glue" state
-[tomcat.shibboleth-idp](https://github.com/irtnog/tomcat-formula/blob/master/tomcat/shibboleth-idp.sls).
+[tomcat.shibboleth-idp](blob/master/tomcat/shibboleth-idp.sls).
 
 Likewise, the SP interfaces with the web server.  For example, the
 following configures Apache httpd 2.4 to authenticate users via

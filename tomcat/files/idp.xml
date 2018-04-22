@@ -1,0 +1,2 @@
+{%- from "shibboleth/idp/map.jinja" import shibidp with context -%}
+<Context docBase="{{ shibidp.prefix }}/war/idp.war" antiResourceLocking="false" privileged="true" swallowOutput="true"/>
