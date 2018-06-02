@@ -3,7 +3,7 @@ shibboleth:
     packages:
       - shibboleth-embedded-ds
     dist_version:               # don't forget to update map.jinja
-      1.1.0                     # when updating the version number
+      1.2.0                     # when updating the version number
     user:
       root
     group:
