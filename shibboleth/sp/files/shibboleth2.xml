@@ -87,6 +87,7 @@
       sp_name_qualifier=shibsp.sp_name_qualifier,
       sso_default_idp=shibsp.sso_default_idp,
       sso_discovery_protocol=shibsp.sso_discovery_protocol,
+      sso_discovery_url=shibsp.sso_discovery_url,
       style_sheet=shibsp.style_sheet,
       support_contact=shibsp.support_contact,
    ) }}

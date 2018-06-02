@@ -347,7 +347,8 @@ shibsp_attribute_map_{{ app_id }}:
       or session_sso != None
       or session_timeout != None
       or sso_default_idp != None
-      or sso_discovery_protocol != None %}
+      or sso_discovery_protocol != None
+      or sso_discovery_url != None %}
 
 {{      '<Sessions%s>'|format({
           'lifetime': session_lifetime,
@@ -642,6 +643,7 @@ shibsp_attribute_map_{{ app_id }}:
           sp_name_qualifier=overrides['sp_name_qualifier']|default(None),
           sso_default_idp=overrides['sso_default_idp']|default(None),
           sso_discovery_protocol=overrides['sso_discovery_protocol']|default(None),
+          sso_discovery_url=overrides['sso_discovery_url']|default(None),
           style_sheet=overrides['style_sheet']|default(None),
           support_contact=overrides['support_contact']|default(None),
           indent=indent+step,
