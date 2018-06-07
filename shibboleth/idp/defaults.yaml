@@ -130,12 +130,12 @@ shibboleth:
     ## attribute-resolver.xml
     resolver_attribute_definitions:
       - id: uid
-        type: ad:PrincipalName
+        type: PrincipalName
         attribute_encoders:
-          - type: enc:SAML1String
+          - type: SAML1String
             name: urn:mace:dir:attribute-def:uid
             encode_type: False
-          - type: enc:SAML2String
+          - type: SAML2String
             name: urn:oid:0.9.2342.19200300.100.1.1
             friendly_name: uid
             encode_type: False
