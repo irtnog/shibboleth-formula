@@ -1,0 +1,9 @@
+name: shibboleth
+os: Debian, Ubuntu, RedHat, CentOS, Suse, openSUSE, FreeBSD, Windows
+os_family: Debian, RedHat, Suse, FreeBSD, Windows
+version: 1.0.0
+release: 1
+minimum_version: 2019.02
+summary: Shibboleth formula
+description: Deploy the SAML IdP and SP from the Shibboleth Project
+top_level_dir: shibboleth
